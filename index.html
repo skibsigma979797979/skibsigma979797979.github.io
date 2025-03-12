@@ -1,27 +1,24 @@
-# Cat Display on Button Click
+# Random Button Game
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cat Display</title>
-    <style>
-        #catImage {
-            display: none;
-            width: 300px;
-            height: auto;
+    <title>Random Button Game</title>
+    <script>
+        function checkButton(button) {
+            const correctButton = Math.random() < 0.5 ? 'button1' : 'button2';
+            if (button === correctButton) {
+                alert('Good job!');
+            } else {
+                alert('You lose!');
+            }
         }
-    </style>
+    </script>
 </head>
 <body>
-    <button id="showCatButton">Show Cat</button>
-    <img id="catImage" src="https://placekitten.com/300/200" alt="Cute Cat">
-
-    <script>
-        document.getElementById('showCatButton').onclick = function() {
-            document.getElementById('catImage').style.display = 'block';
-        };
-    </script>
+    <button id="button1" onclick="checkButton('button1')">Button 1</button>
+    <button id="button2" onclick="checkButton('button2')">Button 2</button>
 </body>
 </html>
