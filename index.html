@@ -1,39 +1,32 @@
-# Random Button Game
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Random Button Game</title>
+    <title>Jumpscare Buttons</title>
     <style>
-        button {
+        .button {
             margin: 5px;
             padding: 10px 20px;
             font-size: 16px;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
-    <h1>Random Button Game</h1>
-    <div id="buttonContainer"></div>
-    <p id="result"></p>
+    <div id="button-container">
+        <!-- JavaScript will generate buttons here -->
+    </div>
 
     <script>
-        const buttonContainer = document.getElementById('buttonContainer');
-        const result = document.getElementById('result');
-
-        for (let i = 0; i < 300; i++) {
+        for (let i = 1; i <= 300; i++) {
             const button = document.createElement('button');
-            button.textContent = Math.random() < 0.5 ? 'Button 1' : 'Button 2';
+            button.className = 'button';
+            button.innerText = `Button ${i}`;
             button.onclick = function() {
-                if (button.textContent === 'Button 1') {
-                    result.textContent = 'Good Job!';
-                } else {
-                    result.textContent = 'You Lose!';
-                }
+                alert('JUMPSCARE');
             };
-            buttonContainer.appendChild(button);
+            document.getElementById('button-container').appendChild(button);
         }
     </script>
 </body>
