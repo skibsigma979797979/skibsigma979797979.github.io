@@ -6,19 +6,35 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Random Button Game</title>
-    <script>
-        function checkButton(button) {
-            const correctButton = Math.random() < 0.5 ? 'button1' : 'button2';
-            if (button === correctButton) {
-                alert('Good job!');
-            } else {
-                alert('You lose!');
-            }
+    <style>
+        button {
+            margin: 5px;
+            padding: 10px 20px;
+            font-size: 16px;
         }
-    </script>
+    </style>
 </head>
 <body>
-    <button id="button1" onclick="checkButton('button1')">Button 1</button>
-    <button id="button2" onclick="checkButton('button2')">Button 2</button>
+    <h1>Random Button Game</h1>
+    <div id="buttonContainer"></div>
+    <p id="result"></p>
+
+    <script>
+        const buttonContainer = document.getElementById('buttonContainer');
+        const result = document.getElementById('result');
+
+        for (let i = 0; i < 300; i++) {
+            const button = document.createElement('button');
+            button.textContent = Math.random() < 0.5 ? 'Button 1' : 'Button 2';
+            button.onclick = function() {
+                if (button.textContent === 'Button 1') {
+                    result.textContent = 'Good Job!';
+                } else {
+                    result.textContent = 'You Lose!';
+                }
+            };
+            buttonContainer.appendChild(button);
+        }
+    </script>
 </body>
 </html>
