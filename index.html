@@ -3,30 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jumpscare Buttons</title>
+    <title>I Love You Mom</title>
     <style>
-        .button {
+        button {
             margin: 5px;
-            padding: 10px 20px;
+            padding: 10px;
             font-size: 16px;
-            cursor: pointer;
         }
     </style>
 </head>
 <body>
+    <h1>I Love You Mom</h1>
     <div id="button-container">
         <!-- JavaScript will generate buttons here -->
     </div>
 
     <script>
-        for (let i = 1; i <= 300; i++) {
+        const container = document.getElementById('button-container');
+        for (let i = 0; i < 300; i++) {
             const button = document.createElement('button');
-            button.className = 'button';
-            button.innerText = `Button ${i}`;
+            button.innerText = 'I Love You Mom';
             button.onclick = function() {
-                alert('JUMPSCARE');
+                alert('I love you mom with all my heart');
             };
-            document.getElementById('button-container').appendChild(button);
+            container.appendChild(button);
         }
     </script>
 </body>
