@@ -1,14 +1,27 @@
-# HTML Buttons Example
+# Cat Display on Button Click
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Button Example</title>
+    <title>Cat Display</title>
+    <style>
+        #catImage {
+            display: none;
+            width: 300px;
+            height: auto;
+        }
+    </style>
 </head>
 <body>
-    <button onclick="alert('Hello!')">Hello</button>
-    <button onclick="alert('Bye!')">Bye</button>
+    <button id="showCatButton">Show Cat</button>
+    <img id="catImage" src="https://placekitten.com/300/200" alt="Cute Cat">
+
+    <script>
+        document.getElementById('showCatButton').onclick = function() {
+            document.getElementById('catImage').style.display = 'block';
+        };
+    </script>
 </body>
 </html>
