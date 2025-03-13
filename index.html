@@ -1,55 +1,31 @@
+# Base64 Translator
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Base64 Phrase Generator</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        button {
-            margin: 5px;
-            padding: 10px;
-        }
-    </style>
+    <title>Base64 Translator</title>
 </head>
 <body>
-
-    <h1>Base64 Phrase Generator</h1>
-
-    <div id="buttons"></div>
-
-    <input type="text" id="base64Input" placeholder="Enter Base64">
-    <button onclick="translateBase64()">Translate</button>
-    <p id="translationResult"></p>
+    <h1>Base64 Translator</h1>
+    <input type="text" id="inputText" placeholder="Enter text here">
+    <button onclick="encodeToBase64()">Encode to Base64</button>
+    <button onclick="decodeFromBase64()">Decode from Base64</button>
+    <p id="result"></p>
 
     <script>
-        const phrases = [
-            "Hello, World!", "Welcome to the future.", "Base64 is fun!", "Learning is a journey.",
-            "Coding is like poetry.", "HTML is the backbone of the web.", "JavaScript brings it to life.",
-            "CSS makes it beautiful.", "Web development is creative.", "Let's build something amazing!",
-            // Add more phrases up to 301
-        ];
-
-        const buttonsDiv = document.getElementById('buttons');
-
-        for (let i = 0; i < 301; i++) {
-            const phrase = phrases[i % phrases.length];
-            const base64Phrase = btoa(phrase);
-            const button = document.createElement('button');
-            button.innerText = base64Phrase;
-            button.onclick = () => alert(base64Phrase);
-            buttonsDiv.appendChild(button);
+        function encodeToBase64() {
+            const input = document.getElementById('inputText').value;
+            const encoded = btoa(input);
+            document.getElementById('result').innerText = encoded;
         }
 
-        function translateBase64() {
-            const input = document.getElementById('base64Input').value;
+        function decodeFromBase64() {
+            const input = document.getElementById('inputText').value;
             const decoded = atob(input);
-            document.getElementById('translationResult').innerText = decoded;
+            document.getElementById('result').innerText = decoded;
         }
     </script>
-
 </body>
 </html>
