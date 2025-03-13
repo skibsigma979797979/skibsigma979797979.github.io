@@ -1,25 +1,91 @@
-# AI Implementation
+# AI Chatbot
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Implementation</title>
+    <title>AI Chatbot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        #chatbox {
+            width: 100%;
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        #messages {
+            height: 300px;
+            overflow-y: scroll;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        #userInput {
+            width: calc(100% - 22px);
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        #sendButton {
+            padding: 10px 15px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
-    <h1>Welcome to AI Implementation</h1>
-    <p>This is a simple AI interface.</p>
-    <input type="text" id="userInput" placeholder="Type your query here...">
-    <button onclick="processInput()">Submit</button>
-    <div id="response"></div>
 
-    <script>
-        function processInput() {
-            const input = document.getElementById('userInput').value;
-            const responseDiv = document.getElementById('response');
-            responseDiv.innerHTML = `You asked: ${input}`;
+<div id="chatbox">
+    <div id="messages"></div>
+    <input type="text" id="userInput" placeholder="Ask me anything...">
+    <button id="sendButton">Send</button>
+</div>
+
+<script>
+    const messages = document.getElementById('messages');
+    const userInput = document.getElementById('userInput');
+    const sendButton = document.getElementById('sendButton');
+
+    sendButton.addEventListener('click', () => {
+        const userText = userInput.value;
+        if (userText) {
+            appendMessage('You: ' + userText);
+            getAIResponse(userText);
+            userInput.value = '';
         }
-    </script>
+    });
+
+    function appendMessage(text) {
+        const messageElement = document.createElement('div');
+        messageElement.textContent = text;
+        messages.appendChild(messageElement);
+        messages.scrollTop = messages.scrollHeight;
+    }
+
+    function getAIResponse(userText) {
+        // Simulated AI response
+        const responses = {
+            "hello": "Hello! How can I assist you today?",
+            "how are you?": "I'm just a program, but thanks for asking!",
+            "what is your name?": "I am an AI chatbot created to help you.",
+            "bye": "Goodbye! Have a great day!"
+        };
+        const response = responses[userText.toLowerCase()] || "I'm sorry, I don't understand that.";
+        appendMessage('AI: ' + response);
+    }
+</script>
+
 </body>
 </html>
