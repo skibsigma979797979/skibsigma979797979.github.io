@@ -3,8 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Random Base64 Generator</title>
+    <title>Base64 Phrase Generator</title>
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
         button {
             margin: 5px;
             padding: 10px;
@@ -12,32 +16,40 @@
     </style>
 </head>
 <body>
-    <div id="button-container"></div>
-    <div id="output"></div>
+
+    <h1>Base64 Phrase Generator</h1>
+
+    <div id="buttons"></div>
+
+    <input type="text" id="base64Input" placeholder="Enter Base64">
+    <button onclick="translateBase64()">Translate</button>
+    <p id="translationResult"></p>
 
     <script>
-        function generateRandomString(length) {
-            const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-            let result = '';
-            for (let i = 0; i < length; i++) {
-                result += characters.charAt(Math.floor(Math.random() * characters.length));
-            }
-            return result;
-        }
+        const phrases = [
+            "Hello, World!", "Welcome to the future.", "Base64 is fun!", "Learning is a journey.",
+            "Coding is like poetry.", "HTML is the backbone of the web.", "JavaScript brings it to life.",
+            "CSS makes it beautiful.", "Web development is creative.", "Let's build something amazing!",
+            // Add more phrases up to 301
+        ];
 
-        function displayRandomBase64() {
-            const randomString = generateRandomString(10);
-            const base64String = btoa(randomString);
-            document.getElementById('output').innerText = base64String;
-        }
+        const buttonsDiv = document.getElementById('buttons');
 
-        const buttonContainer = document.getElementById('button-container');
-        for (let i = 0; i < 300; i++) {
+        for (let i = 0; i < 301; i++) {
+            const phrase = phrases[i % phrases.length];
+            const base64Phrase = btoa(phrase);
             const button = document.createElement('button');
-            button.innerText = `Button ${i + 1}`;
-            button.onclick = displayRandomBase64;
-            buttonContainer.appendChild(button);
+            button.innerText = base64Phrase;
+            button.onclick = () => alert(base64Phrase);
+            buttonsDiv.appendChild(button);
+        }
+
+        function translateBase64() {
+            const input = document.getElementById('base64Input').value;
+            const decoded = atob(input);
+            document.getElementById('translationResult').innerText = decoded;
         }
     </script>
+
 </body>
 </html>
