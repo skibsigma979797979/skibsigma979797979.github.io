@@ -4,22 +4,52 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Base64 Phrase Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        button {
+            margin: 5px;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Base64 Phrase Generator</h1>
+
+    <div id="buttons"></div>
+
+    <input type="text" id="base64Input" placeholder="Enter Base64">
+    <button onclick="translateBase64()">Translate</button>
+    <p id="translationResult"></p>
+
     <script>
-        function generateBase64(index) {
-            const phrases = [
-                "Hello World", "Goodbye", "Welcome", "Thank You", "Have a Nice Day",
-                "Programming is Fun", "HTML is Awesome", "JavaScript Rocks", "CSS is Cool",
-                "Let's Code", "Stay Curious", "Keep Learning", "Embrace Challenges",
-                "Think Outside the Box", "Innovate", "Create", "Inspire", "Motivate",
-                "Achieve Greatness", "Believe in Yourself", "Dream Big", "Stay Positive",
-                "Work Hard", "Stay Focused", "Never Give Up", "Be Kind", "Help Others",
-                "Make a Difference", "Lead by Example", "Be the Change", "Stay Humble",
-                "Keep Smiling", "Enjoy the Journey", "Live in the Moment", "Cherish Memories",
-                "Explore New Horizons", "Seek Adventure", "Find Your Passion", "Follow Your Dreams",
-                "Stay True to Yourself", "Be Authentic", "Cultivate Gratitude", "Spread Love",
-                "Practice Mindfulness", "Stay Resilient", "Adapt to Change", "Overcome Obstacles",
-                "Face Your Fears", "Take Risks", "Learn from Failure", "Celebrate Success",
-                "Value Relationships", "Build Trust", "Communicate Effectively", "Listen Actively",
-                "Be Open-Minded", "Embrace Diversity", "Foster Collaboration", "Encourage Creativity",
-                "Support Each Other", "Share Knowledge", "Be Resourceful", "Think Critically",
-                "
+        const phrases = [
+            "Hello, World!", "Welcome to the future.", "Base64 is fun!", "Learning is a journey.",
+            "Coding is like poetry.", "HTML is the backbone of the web.", "JavaScript brings it to life.",
+            "CSS makes it beautiful.", "Web development is creative.", "Let's build something amazing!",
+            // Add more phrases up to 301
+        ];
+
+        const buttonsDiv = document.getElementById('buttons');
+
+        for (let i = 0; i < 301; i++) {
+            const phrase = phrases[i % phrases.length];
+            const base64Phrase = btoa(phrase);
+            const button = document.createElement('button');
+            button.innerText = base64Phrase;
+            button.onclick = () => alert(base64Phrase);
+            buttonsDiv.appendChild(button);
+        }
+
+        function translateBase64() {
+            const input = document.getElementById('base64Input').value;
+            const decoded = atob(input);
+            document.getElementById('translationResult').innerText = decoded;
+        }
+    </script>
+
+</body>
+</html>
