@@ -1,61 +1,47 @@
-# Minecraft HTML Representation
+# Playable Version of Minecraft
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minecraft</title>
+    <title>Mini Minecraft</title>
     <style>
         body {
-            background-color: #87CEEB;
-            font-family: Arial, sans-serif;
-            text-align: center;
-        }
-        .grass {
-            background-color: #4CAF50;
-            width: 100%;
-            height: 50px;
-            position: relative;
-            top: 300px;
-        }
-        .dirt {
-            background-color: #8B4513;
-            width: 100%;
-            height: 50px;
-            position: relative;
-            top: 250px;
-        }
-        .block {
-            width: 50px;
-            height: 50px;
-            display: inline-block;
             margin: 0;
+            overflow: hidden;
+            background-color: #87CEEB;
+        }
+        #gameCanvas {
             border: 1px solid #000;
-        }
-        .grass-block {
-            background-color: #4CAF50;
-        }
-        .dirt-block {
             background-color: #8B4513;
         }
     </style>
 </head>
 <body>
-    <h1>Welcome to Minecraft</h1>
-    <div class="dirt">
-        <div class="block dirt-block"></div>
-        <div class="block dirt-block"></div>
-        <div class="block dirt-block"></div>
-        <div class="block dirt-block"></div>
-        <div class="block dirt-block"></div>
-    </div>
-    <div class="grass">
-        <div class="block grass-block"></div>
-        <div class="block grass-block"></div>
-        <div class="block grass-block"></div>
-        <div class="block grass-block"></div>
-        <div class="block grass-block"></div>
-    </div>
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        const player = {
+            x: 400,
+            y: 300,
+            size: 20,
+            color: 'green'
+        };
+
+        function drawPlayer() {
+            ctx.fillStyle = player.color;
+            ctx.fillRect(player.x, player.y, player.size, player.size);
+        }
+
+        function update() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawPlayer();
+        }
+
+        setInterval(update, 1000 / 60);
+    </script>
 </body>
 </html>
