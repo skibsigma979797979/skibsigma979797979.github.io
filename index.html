@@ -1,32 +1,25 @@
-# Base64 Translator
+# AI Implementation
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Base64 Translator</title>
+    <title>AI Implementation</title>
 </head>
 <body>
-    <h1>Base64 Translator</h1>
-    <input type="text" id="inputText" placeholder="Enter text here">
-    <button onclick="encodeToBase64()">Encode to Base64</button>
-    <button onclick="decodeFromBase64()">Decode from Base64</button>
-    <p id="result"></p>
+    <h1>Welcome to AI Implementation</h1>
+    <p>This is a simple AI interface.</p>
+    <input type="text" id="userInput" placeholder="Type your query here...">
+    <button onclick="processInput()">Submit</button>
+    <div id="response"></div>
 
     <script>
-        function encodeToBase64() {
-            const input = document.getElementById('inputText').value;
-            const encoded = btoa(input);
-            document.getElementById('result').innerText = encoded;
-        }
-
-        function decodeFromBase64() {
-            const input = document.getElementById('inputText').value;
-            const decoded = atob(input);
-            document.getElementById('result').innerText = decoded;
+        function processInput() {
+            const input = document.getElementById('userInput').value;
+            const responseDiv = document.getElementById('response');
+            responseDiv.innerHTML = `You asked: ${input}`;
         }
     </script>
 </body>
 </html>
-
