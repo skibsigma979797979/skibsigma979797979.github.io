@@ -1,39 +1,46 @@
-# AI Chatbot
+# Kahoot Game
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Chatbot</title>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <style>
-        body { font-family: Arial, sans-serif; }
-        #chatbox { width: 300px; height: 400px; border: 1px solid #ccc; overflow-y: scroll; padding: 10px; }
-        #userInput { width: 300px; }
-    </style>
+    <title>Kahoot Game</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-
-<h1>Ask the AI Anything!</h1>
-<div id="chatbox"></div>
-<input type="text" id="userInput" placeholder="Type your question here...">
-<button id="sendBtn">Send</button>
-
-<script>
-    $(document).ready(function() {
-        $('#sendBtn').click(function() {
-            var userQuestion = $('#userInput').val();
-            $('#chatbox').append('<div>User: ' + userQuestion + '</div>');
-            $('#userInput').val('');
-
-            $.get('https://api.example.com/search?q=' + encodeURIComponent(userQuestion), function(data) {
-                $('#chatbox').append('<div>AI: ' + data.answer + '</div>');
-                $('#chatbox').scrollTop($('#chatbox')[0].scrollHeight);
-            });
-        });
-    });
-</script>
-
+    <header>
+        <h1>Welcome to Kahoot!</h1>
+    </header>
+    <main>
+        <section id="game-setup">
+            <h2>Set Up Your Game</h2>
+            <form id="kahoot-form">
+                <label for="game-title">Game Title:</label>
+                <input type="text" id="game-title" name="game-title" required>
+                
+                <label for="question">Question:</label>
+                <input type="text" id="question" name="question" required>
+                
+                <label for="option1">Option 1:</label>
+                <input type="text" id="option1" name="option1" required>
+                
+                <label for="option2">Option 2:</label>
+                <input type="text" id="option2" name="option2" required>
+                
+                <label for="option3">Option 3:</label>
+                <input type="text" id="option3" name="option3" required>
+                
+                <label for="option4">Option 4:</label>
+                <input type="text" id="option4" name="option4" required>
+                
+                <button type="submit">Create Kahoot</button>
+            </form>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2023 Kahoot Game. All rights reserved.</p>
+    </footer>
+    <script src="script.js"></script>
 </body>
 </html>
