@@ -1,46 +1,61 @@
-# Kahoot Game
+# Minecraft HTML Representation
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kahoot Game</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Minecraft</title>
+    <style>
+        body {
+            background-color: #87CEEB;
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        .grass {
+            background-color: #4CAF50;
+            width: 100%;
+            height: 50px;
+            position: relative;
+            top: 300px;
+        }
+        .dirt {
+            background-color: #8B4513;
+            width: 100%;
+            height: 50px;
+            position: relative;
+            top: 250px;
+        }
+        .block {
+            width: 50px;
+            height: 50px;
+            display: inline-block;
+            margin: 0;
+            border: 1px solid #000;
+        }
+        .grass-block {
+            background-color: #4CAF50;
+        }
+        .dirt-block {
+            background-color: #8B4513;
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <h1>Welcome to Kahoot!</h1>
-    </header>
-    <main>
-        <section id="game-setup">
-            <h2>Set Up Your Game</h2>
-            <form id="kahoot-form">
-                <label for="game-title">Game Title:</label>
-                <input type="text" id="game-title" name="game-title" required>
-                
-                <label for="question">Question:</label>
-                <input type="text" id="question" name="question" required>
-                
-                <label for="option1">Option 1:</label>
-                <input type="text" id="option1" name="option1" required>
-                
-                <label for="option2">Option 2:</label>
-                <input type="text" id="option2" name="option2" required>
-                
-                <label for="option3">Option 3:</label>
-                <input type="text" id="option3" name="option3" required>
-                
-                <label for="option4">Option 4:</label>
-                <input type="text" id="option4" name="option4" required>
-                
-                <button type="submit">Create Kahoot</button>
-            </form>
-        </section>
-    </main>
-    <footer>
-        <p>&copy; 2023 Kahoot Game. All rights reserved.</p>
-    </footer>
-    <script src="script.js"></script>
+    <h1>Welcome to Minecraft</h1>
+    <div class="dirt">
+        <div class="block dirt-block"></div>
+        <div class="block dirt-block"></div>
+        <div class="block dirt-block"></div>
+        <div class="block dirt-block"></div>
+        <div class="block dirt-block"></div>
+    </div>
+    <div class="grass">
+        <div class="block grass-block"></div>
+        <div class="block grass-block"></div>
+        <div class="block grass-block"></div>
+        <div class="block grass-block"></div>
+        <div class="block grass-block"></div>
+    </div>
 </body>
 </html>
