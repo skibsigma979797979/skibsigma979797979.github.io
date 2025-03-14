@@ -17,70 +17,75 @@
         <option value="binary">Binary</option>
         <option value="hex">Hex</option>
     </select>
-    <textarea id="inputText" placeholder="Enter text here..."></textarea>
+    <textarea id="inputText" placeholder="Enter text or upload an image..."></textarea>
     <button onclick="encode()">Encode</button>
     <button onclick="decode()">Decode</button>
     <button onclick="copyToClipboard()">Copy to Clipboard</button>
-    <input type="file" id="imageInput" accept="image/*">
-    <button onclick="encodeImage()">Encode Image</button>
+    <input type="file" id="fileInput" accept="image/*">
+    <button onclick="uploadImage()">Upload Image</button>
     <button onclick="decodeImage()">Decode Image</button>
-    <div id="output"></div>
+    <div>
+        <h3>Output:</h3>
+        <textarea id="outputText" readonly></textarea>
+    </div>
 
     <script>
         function encode() {
             const input = document.getElementById('inputText').value;
-            const language = document.getElementById('languageSelect').value;
+            const selectedLanguage = document.getElementById('languageSelect').value;
             let output;
-            if (language === 'base64') {
+
+            if (selectedLanguage === 'base64') {
                 output = btoa(input);
-            } else if (language === 'binary') {
+            } else if (selectedLanguage === 'binary') {
                 output = input.split('').map(char => char.charCodeAt(0).toString(2)).join(' ');
-            } else if (language === 'hex') {
+            } else if (selectedLanguage === 'hex') {
                 output = input.split('').map(char => char.charCodeAt(0).toString(16)).join(' ');
             }
-            document.getElementById('output').innerText = output;
+
+            document.getElementById('outputText').value = output;
         }
 
         function decode() {
             const input = document.getElementById('inputText').value;
-            const language = document.getElementById('languageSelect').value;
+            const selectedLanguage = document.getElementById('languageSelect').value;
             let output;
-            if (language === 'base64') {
+
+            if (selectedLanguage === 'base64') {
                 output = atob(input);
-            } else if (language === 'binary') {
+            } else if (selectedLanguage === 'binary') {
                 output = input.split(' ').map(bin => String.fromCharCode(parseInt(bin, 2))).join('');
-            } else if (language === 'hex') {
+            } else if (selectedLanguage === 'hex') {
                 output = input.split(' ').map(hex => String.fromCharCode(parseInt(hex, 16))).join('');
             }
-            document.getElementById('output').innerText = output;
+
+            document.getElementById('outputText').value = output;
         }
 
         function copyToClipboard() {
-            const output = document.getElementById('output').innerText;
-            navigator.clipboard.writeText(output);
+            const output = document.getElementById('outputText');
+            output.select();
+            document.execCommand('copy');
         }
 
-        function encodeImage() {
-            const file = document.getElementById('imageInput').files[0];
+        function uploadImage() {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function(event) {
+                const base64String = event.target.result.split(',')[1];
+                document.getElementById('inputText').value = base64String;
+            };
+
             if (file) {
-                const reader = new FileReader();
-                reader.onloadend = function() {
-                    document.getElementById('output').innerText = reader.result.split(',')[1];
-                }
                 reader.readAsDataURL(file);
             }
         }
 
         function decodeImage() {
-            const data = document.getElementById('output').innerText;
-            if (data) {
-                const img = new Image();
-                img.src = 'data:image/png;base64,' + data;
-                img.onload = function() {
-                    alert('Image decoded and ready to view.');
-                    document.body.appendChild(img);
-                }
-            }
+            const base64String = document.getElementById('inputText').value;
+            alert('Decoded Image: ' + base64String);
         }
     </script>
 </body>
