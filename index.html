@@ -1,3 +1,5 @@
+# Base64, Binary, and Hex Encoder/Decoder
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -20,26 +22,21 @@
     <textarea id="inputText" placeholder="Enter text here..."></textarea>
     <button onclick="encode()">Encode</button>
     <button onclick="decode()">Decode</button>
-    <button onclick="alertDecoded()">Alert Decoded</button>
+    <h2>Output:</h2>
+    <textarea id="outputText" readonly></textarea>
     <button onclick="copyToClipboard()">Copy to Clipboard</button>
-    <input type="file" id="fileInput" accept="image/*">
-    <button onclick="encodeImage()">Encode Image</button>
-    <div>
-        <h3>Output:</h3>
-        <textarea id="outputText" readonly></textarea>
-    </div>
 
     <script>
         function encode() {
             const input = document.getElementById('inputText').value;
-            const selectedLanguage = document.getElementById('languageSelect').value;
-            let output;
+            const language = document.getElementById('languageSelect').value;
+            let output = '';
 
-            if (selectedLanguage === 'base64') {
+            if (language === 'base64') {
                 output = btoa(input);
-            } else if (selectedLanguage === 'binary') {
+            } else if (language === 'binary') {
                 output = input.split('').map(char => char.charCodeAt(0).toString(2)).join(' ');
-            } else if (selectedLanguage === 'hex') {
+            } else if (language === 'hex') {
                 output = input.split('').map(char => char.charCodeAt(0).toString(16)).join(' ');
             }
 
@@ -48,41 +45,24 @@
 
         function decode() {
             const input = document.getElementById('inputText').value;
-            const selectedLanguage = document.getElementById('languageSelect').value;
-            let output;
+            const language = document.getElementById('languageSelect').value;
+            let output = '';
 
-            if (selectedLanguage === 'base64') {
+            if (language === 'base64') {
                 output = atob(input);
-            } else if (selectedLanguage === 'binary') {
+            } else if (language === 'binary') {
                 output = input.split(' ').map(bin => String.fromCharCode(parseInt(bin, 2))).join('');
-            } else if (selectedLanguage === 'hex') {
+            } else if (language === 'hex') {
                 output = input.split(' ').map(hex => String.fromCharCode(parseInt(hex, 16))).join('');
             }
 
             document.getElementById('outputText').value = output;
         }
 
-        function alertDecoded() {
-            const output = document.getElementById('outputText').value;
-            alert(output);
-        }
-
         function copyToClipboard() {
             const output = document.getElementById('outputText');
             output.select();
             document.execCommand('copy');
-        }
-
-        function encodeImage() {
-            const fileInput = document.getElementById('fileInput');
-            const file = fileInput.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onloadend = function() {
-                    document.getElementById('outputText').value = reader.result.split(',')[1];
-                }
-                reader.readAsDataURL(file);
-            }
         }
     </script>
 </body>
