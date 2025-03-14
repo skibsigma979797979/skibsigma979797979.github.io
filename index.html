@@ -20,66 +20,43 @@
         <option value="hex">Hex</option>
     </select>
     <textarea id="inputText" placeholder="Enter text here..."></textarea>
-    <button id="encodeButton">Encode to English</button>
-    <button id="decodeButton">Decode to English</button>
-    <textarea id="outputText" placeholder="Output will appear here..." readonly></textarea>
+    <button onclick="encode()">Encode</button>
+    <button onclick="decode()">Decode</button>
+    <h2>Output:</h2>
+    <textarea id="outputText" readonly></textarea>
 
     <script>
-        function encodeBase64(str) {
-            return btoa(str);
-        }
-
-        function decodeBase64(str) {
-            return atob(str);
-        }
-
-        function encodeBinary(str) {
-            return str.split('').map(char => char.charCodeAt(0).toString(2)).join(' ');
-        }
-
-        function decodeBinary(str) {
-            return str.split(' ').map(bin => String.fromCharCode(parseInt(bin, 2))).join('');
-        }
-
-        function encodeHex(str) {
-            return str.split('').map(char => char.charCodeAt(0).toString(16)).join(' ');
-        }
-
-        function decodeHex(str) {
-            return str.split(' ').map(hex => String.fromCharCode(parseInt(hex, 16))).join('');
-        }
-
-        document.getElementById('encodeButton').addEventListener('click', function() {
+        function encode() {
             const input = document.getElementById('inputText').value;
             const selectedLanguage = document.getElementById('languageSelect').value;
-            let output = '';
+            let output;
 
             if (selectedLanguage === 'base64') {
-                output = encodeBase64(input);
+                output = btoa(input);
             } else if (selectedLanguage === 'binary') {
-                output = encodeBinary(input);
+                output = input.split('').map(char => char.charCodeAt(0).toString(2)).join(' ');
             } else if (selectedLanguage === 'hex') {
-                output = encodeHex(input);
+                output = input.split('').map(char => char.charCodeAt(0).toString(16)).join(' ');
             }
 
             document.getElementById('outputText').value = output;
-        });
+        }
 
-        document.getElementById('decodeButton').addEventListener('click', function() {
+        function decode() {
             const input = document.getElementById('inputText').value;
             const selectedLanguage = document.getElementById('languageSelect').value;
-            let output = '';
+            let output;
 
             if (selectedLanguage === 'base64') {
-                output = decodeBase64(input);
+                output = atob(input);
             } else if (selectedLanguage === 'binary') {
-                output = decodeBinary(input);
+                output = input.split(' ').map(bin => String.fromCharCode(parseInt(bin, 2))).join('');
             } else if (selectedLanguage === 'hex') {
-                output = decodeHex(input);
+                output = input.split(' ').map(hex => String.fromCharCode(parseInt(hex, 16))).join('');
             }
 
             document.getElementById('outputText').value = output;
-        });
+        }
     </script>
 </body>
 </html>
