@@ -3,99 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Encoder/Decoder</title>
+    <title>Base64, Binary, and Hex Encoder/Decoder</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        #output, #languageOutput { display: none; }
+        body { font-family: Arial, sans-serif; }
+        #output { margin-top: 20px; }
     </style>
 </head>
 <body>
-    <h1>Base64, Binary, and Hex Encoder/Decoder</h1>
-    <div id="passwordSection">
-        <label for="password">Enter Password:</label>
-        <input type="password" id="password" />
+    <h1>Encoder/Decoder</h1>
+    <div id="password-section">
+        <input type="password" id="password" placeholder="Enter password">
         <button onclick="checkPassword()">Submit</button>
     </div>
-    
-    <div id="mainSection" style="display:none;">
-        <select id="languageSelect">
+    <div id="main-section" style="display:none;">
+        <select id="language">
             <option value="base64">Base64</option>
             <option value="binary">Binary</option>
             <option value="hex">Hex</option>
         </select>
-        <textarea id="inputText" placeholder="Enter text here..."></textarea>
+        <textarea id="input" placeholder="Enter text here"></textarea>
         <button onclick="encode()">Encode</button>
         <button onclick="decode()">Decode</button>
-        <button onclick="clearOutput()">Clear</button>
         <button onclick="copyToClipboard()">Copy to Clipboard</button>
-        
-        <h3>Output:</h3>
+        <button onclick="clearOutput()">Clear</button>
         <div id="output"></div>
-        
-        <h3>Language/English Output:</h3>
-        <div id="languageOutput"></div>
     </div>
 
     <script>
         function checkPassword() {
             const password = document.getElementById('password').value;
             if (password === 'skibidi') {
-                document.getElementById('passwordSection').style.display = 'none';
-                document.getElementById('mainSection').style.display = 'block';
+                document.getElementById('password-section').style.display = 'none';
+                document.getElementById('main-section').style.display = 'block';
             } else {
-                alert('Incorrect Password');
+                alert('Incorrect password');
             }
         }
 
         function encode() {
-            const text = document.getElementById('inputText').value;
-            const selectedLanguage = document.getElementById('languageSelect').value;
-            let encodedText;
-
-            if (selectedLanguage === 'base64') {
-                encodedText = btoa(text);
-            } else if (selectedLanguage === 'binary') {
-                encodedText = text.split('').map(char => char.charCodeAt(0).toString(2)).join(' ');
-            } else if (selectedLanguage === 'hex') {
-                encodedText = text.split('').map(char => char.charCodeAt(0).toString(16)).join(' ');
+            const input = document.getElementById('input').value;
+            const language = document.getElementById('language').value;
+            let output;
+            if (language === 'base64') {
+                output = btoa(input);
+            } else if (language === 'binary') {
+                output = input.split('').map(char => char.charCodeAt(0).toString(2)).join(' ');
+            } else if (language === 'hex') {
+                output = input.split('').map(char => char.charCodeAt(0).toString(16)).join(' ');
             }
-
-            document.getElementById('output').innerText = encodedText;
-            document.getElementById('languageOutput').innerText = text;
-            document.getElementById('output').style.display = 'block';
-            document.getElementById('languageOutput').style.display = 'block';
+            document.getElementById('output').innerText = output;
         }
 
         function decode() {
-            const text = document.getElementById('inputText').value;
-            const selectedLanguage = document.getElementById('languageSelect').value;
-            let decodedText;
-
-            if (selectedLanguage === 'base64') {
-                decodedText = atob(text);
-            } else if (selectedLanguage === 'binary') {
-                decodedText = text.split(' ').map(bin => String.fromCharCode(parseInt(bin, 2))).join('');
-            } else if (selectedLanguage === 'hex') {
-                decodedText = text.split(' ').map(hex => String.fromCharCode(parseInt(hex, 16))).join('');
+            const input = document.getElementById('input').value;
+            const language = document.getElementById('language').value;
+            let output;
+            if (language === 'base64') {
+                output = atob(input);
+            } else if (language === 'binary') {
+                output = input.split(' ').map(bin => String.fromCharCode(parseInt(bin, 2))).join('');
+            } else if (language === 'hex') {
+                output = input.split(' ').map(hex => String.fromCharCode(parseInt(hex, 16))).join('');
             }
-
-            document.getElementById('output').innerText = decodedText;
-            document.getElementById('languageOutput').innerText = decodedText;
-            document.getElementById('output').style.display = 'block';
-            document.getElementById('languageOutput').style.display = 'block';
-        }
-
-        function clearOutput() {
-            document.getElementById('inputText').value = '';
-            document.getElementById('output').innerText = '';
-            document.getElementById('languageOutput').innerText = '';
+            document.getElementById('output').innerText = output;
         }
 
         function copyToClipboard() {
-            const outputText = document.getElementById('output').innerText;
-            navigator.clipboard.writeText(outputText).then(() => {
-                alert('Copied to clipboard');
-            });
+            const output = document.getElementById('output').innerText;
+            navigator.clipboard.writeText(output);
+        }
+
+        function clearOutput() {
+            document.getElementById('output').innerText = '';
+            document.getElementById('input').value = '';
         }
     </script>
 </body>
