@@ -1,30 +1,43 @@
-# Base64 Translator
+# Base64, Binary, and Hex Encoder/Decoder
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Base64 Translator</title>
+    <title>Encoder/Decoder</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        select, textarea { width: 100%; margin: 10px 0; }
+    </style>
 </head>
 <body>
-    <h1>Base64 Translator</h1>
-    <input type="text" id="inputText" placeholder="Enter text here">
-    <button onclick="encodeToBase64()">Encode to Base64</button>
-    <button onclick="decodeFromBase64()">Decode from Base64</button>
-    <p id="result"></p>
+    <h1>Base64, Binary, and Hex Encoder/Decoder</h1>
+    <select id="languageSelect">
+        <option value="base64">Base64</option>
+        <option value="binary">Binary</option>
+        <option value="hex">Hex</option>
+    </select>
+    <textarea id="inputText" rows="4" placeholder="Enter text here..."></textarea>
+    <button onclick="convert()">Convert</button>
+    <h2>Output:</h2>
+    <textarea id="outputText" rows="4" readonly></textarea>
 
     <script>
-        function encodeToBase64() {
+        function convert() {
             const input = document.getElementById('inputText').value;
-            const encoded = btoa(input);
-            document.getElementById('result').innerText = encoded;
-        }
+            const language = document.getElementById('languageSelect').value;
+            let output = '';
 
-        function decodeFromBase64() {
-            const input = document.getElementById('inputText').value;
-            const decoded = atob(input);
-            document.getElementById('result').innerText = decoded;
+            if (language === 'base64') {
+                output = btoa(input);
+            } else if (language === 'binary') {
+                output = input.split('').map(char => char.charCodeAt(0).toString(2)).join(' ');
+            } else if (language === 'hex') {
+                output = input.split('').map(char => char.charCodeAt(0).toString(16)).join(' ');
+            }
+
+            document.getElementById('outputText').value = output;
         }
     </script>
 </body>
