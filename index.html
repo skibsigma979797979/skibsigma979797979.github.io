@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Encoder/Decoder</title>
     <style>
-        body { font-family: Arial, sans-serif; }
+        body { font-family: Arial, sans-serif; margin: 20px; }
         #output { margin-top: 10px; }
     </style>
 </head>
@@ -14,70 +14,72 @@
     <input type="password" id="password" placeholder="Enter password" />
     <button onclick="checkPassword()">Submit</button>
     
-    <div id="encoder-decoder" style="display:none;">
+    <div id="encoderDecoder" style="display:none;">
         <select id="language">
             <option value="base64">Base64</option>
             <option value="binary">Binary</option>
             <option value="hex">Hex</option>
         </select>
-        <textarea id="input" placeholder="Enter text here"></textarea>
+        <textarea id="inputText" placeholder="Enter text here"></textarea>
         <button onclick="encode()">Encode</button>
         <button onclick="decode()">Decode</button>
         <button onclick="copyToClipboard()">Copy to Clipboard</button>
         <button onclick="clearOutput()">Clear</button>
-        <div id="output"></div>
+        <div id="output" placeholder="Output will appear here"></div>
     </div>
 
     <script>
         function checkPassword() {
             const password = document.getElementById('password').value;
             if (password === 'skibidi') {
-                document.getElementById('encoder-decoder').style.display = 'block';
+                document.getElementById('encoderDecoder').style.display = 'block';
             } else {
                 alert('Incorrect password');
             }
         }
 
         function encode() {
-            const input = document.getElementById('input').value;
+            const text = document.getElementById('inputText').value;
             const language = document.getElementById('language').value;
-            let output;
+            let encodedText;
 
             if (language === 'base64') {
-                output = btoa(input);
+                encodedText = btoa(text);
             } else if (language === 'binary') {
-                output = input.split('').map(char => char.charCodeAt(0).toString(2)).join(' ');
+                encodedText = text.split('').map(char => char.charCodeAt(0).toString(2)).join(' ');
             } else if (language === 'hex') {
-                output = input.split('').map(char => char.charCodeAt(0).toString(16)).join(' ');
+                encodedText = text.split('').map(char => char.charCodeAt(0).toString(16)).join(' ');
             }
 
-            document.getElementById('output').innerText = output;
+            document.getElementById('output').innerText = encodedText;
         }
 
         function decode() {
-            const input = document.getElementById('input').value;
+            const text = document.getElementById('inputText').value;
             const language = document.getElementById('language').value;
-            let output;
+            let decodedText;
 
             if (language === 'base64') {
-                output = atob(input);
+                decodedText = atob(text);
             } else if (language === 'binary') {
-                output = input.split(' ').map(bin => String.fromCharCode(parseInt(bin, 2))).join('');
+                decodedText = text.split(' ').map(bin => String.fromCharCode(parseInt(bin, 2))).join('');
             } else if (language === 'hex') {
-                output = input.split(' ').map(hex => String.fromCharCode(parseInt(hex, 16))).join('');
+                decodedText = text.split(' ').map(hex => String.fromCharCode(parseInt(hex, 16))).join('');
             }
 
-            document.getElementById('output').innerText = output;
+            document.getElementById('output').innerText = decodedText;
         }
 
         function copyToClipboard() {
             const output = document.getElementById('output').innerText;
-            navigator.clipboard.writeText(output);
+            navigator.clipboard.writeText(output).then(() => {
+                alert('Copied to clipboard');
+            });
         }
 
         function clearOutput() {
+            document.getElementById('inputText').value = '';
             document.getElementById('output').innerText = '';
-            document.getElementById('input').value = '';
         }
     </script>
 </body>
