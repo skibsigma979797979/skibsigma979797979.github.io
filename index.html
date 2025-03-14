@@ -1,47 +1,95 @@
-# Playable Version of Minecraft
+# Playable Game
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mini Minecraft</title>
+    <title>Simple Game</title>
     <style>
         body {
-            margin: 0;
-            overflow: hidden;
-            background-color: #87CEEB;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
         }
-        #gameCanvas {
-            border: 1px solid #000;
-            background-color: #8B4513;
+        #game {
+            margin: 20px auto;
+            width: 300px;
+            height: 300px;
+            border: 2px solid #333;
+            position: relative;
+            overflow: hidden;
+            background-color: #fff;
+        }
+        #player {
+            width: 30px;
+            height: 30px;
+            background-color: red;
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        #score {
+            font-size: 20px;
+            margin: 10px;
         }
     </style>
 </head>
 <body>
-    <canvas id="gameCanvas" width="800" height="600"></canvas>
-    <script>
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
 
-        const player = {
-            x: 400,
-            y: 300,
-            size: 20,
-            color: 'green'
-        };
+<h1>Catch the Falling Objects!</h1>
+<div id="score">Score: 0</div>
+<div id="game">
+    <div id="player"></div>
+</div>
 
-        function drawPlayer() {
-            ctx.fillStyle = player.color;
-            ctx.fillRect(player.x, player.y, player.size, player.size);
-        }
+<script>
+    let score = 0;
+    const player = document.getElementById('player');
+    const game = document.getElementById('game');
+    const scoreDisplay = document.getElementById('score');
+    let playerPosition = 135;
 
-        function update() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            drawPlayer();
-        }
+    document.addEventListener('mousemove', (event) => {
+        playerPosition = event.clientX - game.offsetLeft - 15;
+        if (playerPosition < 0) playerPosition = 0;
+        if (playerPosition > 270) playerPosition = 270;
+        player.style.left = playerPosition + 'px';
+    });
 
-        setInterval(update, 1000 / 60);
-    </script>
+    function createFallingObject() {
+        const object = document.createElement('div');
+        object.style.width = '30px';
+        object.style.height = '30px';
+        object.style.backgroundColor = 'blue';
+        object.style.position = 'absolute';
+        object.style.left = Math.random() * 270 + 'px';
+        object.style.top = '0px';
+        game.appendChild(object);
+        fall(object);
+    }
+
+    function fall(object) {
+        let position = 0;
+        const interval = setInterval(() => {
+            position += 5;
+            object.style.top = position + 'px';
+            if (position > 300) {
+                clearInterval(interval);
+                game.removeChild(object);
+            }
+            if (position > 270 && Math.abs(parseInt(object.style.left) - playerPosition) < 30) {
+                clearInterval(interval);
+                game.removeChild(object);
+                score++;
+                scoreDisplay.innerText = 'Score: ' + score;
+            }
+        }, 100);
+    }
+
+    setInterval(createFallingObject, 1000);
+</script>
+
 </body>
 </html>
