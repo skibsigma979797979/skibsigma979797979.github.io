@@ -17,13 +17,13 @@
         <option value="binary">Binary</option>
         <option value="hex">Hex</option>
     </select>
-    <textarea id="inputText" placeholder="Enter text or upload an image..."></textarea>
+    <textarea id="inputText" placeholder="Enter text here..."></textarea>
     <button onclick="encode()">Encode</button>
     <button onclick="decode()">Decode</button>
+    <button onclick="alertDecoded()">Alert Decoded</button>
     <button onclick="copyToClipboard()">Copy to Clipboard</button>
     <input type="file" id="fileInput" accept="image/*">
-    <button onclick="uploadImage()">Upload Image</button>
-    <button onclick="decodeImage()">Decode Image</button>
+    <button onclick="encodeImage()">Encode Image</button>
     <div>
         <h3>Output:</h3>
         <textarea id="outputText" readonly></textarea>
@@ -62,30 +62,27 @@
             document.getElementById('outputText').value = output;
         }
 
+        function alertDecoded() {
+            const output = document.getElementById('outputText').value;
+            alert(output);
+        }
+
         function copyToClipboard() {
             const output = document.getElementById('outputText');
             output.select();
             document.execCommand('copy');
         }
 
-        function uploadImage() {
+        function encodeImage() {
             const fileInput = document.getElementById('fileInput');
             const file = fileInput.files[0];
-            const reader = new FileReader();
-
-            reader.onload = function(event) {
-                const base64String = event.target.result.split(',')[1];
-                document.getElementById('inputText').value = base64String;
-            };
-
             if (file) {
+                const reader = new FileReader();
+                reader.onloadend = function() {
+                    document.getElementById('outputText').value = reader.result.split(',')[1];
+                }
                 reader.readAsDataURL(file);
             }
-        }
-
-        function decodeImage() {
-            const base64String = document.getElementById('inputText').value;
-            alert('Decoded Image: ' + base64String);
         }
     </script>
 </body>
