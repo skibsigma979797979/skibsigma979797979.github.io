@@ -5,31 +5,43 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Encoder/Decoder</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        textarea { width: 100%; height: 100px; }
-        button { margin-top: 10px; }
+        body { font-family: Arial, sans-serif; }
+        #output { margin-top: 10px; }
     </style>
 </head>
 <body>
     <h1>Base64, Binary, and Hex Encoder/Decoder</h1>
-    <select id="languageSelect">
-        <option value="base64">Base64</option>
-        <option value="binary">Binary</option>
-        <option value="hex">Hex</option>
-    </select>
-    <textarea id="inputText" placeholder="Enter text here..."></textarea>
-    <button id="encodeButton">Encode</button>
-    <button id="decodeButton">Decode</button>
-    <button id="clearButton">Clear</button>
-    <h2>Output:</h2>
-    <textarea id="outputText" readonly></textarea>
-    <button id="copyButton">Copy to Clipboard</button>
+    <input type="password" id="password" placeholder="Enter password" />
+    <button onclick="checkPassword()">Submit</button>
+    
+    <div id="encoder-decoder" style="display:none;">
+        <select id="language">
+            <option value="base64">Base64</option>
+            <option value="binary">Binary</option>
+            <option value="hex">Hex</option>
+        </select>
+        <textarea id="input" placeholder="Enter text here"></textarea>
+        <button onclick="encode()">Encode</button>
+        <button onclick="decode()">Decode</button>
+        <button onclick="copyToClipboard()">Copy to Clipboard</button>
+        <button onclick="clearOutput()">Clear</button>
+        <div id="output"></div>
+    </div>
 
     <script>
-        document.getElementById('encodeButton').onclick = function() {
-            const input = document.getElementById('inputText').value;
-            const language = document.getElementById('languageSelect').value;
-            let output = '';
+        function checkPassword() {
+            const password = document.getElementById('password').value;
+            if (password === 'skibidi') {
+                document.getElementById('encoder-decoder').style.display = 'block';
+            } else {
+                alert('Incorrect password');
+            }
+        }
+
+        function encode() {
+            const input = document.getElementById('input').value;
+            const language = document.getElementById('language').value;
+            let output;
 
             if (language === 'base64') {
                 output = btoa(input);
@@ -39,13 +51,13 @@
                 output = input.split('').map(char => char.charCodeAt(0).toString(16)).join(' ');
             }
 
-            document.getElementById('outputText').value = output;
-        };
+            document.getElementById('output').innerText = output;
+        }
 
-        document.getElementById('decodeButton').onclick = function() {
-            const input = document.getElementById('inputText').value;
-            const language = document.getElementById('languageSelect').value;
-            let output = '';
+        function decode() {
+            const input = document.getElementById('input').value;
+            const language = document.getElementById('language').value;
+            let output;
 
             if (language === 'base64') {
                 output = atob(input);
@@ -55,19 +67,18 @@
                 output = input.split(' ').map(hex => String.fromCharCode(parseInt(hex, 16))).join('');
             }
 
-            document.getElementById('outputText').value = output;
-        };
+            document.getElementById('output').innerText = output;
+        }
 
-        document.getElementById('clearButton').onclick = function() {
-            document.getElementById('inputText').value = '';
-            document.getElementById('outputText').value = '';
-        };
+        function copyToClipboard() {
+            const output = document.getElementById('output').innerText;
+            navigator.clipboard.writeText(output);
+        }
 
-        document.getElementById('copyButton').onclick = function() {
-            const output = document.getElementById('outputText');
-            output.select();
-            document.execCommand('copy');
-        };
+        function clearOutput() {
+            document.getElementById('output').innerText = '';
+            document.getElementById('input').value = '';
+        }
     </script>
 </body>
 </html>
