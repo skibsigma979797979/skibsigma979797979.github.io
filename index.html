@@ -21,10 +21,11 @@
     <button onclick="encode()">Encode</button>
     <button onclick="decode()">Decode</button>
     <button onclick="copyToClipboard()">Copy to Clipboard</button>
-    <h2>Output:</h2>
-    <textarea id="outputText" readonly></textarea>
-    <input type="file" id="fileInput" accept="image/*">
+    <input type="file" id="imageInput" accept="image/*">
     <button onclick="encodeImage()">Encode Image</button>
+    <button onclick="decodeImage()">Decode Image</button>
+    <div id="output"></div>
+
     <script>
         function encode() {
             const input = document.getElementById('inputText').value;
@@ -37,7 +38,7 @@
             } else if (language === 'hex') {
                 output = input.split('').map(char => char.charCodeAt(0).toString(16)).join(' ');
             }
-            document.getElementById('outputText').value = output;
+            document.getElementById('output').innerText = output;
         }
 
         function decode() {
@@ -51,24 +52,34 @@
             } else if (language === 'hex') {
                 output = input.split(' ').map(hex => String.fromCharCode(parseInt(hex, 16))).join('');
             }
-            document.getElementById('outputText').value = output;
+            document.getElementById('output').innerText = output;
         }
 
         function copyToClipboard() {
-            const output = document.getElementById('outputText');
-            output.select();
-            document.execCommand('copy');
+            const output = document.getElementById('output').innerText;
+            navigator.clipboard.writeText(output);
         }
 
         function encodeImage() {
-            const fileInput = document.getElementById('fileInput');
-            const file = fileInput.files[0];
+            const file = document.getElementById('imageInput').files[0];
             if (file) {
                 const reader = new FileReader();
                 reader.onloadend = function() {
-                    document.getElementById('outputText').value = reader.result;
+                    document.getElementById('output').innerText = reader.result.split(',')[1];
                 }
                 reader.readAsDataURL(file);
+            }
+        }
+
+        function decodeImage() {
+            const data = document.getElementById('output').innerText;
+            if (data) {
+                const img = new Image();
+                img.src = 'data:image/png;base64,' + data;
+                img.onload = function() {
+                    alert('Image decoded and ready to view.');
+                    document.body.appendChild(img);
+                }
             }
         }
     </script>
