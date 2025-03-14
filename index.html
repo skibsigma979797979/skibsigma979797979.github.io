@@ -1,5 +1,3 @@
-# Base64, Binary, and Hex Encoder/Decoder
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -20,14 +18,15 @@
         <option value="hex">Hex</option>
     </select>
     <textarea id="inputText" placeholder="Enter text here..."></textarea>
-    <button onclick="encode()">Encode</button>
-    <button onclick="decode()">Decode</button>
+    <button id="encodeButton">Encode</button>
+    <button id="decodeButton">Decode</button>
+    <button id="clearButton">Clear</button>
     <h2>Output:</h2>
     <textarea id="outputText" readonly></textarea>
-    <button onclick="copyToClipboard()">Copy to Clipboard</button>
+    <button id="copyButton">Copy to Clipboard</button>
 
     <script>
-        function encode() {
+        document.getElementById('encodeButton').onclick = function() {
             const input = document.getElementById('inputText').value;
             const language = document.getElementById('languageSelect').value;
             let output = '';
@@ -41,9 +40,9 @@
             }
 
             document.getElementById('outputText').value = output;
-        }
+        };
 
-        function decode() {
+        document.getElementById('decodeButton').onclick = function() {
             const input = document.getElementById('inputText').value;
             const language = document.getElementById('languageSelect').value;
             let output = '';
@@ -57,13 +56,18 @@
             }
 
             document.getElementById('outputText').value = output;
-        }
+        };
 
-        function copyToClipboard() {
+        document.getElementById('clearButton').onclick = function() {
+            document.getElementById('inputText').value = '';
+            document.getElementById('outputText').value = '';
+        };
+
+        document.getElementById('copyButton').onclick = function() {
             const output = document.getElementById('outputText');
             output.select();
             document.execCommand('copy');
-        }
+        };
     </script>
 </body>
 </html>
