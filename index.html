@@ -1,95 +1,31 @@
-# Playable Game
+# Base64 Translator
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple Game</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            background-color: #f4f4f4;
-        }
-        #game {
-            margin: 20px auto;
-            width: 300px;
-            height: 300px;
-            border: 2px solid #333;
-            position: relative;
-            overflow: hidden;
-            background-color: #fff;
-        }
-        #player {
-            width: 30px;
-            height: 30px;
-            background-color: red;
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-        #score {
-            font-size: 20px;
-            margin: 10px;
-        }
-    </style>
+    <title>Base64 Translator</title>
 </head>
 <body>
+    <h1>Base64 Translator</h1>
+    <input type="text" id="inputText" placeholder="Enter text here">
+    <button onclick="encodeToBase64()">Encode to Base64</button>
+    <button onclick="decodeFromBase64()">Decode from Base64</button>
+    <p id="result"></p>
 
-<h1>Catch the Falling Objects!</h1>
-<div id="score">Score: 0</div>
-<div id="game">
-    <div id="player"></div>
-</div>
+    <script>
+        function encodeToBase64() {
+            const input = document.getElementById('inputText').value;
+            const encoded = btoa(input);
+            document.getElementById('result').innerText = encoded;
+        }
 
-<script>
-    let score = 0;
-    const player = document.getElementById('player');
-    const game = document.getElementById('game');
-    const scoreDisplay = document.getElementById('score');
-    let playerPosition = 135;
-
-    document.addEventListener('mousemove', (event) => {
-        playerPosition = event.clientX - game.offsetLeft - 15;
-        if (playerPosition < 0) playerPosition = 0;
-        if (playerPosition > 270) playerPosition = 270;
-        player.style.left = playerPosition + 'px';
-    });
-
-    function createFallingObject() {
-        const object = document.createElement('div');
-        object.style.width = '30px';
-        object.style.height = '30px';
-        object.style.backgroundColor = 'blue';
-        object.style.position = 'absolute';
-        object.style.left = Math.random() * 270 + 'px';
-        object.style.top = '0px';
-        game.appendChild(object);
-        fall(object);
-    }
-
-    function fall(object) {
-        let position = 0;
-        const interval = setInterval(() => {
-            position += 5;
-            object.style.top = position + 'px';
-            if (position > 300) {
-                clearInterval(interval);
-                game.removeChild(object);
-            }
-            if (position > 270 && Math.abs(parseInt(object.style.left) - playerPosition) < 30) {
-                clearInterval(interval);
-                game.removeChild(object);
-                score++;
-                scoreDisplay.innerText = 'Score: ' + score;
-            }
-        }, 100);
-    }
-
-    setInterval(createFallingObject, 1000);
-</script>
-
+        function decodeFromBase64() {
+            const input = document.getElementById('inputText').value;
+            const decoded = atob(input);
+            document.getElementById('result').innerText = decoded;
+        }
+    </script>
 </body>
 </html>
