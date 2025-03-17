@@ -25,19 +25,21 @@
                 <option value="binary">Binary</option>
                 <option value="hex">Hex</option>
             </select>
-            <textarea id="input-text" placeholder="Enter text here"></textarea>
+            <textarea id="input-text" placeholder="Enter text here..."></textarea>
             <button onclick="encode()">Encode</button>
             <button onclick="decode()">Decode</button>
             <button onclick="copyToClipboard()">Copy to Clipboard</button>
             <button onclick="clearOutput()">Clear</button>
-            <div class="output-box" id="output-box"></div>
+            <div class="output-box">
+                <h3>Output:</h3>
+                <textarea id="output-text" readonly></textarea>
+            </div>
         </div>
     </div>
+
     <script>
         let attempts = 0;
         let locked = false;
-        let lockoutTime = 60000; // 60 seconds
-        let bannedIPs = [];
 
         function checkPassword() {
             const password = document.getElementById('password').value;
@@ -52,7 +54,7 @@
                 attempts++;
                 if (attempts >= 5) {
                     locked = true;
-                    setTimeout(() => { locked = false; attempts = 0; }, lockoutTime);
+                    setTimeout(() => { locked = false; attempts = 0; }, 60000);
                 }
                 document.getElementById('password-error').classList.remove('hidden');
             }
@@ -61,39 +63,40 @@
         function encode() {
             const text = document.getElementById('input-text').value;
             const language = document.getElementById('language').value;
-            let output;
-            if (language === "base64") {
+            let output = '';
+            if (language === 'base64') {
                 output = btoa(text);
-            } else if (language === "binary") {
+            } else if (language === 'binary') {
                 output = text.split('').map(char => char.charCodeAt(0).toString(2)).join(' ');
-            } else if (language === "hex") {
+            } else if (language === 'hex') {
                 output = text.split('').map(char => char.charCodeAt(0).toString(16)).join(' ');
             }
-            document.getElementById('output-box').innerText = output;
+            document.getElementById('output-text').value = output;
         }
 
         function decode() {
             const text = document.getElementById('input-text').value;
             const language = document.getElementById('language').value;
-            let output;
-            if (language === "base64") {
+            let output = '';
+            if (language === 'base64') {
                 output = atob(text);
-            } else if (language === "binary") {
+            } else if (language === 'binary') {
                 output = text.split(' ').map(bin => String.fromCharCode(parseInt(bin, 2))).join('');
-            } else if (language === "hex") {
+            } else if (language === 'hex') {
                 output = text.split(' ').map(hex => String.fromCharCode(parseInt(hex, 16))).join('');
             }
-            document.getElementById('output-box').innerText = output;
+            document.getElementById('output-text').value = output;
         }
 
         function copyToClipboard() {
-            const output = document.getElementById('output-box').innerText;
-            navigator.clipboard.writeText(output);
+            const outputText = document.getElementById('output-text');
+            outputText.select();
+            document.execCommand('copy');
         }
 
         function clearOutput() {
-            document.getElementById('output-box').innerText = '';
             document.getElementById('input-text').value = '';
+            document.getElementById('output-text').value = '';
         }
     </script>
 </body>
