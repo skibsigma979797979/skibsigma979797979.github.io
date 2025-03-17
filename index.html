@@ -14,90 +14,94 @@
 <body>
     <div class="container">
         <h1>Encoder/Decoder</h1>
-        <div id="password-section">
-            <input type="password" id="password" placeholder="Enter Password">
-            <button onclick="checkPassword()">Submit</button>
-            <p id="password-error" class="hidden">Incorrect password. Try again.</p>
-        </div>
-        <div id="main-section" class="hidden">
-            <select id="language">
+        <input type="password" id="password" placeholder="Enter Password" />
+        <button id="submitPassword">Submit</button>
+        <div id="mainContent" class="hidden">
+            <select id="languageSelect">
                 <option value="base64">Base64</option>
                 <option value="binary">Binary</option>
                 <option value="hex">Hex</option>
             </select>
-            <textarea id="input-text" placeholder="Enter text here..."></textarea>
-            <button onclick="encode()">Encode</button>
-            <button onclick="decode()">Decode</button>
-            <button onclick="copyToClipboard()">Copy to Clipboard</button>
-            <button onclick="clearOutput()">Clear</button>
+            <textarea id="inputText" placeholder="Enter text here..."></textarea>
+            <button id="encodeButton">Encode</button>
+            <button id="decodeButton">Decode</button>
+            <button id="clearButton">Clear</button>
             <div class="output-box">
-                <h3>Output:</h3>
-                <textarea id="output-text" readonly></textarea>
+                <textarea id="outputText" readonly></textarea>
+                <button id="copyButton">Copy to Clipboard</button>
             </div>
+            <button id="reportButton">Report User</button>
         </div>
     </div>
 
     <script>
+        const correctPassword = "skibidi";
         let attempts = 0;
-        let locked = false;
+        let lockedOut = false;
 
-        function checkPassword() {
-            const password = document.getElementById('password').value;
-            if (locked) {
+        document.getElementById('submitPassword').onclick = function() {
+            const passwordInput = document.getElementById('password').value;
+            if (lockedOut) {
                 alert("You are locked out. Please wait.");
                 return;
             }
-            if (password === "skibidi") {
-                document.getElementById('password-section').classList.add('hidden');
-                document.getElementById('main-section').classList.remove('hidden');
+            if (passwordInput === correctPassword) {
+                document.getElementById('mainContent').classList.remove('hidden');
+                document.getElementById('password').classList.add('hidden');
+                this.classList.add('hidden');
             } else {
                 attempts++;
                 if (attempts >= 5) {
-                    locked = true;
-                    setTimeout(() => { locked = false; attempts = 0; }, 60000);
+                    lockedOut = true;
+                    alert("Too many attempts. Locked out for 60 seconds.");
+                    setTimeout(() => { lockedOut = false; attempts = 0; }, 60000);
+                } else {
+                    alert("Incorrect password. Try again.");
                 }
-                document.getElementById('password-error').classList.remove('hidden');
             }
-        }
+        };
 
-        function encode() {
-            const text = document.getElementById('input-text').value;
-            const language = document.getElementById('language').value;
-            let output = '';
-            if (language === 'base64') {
-                output = btoa(text);
-            } else if (language === 'binary') {
-                output = text.split('').map(char => char.charCodeAt(0).toString(2)).join(' ');
-            } else if (language === 'hex') {
-                output = text.split('').map(char => char.charCodeAt(0).toString(16)).join(' ');
+        document.getElementById('encodeButton').onclick = function() {
+            const inputText = document.getElementById('inputText').value;
+            const selectedLanguage = document.getElementById('languageSelect').value;
+            let outputText = '';
+            if (selectedLanguage === 'base64') {
+                outputText = btoa(inputText);
+            } else if (selectedLanguage === 'binary') {
+                outputText = inputText.split('').map(char => char.charCodeAt(0).toString(2)).join(' ');
+            } else if (selectedLanguage === 'hex') {
+                outputText = inputText.split('').map(char => char.charCodeAt(0).toString(16)).join(' ');
             }
-            document.getElementById('output-text').value = output;
-        }
+            document.getElementById('outputText').value = outputText;
+        };
 
-        function decode() {
-            const text = document.getElementById('input-text').value;
-            const language = document.getElementById('language').value;
-            let output = '';
-            if (language === 'base64') {
-                output = atob(text);
-            } else if (language === 'binary') {
-                output = text.split(' ').map(bin => String.fromCharCode(parseInt(bin, 2))).join('');
-            } else if (language === 'hex') {
-                output = text.split(' ').map(hex => String.fromCharCode(parseInt(hex, 16))).join('');
+        document.getElementById('decodeButton').onclick = function() {
+            const inputText = document.getElementById('inputText').value;
+            const selectedLanguage = document.getElementById('languageSelect').value;
+            let outputText = '';
+            if (selectedLanguage === 'base64') {
+                outputText = atob(inputText);
+            } else if (selectedLanguage === 'binary') {
+                outputText = inputText.split(' ').map(bin => String.fromCharCode(parseInt(bin, 2))).join('');
+            } else if (selectedLanguage === 'hex') {
+                outputText = inputText.split(' ').map(hex => String.fromCharCode(parseInt(hex, 16))).join('');
             }
-            document.getElementById('output-text').value = output;
-        }
+            document.getElementById('outputText').value = outputText;
+        };
 
-        function copyToClipboard() {
-            const outputText = document.getElementById('output-text');
+        document.getElementById('clearButton').onclick = function() {
+            document.getElementById('inputText').value = '';
+            document.getElementById('outputText').value = '';
+        };
+
+        document.getElementById('copyButton').onclick = function() {
+            const outputText = document.getElementById('outputText');
             outputText.select();
             document.execCommand('copy');
-        }
+            alert("Copied to clipboard!");
+        };
 
-        function clearOutput() {
-            document.getElementById('input-text').value = '';
-            document.getElementById('output-text').value = '';
-        }
-    </script>
-</body>
-</html>
+        document.getElementById('reportButton').onclick = function() {
+            window.open('mailto:example@gmail.com');
+        };
+    </script
