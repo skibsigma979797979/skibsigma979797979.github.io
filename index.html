@@ -12,77 +12,82 @@
 <body>
     <h1>Base64, Binary, and Hex Encoder/Decoder</h1>
     <div id="password-section">
-        <label for="password">Enter Password:</label>
-        <input type="password" id="password">
+        <input type="password" id="password" placeholder="Enter Password">
         <button onclick="checkPassword()">Submit</button>
     </div>
-    
-    <div id="output" style="display: none;">
+    <div id="encoder-decoder" style="display:none;">
         <select id="language">
             <option value="base64">Base64</option>
             <option value="binary">Binary</option>
             <option value="hex">Hex</option>
         </select>
-        <textarea id="inputText" placeholder="Enter text here..."></textarea>
+        <textarea id="input" placeholder="Enter text here..."></textarea>
         <button onclick="encode()">Encode</button>
         <button onclick="decode()">Decode</button>
         <button onclick="copyToClipboard()">Copy to Clipboard</button>
         <button onclick="clearOutput()">Clear</button>
-        <textarea id="result" placeholder="Output will appear here..." readonly></textarea>
+        <div id="output">
+            <textarea id="outputText" readonly></textarea>
+        </div>
     </div>
 
     <script>
+        const correctPassword = "skibidi";
+
         function checkPassword() {
-            const password = document.getElementById('password').value;
-            if (password === 'skibidi') {
-                document.getElementById('output').style.display = 'block';
-                document.getElementById('password-section').style.display = 'none';
+            const passwordInput = document.getElementById("password").value;
+            if (passwordInput === correctPassword) {
+                document.getElementById("password-section").style.display = "none";
+                document.getElementById("encoder-decoder").style.display = "block";
             } else {
-                alert('Incorrect password!');
+                alert("Incorrect Password");
             }
         }
 
         function encode() {
-            const text = document.getElementById('inputText').value;
-            const language = document.getElementById('language').value;
+            const inputText = document.getElementById("input").value;
+            const selectedLanguage = document.getElementById("language").value;
             let encodedText;
 
-            if (language === 'base64') {
-                encodedText = btoa(text);
-            } else if (language === 'binary') {
-                encodedText = text.split('').map(char => char.charCodeAt(0).toString(2)).join(' ');
-            } else if (language === 'hex') {
-                encodedText = text.split('').map(char => char.charCodeAt(0).toString(16)).join(' ');
+            if (selectedLanguage === "base64") {
+                encodedText = btoa(inputText);
+            } else if (selectedLanguage === "binary") {
+                encodedText = inputText.split('').map(char => char.charCodeAt(0).toString(2)).join(' ');
+            } else if (selectedLanguage === "hex") {
+                encodedText = inputText.split('').map(char => char.charCodeAt(0).toString(16)).join(' ');
             }
 
-            document.getElementById('result').value = encodedText;
+            document.getElementById("outputText").value = encodedText;
+            document.getElementById("output").style.display = "block";
         }
 
         function decode() {
-            const text = document.getElementById('inputText').value;
-            const language = document.getElementById('language').value;
+            const inputText = document.getElementById("input").value;
+            const selectedLanguage = document.getElementById("language").value;
             let decodedText;
 
-            if (language === 'base64') {
-                decodedText = atob(text);
-            } else if (language === 'binary') {
-                decodedText = text.split(' ').map(bin => String.fromCharCode(parseInt(bin, 2))).join('');
-            } else if (language === 'hex') {
-                decodedText = text.split(' ').map(hex => String.fromCharCode(parseInt(hex, 16))).join('');
+            if (selectedLanguage === "base64") {
+                decodedText = atob(inputText);
+            } else if (selectedLanguage === "binary") {
+                decodedText = inputText.split(' ').map(bin => String.fromCharCode(parseInt(bin, 2))).join('');
+            } else if (selectedLanguage === "hex") {
+                decodedText = inputText.split(' ').map(hex => String.fromCharCode(parseInt(hex, 16))).join('');
             }
 
-            document.getElementById('result').value = decodedText;
+            document.getElementById("outputText").value = decodedText;
+            document.getElementById("output").style.display = "block";
         }
 
         function copyToClipboard() {
-            const result = document.getElementById('result');
-            result.select();
-            document.execCommand('copy');
+            const outputText = document.getElementById("outputText");
+            outputText.select();
+            document.execCommand("copy");
         }
 
         function clearOutput() {
-            document.getElementById('inputText').value = '';
-            document.getElementById('result').value = '';
+            document.getElementById("input").value = '';
+            document.getElementById("outputText").value = '';
+            document.getElementById("output").style.display = "none";
         }
     </script>
 </body>
