@@ -6,88 +6,91 @@
     <title>Encoder/Decoder</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; }
-        #output { display: none; }
+        #output { display: none; margin-top: 20px; }
     </style>
 </head>
 <body>
     <h1>Base64, Binary, and Hex Encoder/Decoder</h1>
     <div id="password-section">
-        <input type="password" id="password" placeholder="Enter Password">
+        <label for="password">Enter Password:</label>
+        <input type="password" id="password" />
         <button onclick="checkPassword()">Submit</button>
     </div>
-    <div id="encoder-decoder" style="display:none;">
+    
+    <div id="encoder-decoder" style="display: none;">
         <select id="language">
             <option value="base64">Base64</option>
             <option value="binary">Binary</option>
             <option value="hex">Hex</option>
         </select>
-        <textarea id="input" placeholder="Enter text here..."></textarea>
+        <textarea id="input-text" placeholder="Enter text here..."></textarea>
+        <br>
         <button onclick="encode()">Encode</button>
         <button onclick="decode()">Decode</button>
         <button onclick="copyToClipboard()">Copy to Clipboard</button>
         <button onclick="clearOutput()">Clear</button>
         <div id="output">
-            <textarea id="outputText" readonly></textarea>
+            <h3>Output:</h3>
+            <textarea id="output-text" readonly></textarea>
         </div>
     </div>
 
     <script>
-        const correctPassword = "skibidi";
-
         function checkPassword() {
-            const passwordInput = document.getElementById("password").value;
-            if (passwordInput === correctPassword) {
-                document.getElementById("password-section").style.display = "none";
-                document.getElementById("encoder-decoder").style.display = "block";
+            const password = document.getElementById('password').value;
+            if (password === 'skibidi') {
+                document.getElementById('password-section').style.display = 'none';
+                document.getElementById('encoder-decoder').style.display = 'block';
             } else {
-                alert("Incorrect Password");
+                alert('Incorrect password. Please try again.');
             }
         }
 
         function encode() {
-            const inputText = document.getElementById("input").value;
-            const selectedLanguage = document.getElementById("language").value;
+            const text = document.getElementById('input-text').value;
+            const language = document.getElementById('language').value;
             let encodedText;
 
-            if (selectedLanguage === "base64") {
-                encodedText = btoa(inputText);
-            } else if (selectedLanguage === "binary") {
-                encodedText = inputText.split('').map(char => char.charCodeAt(0).toString(2)).join(' ');
-            } else if (selectedLanguage === "hex") {
-                encodedText = inputText.split('').map(char => char.charCodeAt(0).toString(16)).join(' ');
+            if (language === 'base64') {
+                encodedText = btoa(text);
+            } else if (language === 'binary') {
+                encodedText = text.split('').map(char => char.charCodeAt(0).toString(2)).join(' ');
+            } else if (language === 'hex') {
+                encodedText = text.split('').map(char => char.charCodeAt(0).toString(16)).join(' ');
             }
 
-            document.getElementById("outputText").value = encodedText;
-            document.getElementById("output").style.display = "block";
+            document.getElementById('output-text').value = encodedText;
+            document.getElementById('output').style.display = 'block';
         }
 
         function decode() {
-            const inputText = document.getElementById("input").value;
-            const selectedLanguage = document.getElementById("language").value;
+            const text = document.getElementById('input-text').value;
+            const language = document.getElementById('language').value;
             let decodedText;
 
-            if (selectedLanguage === "base64") {
-                decodedText = atob(inputText);
-            } else if (selectedLanguage === "binary") {
-                decodedText = inputText.split(' ').map(bin => String.fromCharCode(parseInt(bin, 2))).join('');
-            } else if (selectedLanguage === "hex") {
-                decodedText = inputText.split(' ').map(hex => String.fromCharCode(parseInt(hex, 16))).join('');
+            if (language === 'base64') {
+                decodedText = atob(text);
+            } else if (language === 'binary') {
+                decodedText = text.split(' ').map(bin => String.fromCharCode(parseInt(bin, 2))).join('');
+            } else if (language === 'hex') {
+                decodedText = text.split(' ').map(hex => String.fromCharCode(parseInt(hex, 16))).join('');
             }
 
-            document.getElementById("outputText").value = decodedText;
-            document.getElementById("output").style.display = "block";
+            document.getElementById('output-text').value = decodedText;
+            document.getElementById('output').style.display = 'block';
         }
 
         function copyToClipboard() {
-            const outputText = document.getElementById("outputText");
+            const outputText = document.getElementById('output-text');
             outputText.select();
-            document.execCommand("copy");
+            document.execCommand('copy');
+            alert('Copied to clipboard!');
         }
 
         function clearOutput() {
-            document.getElementById("input").value = '';
-            document.getElementById("outputText").value = '';
-            document.getElementById("output").style.display = "none";
+            document.getElementById('input-text').value = '';
+            document.getElementById('output-text').value = '';
+            document.getElementById('output').style.display = 'none';
         }
     </script>
 </body>
