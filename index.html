@@ -6,19 +6,18 @@
     <title>Base64, Binary, and Hex Encoder/Decoder</title>
     <style>
         body { font-family: Arial, sans-serif; }
-        #output { margin-top: 20px; }
-        #password-section { display: block; }
-        #main-section { display: none; }
+        #output { display: none; }
+        #lockout { display: none; color: red; }
     </style>
 </head>
 <body>
-    <h1>Base64, Binary, and Hex Encoder/Decoder</h1>
+    <h1>Encoder/Decoder</h1>
     <div id="password-section">
         <input type="password" id="password" placeholder="Enter Password">
         <button onclick="checkPassword()">Submit</button>
-        <p id="attempts"></p>
+        <div id="lockout"></div>
     </div>
-    <div id="main-section">
+    <div id="main-section" style="display: none;">
         <select id="language">
             <option value="base64">Base64</option>
             <option value="binary">Binary</option>
@@ -29,37 +28,39 @@
         <button onclick="decode()">Decode</button>
         <button onclick="copyToClipboard()">Copy to Clipboard</button>
         <button onclick="clearOutput()">Clear</button>
-        <div id="output"></div>
+        <textarea id="output" placeholder="Output will appear here" readonly></textarea>
     </div>
+
     <script>
-        const correctPassword = "skibidi";
         let attempts = 0;
-        let lockedOut = false;
+        let locked = false;
 
         function checkPassword() {
-            if (lockedOut) return;
-            const passwordInput = document.getElementById("password").value;
-            if (passwordInput === correctPassword) {
-                document.getElementById("password-section").style.display = "none";
-                document.getElementById("main-section").style.display = "block";
+            const password = document.getElementById('password').value;
+            if (locked) {
+                alert("You are locked out. Please wait.");
+                return;
+            }
+            if (password === "skibidi") {
+                document.getElementById('password-section').style.display = 'none';
+                document.getElementById('main-section').style.display = 'block';
             } else {
                 attempts++;
-                document.getElementById("attempts").innerText = `Attempts: ${attempts}`;
                 if (attempts >= 5) {
-                    lockedOut = true;
-                    document.getElementById("attempts").innerText = "Locked out for 60 seconds.";
+                    locked = true;
+                    document.getElementById('lockout').innerText = "Locked out for 60 seconds.";
                     setTimeout(() => {
-                        lockedOut = false;
+                        locked = false;
                         attempts = 0;
-                        document.getElementById("attempts").innerText = "";
+                        document.getElementById('lockout').innerText = "";
                     }, 60000);
                 }
             }
         }
 
         function encode() {
-            const input = document.getElementById("input").value;
-            const language = document.getElementById("language").value;
+            const input = document.getElementById('input').value;
+            const language = document.getElementById('language').value;
             let output;
             if (language === "base64") {
                 output = btoa(input);
@@ -68,12 +69,13 @@
             } else if (language === "hex") {
                 output = input.split('').map(char => char.charCodeAt(0).toString(16)).join(' ');
             }
-            document.getElementById("output").innerText = output;
+            document.getElementById('output').value = output;
+            document.getElementById('output').style.display = 'block';
         }
 
         function decode() {
-            const input = document.getElementById("input").value;
-            const language = document.getElementById("language").value;
+            const input = document.getElementById('input').value;
+            const language = document.getElementById('language').value;
             let output;
             if (language === "base64") {
                 output = atob(input);
@@ -82,17 +84,19 @@
             } else if (language === "hex") {
                 output = input.split(' ').map(hex => String.fromCharCode(parseInt(hex, 16))).join('');
             }
-            document.getElementById("output").innerText = output;
+            document.getElementById('output').value = output;
+            document.getElementById('output').style.display = 'block';
         }
 
         function copyToClipboard() {
-            const outputText = document.getElementById("output").innerText;
-            navigator.clipboard.writeText(outputText);
+            const output = document.getElementById('output');
+            output.select();
+            document.execCommand('copy');
         }
 
         function clearOutput() {
-            document.getElementById("output").innerText = '';
-            document.getElementById("input").value = '';
+            document.getElementById('input').value = '';
+            document.getElementById('output').value = '';
         }
     </script>
 </body>
