@@ -14,88 +14,87 @@
 <body>
     <div class="container">
         <h1>Encoder/Decoder</h1>
-        <input type="password" id="password" placeholder="Enter Password" />
-        <button id="submitPassword">Submit</button>
-        <div id="mainContent" class="hidden">
-            <select id="languageSelect">
+        <div id="password-section">
+            <input type="password" id="password" placeholder="Enter Password">
+            <button onclick="checkPassword()">Submit</button>
+            <p id="password-error" class="hidden">Incorrect password. Try again.</p>
+        </div>
+        <div id="main-section" class="hidden">
+            <select id="language">
                 <option value="base64">Base64</option>
                 <option value="binary">Binary</option>
                 <option value="hex">Hex</option>
             </select>
-            <textarea id="inputText" placeholder="Enter text here..."></textarea>
-            <button id="encodeButton">Encode</button>
-            <button id="decodeButton">Decode</button>
-            <button id="clearButton">Clear</button>
-            <div class="output-box" id="outputBox"></div>
-            <button id="copyButton">Copy to Clipboard</button>
+            <textarea id="input-text" placeholder="Enter text here"></textarea>
+            <button onclick="encode()">Encode</button>
+            <button onclick="decode()">Decode</button>
+            <button onclick="copyToClipboard()">Copy to Clipboard</button>
+            <button onclick="clearOutput()">Clear</button>
+            <div class="output-box" id="output-box"></div>
         </div>
     </div>
     <script>
         let attempts = 0;
         let locked = false;
-        const correctPassword = "skibidi";
-        const lockDuration = 60000; // 60 seconds
-        const ipAddress = "192.168.1.1"; // Example IP address for banning
+        let lockoutTime = 60000; // 60 seconds
+        let bannedIPs = [];
 
-        document.getElementById('submitPassword').onclick = function() {
-            const passwordInput = document.getElementById('password').value;
+        function checkPassword() {
+            const password = document.getElementById('password').value;
             if (locked) {
                 alert("You are locked out. Please wait.");
                 return;
             }
-            if (passwordInput === correctPassword) {
-                document.getElementById('mainContent').classList.remove('hidden');
-                document.getElementById('password').classList.add('hidden');
-                this.classList.add('hidden');
+            if (password === "skibidi") {
+                document.getElementById('password-section').classList.add('hidden');
+                document.getElementById('main-section').classList.remove('hidden');
             } else {
                 attempts++;
                 if (attempts >= 5) {
                     locked = true;
-                    alert("Too many attempts. You are locked out for 60 seconds.");
-                    setTimeout(() => { locked = false; attempts = 0; }, lockDuration);
+                    setTimeout(() => { locked = false; attempts = 0; }, lockoutTime);
                 }
+                document.getElementById('password-error').classList.remove('hidden');
             }
-        };
+        }
 
-        document.getElementById('encodeButton').onclick = function() {
-            const inputText = document.getElementById('inputText').value;
-            const selectedLanguage = document.getElementById('languageSelect').value;
+        function encode() {
+            const text = document.getElementById('input-text').value;
+            const language = document.getElementById('language').value;
             let output;
-            if (selectedLanguage === "base64") {
-                output = btoa(inputText);
-            } else if (selectedLanguage === "binary") {
-                output = inputText.split('').map(char => char.charCodeAt(0).toString(2)).join(' ');
-            } else if (selectedLanguage === "hex") {
-                output = inputText.split('').map(char => char.charCodeAt(0).toString(16)).join(' ');
+            if (language === "base64") {
+                output = btoa(text);
+            } else if (language === "binary") {
+                output = text.split('').map(char => char.charCodeAt(0).toString(2)).join(' ');
+            } else if (language === "hex") {
+                output = text.split('').map(char => char.charCodeAt(0).toString(16)).join(' ');
             }
-            document.getElementById('outputBox').innerText = output;
-        };
+            document.getElementById('output-box').innerText = output;
+        }
 
-        document.getElementById('decodeButton').onclick = function() {
-            const inputText = document.getElementById('inputText').value;
-            const selectedLanguage = document.getElementById('languageSelect').value;
+        function decode() {
+            const text = document.getElementById('input-text').value;
+            const language = document.getElementById('language').value;
             let output;
-            if (selectedLanguage === "base64") {
-                output = atob(inputText);
-            } else if (selectedLanguage === "binary") {
-                output = inputText.split(' ').map(bin => String.fromCharCode(parseInt(bin, 2))).join('');
-            } else if (selectedLanguage === "hex") {
-                output = inputText.split(' ').map(hex => String.fromCharCode(parseInt(hex, 16))).join('');
+            if (language === "base64") {
+                output = atob(text);
+            } else if (language === "binary") {
+                output = text.split(' ').map(bin => String.fromCharCode(parseInt(bin, 2))).join('');
+            } else if (language === "hex") {
+                output = text.split(' ').map(hex => String.fromCharCode(parseInt(hex, 16))).join('');
             }
-            document.getElementById('outputBox').innerText = output;
-        };
+            document.getElementById('output-box').innerText = output;
+        }
 
-        document.getElementById('clearButton').onclick = function() {
-            document.getElementById('inputText').value = '';
-            document.getElementById('outputBox').innerText = '';
-        };
+        function copyToClipboard() {
+            const output = document.getElementById('output-box').innerText;
+            navigator.clipboard.writeText(output);
+        }
 
-        document.getElementById('copyButton').onclick = function() {
-            const outputText = document.getElementById('outputBox').innerText;
-            navigator.clipboard.writeText(outputText).then(() => {
-                alert("Copied to clipboard!");
-            });
-        };
+        function clearOutput() {
+            document.getElementById('output-box').innerText = '';
+            document.getElementById('input-text').value = '';
+        }
     </script>
 </body>
 </html>
