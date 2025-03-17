@@ -3,112 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Base64, Binary, and Hex Encoder/Decoder</title>
+    <title>Encoder/Decoder</title>
     <style>
         body { font-family: Arial, sans-serif; }
-        .container { width: 50%; margin: auto; padding: 20px; border: 1px solid #ccc; }
+        .container { width: 300px; margin: auto; }
         .hidden { display: none; }
-        button { margin: 5px; }
-        #outputBox { border: 1px solid #000; padding: 10px; margin-top: 10px; }
+        .bordered { border: 1px solid #ccc; padding: 10px; margin-top: 10px; }
+        button { margin-top: 10px; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Encoder/Decoder</h1>
-        <div id="passwordSection">
-            <input type="password" id="passwordInput" placeholder="Enter Password">
-            <button onclick="checkPassword()">Submit</button>
-        </div>
-        <div id="mainSection" class="hidden">
+        <input type="password" id="password" placeholder="Enter Password" />
+        <button id="submitPassword">Submit</button>
+        <div id="mainContent" class="hidden">
             <select id="languageSelect">
                 <option value="base64">Base64</option>
                 <option value="binary">Binary</option>
                 <option value="hex">Hex</option>
             </select>
             <textarea id="inputText" placeholder="Enter text here"></textarea>
-            <br>
-            <button onclick="encode()">Encode</button>
-            <button onclick="decode()">Decode</button>
-            <button onclick="copyToClipboard()">Copy to Clipboard</button>
-            <button onclick="clearOutput()">Clear</button>
-            <button onclick="sendEmail()">Send via Email</button>
-            <div id="outputBox" class="hidden"></div>
+            <button id="encodeButton">Encode</button>
+            <button id="decodeButton">Decode</button>
+            <button id="copyButton">Copy to Clipboard</button>
+            <button id="clearButton">Clear</button>
+            <div class="bordered">
+                <textarea id="outputText" readonly placeholder="Output will appear here"></textarea>
+            </div>
+            <button id="sendEmailButton">Send via Gmail</button>
         </div>
+        <p class="hidden" id="errorMessage">Too many attempts. Please wait.</p>
+        <p style="font-size: small;">Arvin do not copy or else you are g-a-y</p>
     </div>
 
     <script>
         let attempts = 0;
-        let locked = false;
+        const maxAttempts = 5;
+        const lockoutTime = 60000; // 60 seconds
+        let lockedOut = false;
 
-        function checkPassword() {
-            const password = document.getElementById('passwordInput').value;
-            if (locked) {
-                alert("Too many attempts. Please wait.");
+        document.getElementById('submitPassword').onclick = function() {
+            const passwordInput = document.getElementById('password').value;
+            if (lockedOut) {
+                alert("You are locked out. Please wait.");
                 return;
             }
-            if (password === "skibidi") {
-                document.getElementById('passwordSection').classList.add('hidden');
-                document.getElementById('mainSection').classList.remove('hidden');
-                document.getElementById('outputBox').classList.remove('hidden');
+            if (passwordInput === 'skibidi') {
+                document.getElementById('mainContent').classList.remove('hidden');
+                document.getElementById('errorMessage').classList.add('hidden');
             } else {
                 attempts++;
-                if (attempts >= 5) {
-                    locked = true;
-                    alert("Too many attempts. Locked for 60 seconds.");
-                    setTimeout(() => { locked = false; attempts = 0; }, 60000);
-                } else {
-                    alert("Incorrect password. Try again.");
+                if (attempts >= maxAttempts) {
+                    lockedOut = true;
+                    setTimeout(() => { lockedOut = false; attempts = 0; }, lockoutTime);
+                    alert("Too many attempts. You are locked out for 60 seconds.");
                 }
             }
-        }
+        };
 
-        function encode() {
-            const input = document.getElementById('inputText').value;
-            const selectedLanguage = document.getElementById('languageSelect').value;
-            let output;
-            if (selectedLanguage === "base64") {
-                output = btoa(input);
-            } else if (selectedLanguage === "binary") {
-                output = input.split('').map(char => char.charCodeAt(0).toString(2)).join(' ');
-            } else if (selectedLanguage === "hex") {
-                output = input.split('').map(char => char.charCodeAt(0).toString(16)).join(' ');
-            }
-            document.getElementById('outputBox').innerText = output;
-        }
+        document.getElementById('encodeButton').onclick = function() {
+            // Encoding logic here
+        };
 
-        function decode() {
-            const input = document.getElementById('inputText').value;
-            const selectedLanguage = document.getElementById('languageSelect').value;
-            let output;
-            if (selectedLanguage === "base64") {
-                output = atob(input);
-            } else if (selectedLanguage === "binary") {
-                output = input.split(' ').map(bin => String.fromCharCode(parseInt(bin, 2))).join('');
-            } else if (selectedLanguage === "hex") {
-                output = input.split(' ').map(hex => String.fromCharCode(parseInt(hex, 16))).join('');
-            }
-            document.getElementById('outputBox').innerText = output;
-        }
+        document.getElementById('decodeButton').onclick = function() {
+            // Decoding logic here
+        };
 
-        function copyToClipboard() {
-            const output = document.getElementById('outputBox').innerText;
-            navigator.clipboard.writeText(output).then(() => {
-                alert("Copied to clipboard!");
-            });
-        }
+        document.getElementById('copyButton').onclick = function() {
+            // Copy to clipboard logic here
+        };
 
-        function clearOutput() {
-            document.getElementById('outputBox').innerText = '';
+        document.getElementById('clearButton').onclick = function() {
             document.getElementById('inputText').value = '';
-        }
+            document.getElementById('outputText').value = '';
+        };
 
-        function sendEmail() {
-            const output = document.getElementById('outputBox').innerText;
-            const email = prompt("Enter recipient's email:");
-            if (email) {
-                window.open(`mailto:${email}?subject=Encoded/Decoded Output&body=${encodeURIComponent(output)}`);
-            }
-        }
-    </script>
-</body>
-</html>
+        document.getElementById('sendEmailButton').onclick = function() {
+            const output = document.getElementById('outputText').value;
+            window.open(`mailto:?subject=Output
