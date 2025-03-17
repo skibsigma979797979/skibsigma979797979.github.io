@@ -3,82 +3,107 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Encoder/Decoder</title>
+    <title>Base64, Binary, and Hex Encoder/Decoder</title>
     <style>
         body { font-family: Arial, sans-serif; }
-        .container { width: 300px; margin: auto; }
+        .container { width: 50%; margin: auto; padding: 20px; border: 1px solid #ccc; }
         .hidden { display: none; }
-        .bordered { border: 1px solid #ccc; padding: 10px; margin-top: 10px; }
-        button { margin-top: 10px; }
+        .output-box { border: 1px solid #000; padding: 10px; margin-top: 10px; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Encoder/Decoder</h1>
         <input type="password" id="password" placeholder="Enter Password" />
-        <button id="submitPassword">Submit</button>
+        <button onclick="checkPassword()">Submit</button>
         <div id="mainContent" class="hidden">
-            <select id="languageSelect">
+            <select id="language">
                 <option value="base64">Base64</option>
                 <option value="binary">Binary</option>
                 <option value="hex">Hex</option>
             </select>
             <textarea id="inputText" placeholder="Enter text here"></textarea>
-            <button id="encodeButton">Encode</button>
-            <button id="decodeButton">Decode</button>
-            <button id="copyButton">Copy to Clipboard</button>
-            <button id="clearButton">Clear</button>
-            <div class="bordered">
-                <textarea id="outputText" readonly placeholder="Output will appear here"></textarea>
+            <button onclick="encode()">Encode</button>
+            <button onclick="decode()">Decode</button>
+            <button onclick="copyToClipboard()">Copy to Clipboard</button>
+            <button onclick="clearOutput()">Clear</button>
+            <div class="output-box">
+                <textarea id="outputText" readonly></textarea>
             </div>
-            <button id="sendEmailButton">Send via Gmail</button>
+            <button onclick="sendEmail()">Send via Gmail</button>
+            <p class="hidden" id="warningText">arvin if you copy this you are bad at coding</p>
         </div>
-        <p class="hidden" id="errorMessage">Too many attempts. Please wait.</p>
-        <p style="font-size: small;">Arvin do not copy or else you are g-a-y</p>
     </div>
 
     <script>
         let attempts = 0;
-        const maxAttempts = 5;
-        const lockoutTime = 60000; // 60 seconds
-        let lockedOut = false;
+        let locked = false;
 
-        document.getElementById('submitPassword').onclick = function() {
-            const passwordInput = document.getElementById('password').value;
-            if (lockedOut) {
+        function checkPassword() {
+            const password = document.getElementById('password').value;
+            if (locked) {
                 alert("You are locked out. Please wait.");
                 return;
             }
-            if (passwordInput === 'skibidi') {
+            if (password === "skibidi") {
                 document.getElementById('mainContent').classList.remove('hidden');
-                document.getElementById('errorMessage').classList.add('hidden');
+                document.getElementById('warningText').classList.remove('hidden');
             } else {
                 attempts++;
-                if (attempts >= maxAttempts) {
-                    lockedOut = true;
-                    setTimeout(() => { lockedOut = false; attempts = 0; }, lockoutTime);
-                    alert("Too many attempts. You are locked out for 60 seconds.");
+                if (attempts >= 5) {
+                    locked = true;
+                    alert("Too many attempts. Locked for 60 seconds.");
+                    setTimeout(() => { locked = false; attempts = 0; }, 60000);
+                } else {
+                    alert("Incorrect password. Try again.");
                 }
             }
-        };
+        }
 
-        document.getElementById('encodeButton').onclick = function() {
-            // Encoding logic here
-        };
+        function encode() {
+            const text = document.getElementById('inputText').value;
+            const language = document.getElementById('language').value;
+            let encodedText;
+            if (language === "base64") {
+                encodedText = btoa(text);
+            } else if (language === "binary") {
+                encodedText = text.split('').map(char => char.charCodeAt(0).toString(2)).join(' ');
+            } else if (language === "hex") {
+                encodedText = text.split('').map(char => char.charCodeAt(0).toString(16)).join(' ');
+            }
+            document.getElementById('outputText').value = encodedText;
+        }
 
-        document.getElementById('decodeButton').onclick = function() {
-            // Decoding logic here
-        };
+        function decode() {
+            const text = document.getElementById('inputText').value;
+            const language = document.getElementById('language').value;
+            let decodedText;
+            if (language === "base64") {
+                decodedText = atob(text);
+            } else if (language === "binary") {
+                decodedText = text.split(' ').map(bin => String.fromCharCode(parseInt(bin, 2))).join('');
+            } else if (language === "hex") {
+                decodedText = text.split(' ').map(hex => String.fromCharCode(parseInt(hex, 16))).join('');
+            }
+            document.getElementById('outputText').value = decodedText;
+        }
 
-        document.getElementById('copyButton').onclick = function() {
-            // Copy to clipboard logic here
-        };
+        function copyToClipboard() {
+            const outputText = document.getElementById('outputText');
+            outputText.select();
+            document.execCommand('copy');
+            alert("Copied to clipboard!");
+        }
 
-        document.getElementById('clearButton').onclick = function() {
+        function clearOutput() {
             document.getElementById('inputText').value = '';
             document.getElementById('outputText').value = '';
-        };
+        }
 
-        document.getElementById('sendEmailButton').onclick = function() {
-            const output = document.getElementById('outputText').value;
-            window.open(`mailto:?subject=Output
+        function sendEmail() {
+            const outputText = document.getElementById('outputText').value;
+            window.open(`mailto:?subject=Encoded/Decoded Text&body=${encodeURIComponent(outputText)}`);
+        }
+    </script>
+</body>
+</html>
