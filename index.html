@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Encoder/Decoder</title>
     <style>
-        body { font-family: Arial, sans-serif; }
+        body { font-family: Arial, sans-serif; margin: 20px; }
         #output { display: none; }
     </style>
 </head>
@@ -17,35 +17,33 @@
         <button onclick="checkPassword()">Submit</button>
     </div>
     
-    <div id="encoder-decoder" style="display: none;">
+    <div id="output" style="display: none;">
         <select id="language">
             <option value="base64">Base64</option>
             <option value="binary">Binary</option>
             <option value="hex">Hex</option>
         </select>
-        <textarea id="input-text" placeholder="Enter text here..."></textarea>
+        <textarea id="inputText" placeholder="Enter text here..."></textarea>
         <button onclick="encode()">Encode</button>
         <button onclick="decode()">Decode</button>
+        <button onclick="copyToClipboard()">Copy to Clipboard</button>
         <button onclick="clearOutput()">Clear</button>
-        <div id="output">
-            <textarea id="output-text" readonly></textarea>
-            <button onclick="copyToClipboard()">Copy to Clipboard</button>
-        </div>
+        <textarea id="result" placeholder="Output will appear here..." readonly></textarea>
     </div>
 
     <script>
         function checkPassword() {
             const password = document.getElementById('password').value;
             if (password === 'skibidi') {
+                document.getElementById('output').style.display = 'block';
                 document.getElementById('password-section').style.display = 'none';
-                document.getElementById('encoder-decoder').style.display = 'block';
             } else {
-                alert('Incorrect password. Please try again.');
+                alert('Incorrect password!');
             }
         }
 
         function encode() {
-            const text = document.getElementById('input-text').value;
+            const text = document.getElementById('inputText').value;
             const language = document.getElementById('language').value;
             let encodedText;
 
@@ -57,12 +55,11 @@
                 encodedText = text.split('').map(char => char.charCodeAt(0).toString(16)).join(' ');
             }
 
-            document.getElementById('output-text').value = encodedText;
-            document.getElementById('output').style.display = 'block';
+            document.getElementById('result').value = encodedText;
         }
 
         function decode() {
-            const text = document.getElementById('input-text').value;
+            const text = document.getElementById('inputText').value;
             const language = document.getElementById('language').value;
             let decodedText;
 
@@ -74,21 +71,18 @@
                 decodedText = text.split(' ').map(hex => String.fromCharCode(parseInt(hex, 16))).join('');
             }
 
-            document.getElementById('output-text').value = decodedText;
-            document.getElementById('output').style.display = 'block';
-        }
-
-        function clearOutput() {
-            document.getElementById('input-text').value = '';
-            document.getElementById('output-text').value = '';
-            document.getElementById('output').style.display = 'none';
+            document.getElementById('result').value = decodedText;
         }
 
         function copyToClipboard() {
-            const outputText = document.getElementById('output-text');
-            outputText.select();
+            const result = document.getElementById('result');
+            result.select();
             document.execCommand('copy');
-            alert('Copied to clipboard!');
+        }
+
+        function clearOutput() {
+            document.getElementById('inputText').value = '';
+            document.getElementById('result').value = '';
         }
     </script>
 </body>
