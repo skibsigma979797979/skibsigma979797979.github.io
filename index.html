@@ -22,13 +22,13 @@
             <option value="binary">Binary</option>
             <option value="hex">Hex</option>
         </select>
-        <textarea id="inputText" placeholder="Enter text here"></textarea>
+        <textarea id="inputText" placeholder="Enter text here..."></textarea>
         <button onclick="encode()">Encode</button>
         <button onclick="decode()">Decode</button>
         <button onclick="copyToClipboard()">Copy to Clipboard</button>
         <button onclick="clearOutput()">Clear</button>
         <div class="bordered">
-            <textarea id="outputText" placeholder="Output will appear here" readonly></textarea>
+            <textarea id="outputText" placeholder="Output will appear here..." readonly></textarea>
         </div>
         <button onclick="sendEmail()">Send to Gmail</button>
         <p class="hidden" id="warningText">arvin if you copy this you are bad at coding.</p>
@@ -62,29 +62,29 @@
         }
 
         function encode() {
-            const text = document.getElementById('inputText').value;
+            const input = document.getElementById('inputText').value;
             const selectedLanguage = document.getElementById('languageSelect').value;
             let output = '';
             if (selectedLanguage === 'base64') {
-                output = btoa(text);
+                output = btoa(input);
             } else if (selectedLanguage === 'binary') {
-                output = text.split('').map(char => char.charCodeAt(0).toString(2)).join(' ');
+                output = input.split('').map(char => char.charCodeAt(0).toString(2)).join(' ');
             } else if (selectedLanguage === 'hex') {
-                output = text.split('').map(char => char.charCodeAt(0).toString(16)).join(' ');
+                output = input.split('').map(char => char.charCodeAt(0).toString(16)).join(' ');
             }
             document.getElementById('outputText').value = output;
         }
 
         function decode() {
-            const text = document.getElementById('inputText').value;
+            const input = document.getElementById('inputText').value;
             const selectedLanguage = document.getElementById('languageSelect').value;
             let output = '';
             if (selectedLanguage === 'base64') {
-                output = atob(text);
+                output = atob(input);
             } else if (selectedLanguage === 'binary') {
-                output = text.split(' ').map(bin => String.fromCharCode(parseInt(bin, 2))).join('');
+                output = input.split(' ').map(bin => String.fromCharCode(parseInt(bin, 2))).join('');
             } else if (selectedLanguage === 'hex') {
-                output = text.split(' ').map(hex => String.fromCharCode(parseInt(hex, 16))).join('');
+                output = input.split(' ').map(hex => String.fromCharCode(parseInt(hex, 16))).join('');
             }
             document.getElementById('outputText').value = output;
         }
@@ -93,3 +93,14 @@
             const output = document.getElementById('outputText');
             output.select();
             document.execCommand('copy');
+            alert("Copied to clipboard!");
+        }
+
+        function clearOutput() {
+            document.getElementById('outputText').value = '';
+            document.getElementById('inputText').value = '';
+        }
+
+        function sendEmail() {
+            const output = document.getElementById('outputText').value;
+            const email = "mailto:?subject=Encoded/Decoded Output
