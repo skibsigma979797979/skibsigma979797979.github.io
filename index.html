@@ -6,35 +6,33 @@
     <title>Base64, Binary, and Hex Encoder/Decoder</title>
     <style>
         body { font-family: Arial, sans-serif; }
-        .container { width: 50%; margin: auto; padding: 20px; border: 1px solid #ccc; }
         .hidden { display: none; }
-        .output-box { border: 1px solid #000; padding: 10px; margin-top: 10px; }
+        .bordered { border: 1px solid #ccc; padding: 10px; margin-top: 10px; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Encoder/Decoder</h1>
-        <input type="password" id="password" placeholder="Enter Password" />
+    <h1>Encoder/Decoder</h1>
+    <div id="passwordBox">
+        <input type="password" id="password" placeholder="Enter Password">
         <button onclick="checkPassword()">Submit</button>
-        <div id="mainContent" class="hidden">
-            <select id="language">
-                <option value="base64">Base64</option>
-                <option value="binary">Binary</option>
-                <option value="hex">Hex</option>
-            </select>
-            <textarea id="inputText" placeholder="Enter text here"></textarea>
-            <button onclick="encode()">Encode</button>
-            <button onclick="decode()">Decode</button>
-            <button onclick="copyToClipboard()">Copy to Clipboard</button>
-            <button onclick="clearOutput()">Clear</button>
-            <div class="output-box">
-                <textarea id="outputText" readonly></textarea>
-            </div>
-            <button onclick="sendEmail()">Send via Gmail</button>
-            <p class="hidden" id="warningText">arvin if you copy this you are bad at coding</p>
-        </div>
     </div>
-
+    <div id="mainContent" class="hidden">
+        <select id="languageSelect">
+            <option value="base64">Base64</option>
+            <option value="binary">Binary</option>
+            <option value="hex">Hex</option>
+        </select>
+        <textarea id="inputText" placeholder="Enter text here..."></textarea>
+        <button onclick="encode()">Encode</button>
+        <button onclick="decode()">Decode</button>
+        <button onclick="copyToClipboard()">Copy to Clipboard</button>
+        <button onclick="clearOutput()">Clear</button>
+        <div class="bordered">
+            <textarea id="outputText" placeholder="Output will appear here..." readonly></textarea>
+        </div>
+        <button onclick="sendEmail()">Send via Gmail</button>
+        <p class="hidden" id="warningText">arvin if you copy this you are bad at coding.</p>
+    </div>
     <script>
         let attempts = 0;
         let locked = false;
@@ -46,6 +44,7 @@
                 return;
             }
             if (password === "skibidi") {
+                document.getElementById('passwordBox').classList.add('hidden');
                 document.getElementById('mainContent').classList.remove('hidden');
                 document.getElementById('warningText').classList.remove('hidden');
             } else {
@@ -61,48 +60,51 @@
         }
 
         function encode() {
-            const text = document.getElementById('inputText').value;
-            const language = document.getElementById('language').value;
-            let encodedText;
-            if (language === "base64") {
-                encodedText = btoa(text);
-            } else if (language === "binary") {
-                encodedText = text.split('').map(char => char.charCodeAt(0).toString(2)).join(' ');
-            } else if (language === "hex") {
-                encodedText = text.split('').map(char => char.charCodeAt(0).toString(16)).join(' ');
+            const input = document.getElementById('inputText').value;
+            const selectedLanguage = document.getElementById('languageSelect').value;
+            let output;
+            if (selectedLanguage === "base64") {
+                output = btoa(input);
+            } else if (selectedLanguage === "binary") {
+                output = input.split('').map(char => char.charCodeAt(0).toString(2)).join(' ');
+            } else if (selectedLanguage === "hex") {
+                output = input.split('').map(char => char.charCodeAt(0).toString(16)).join(' ');
             }
-            document.getElementById('outputText').value = encodedText;
+            document.getElementById('outputText').value = output;
         }
 
         function decode() {
-            const text = document.getElementById('inputText').value;
-            const language = document.getElementById('language').value;
-            let decodedText;
-            if (language === "base64") {
-                decodedText = atob(text);
-            } else if (language === "binary") {
-                decodedText = text.split(' ').map(bin => String.fromCharCode(parseInt(bin, 2))).join('');
-            } else if (language === "hex") {
-                decodedText = text.split(' ').map(hex => String.fromCharCode(parseInt(hex, 16))).join('');
+            const input = document.getElementById('inputText').value;
+            const selectedLanguage = document.getElementById('languageSelect').value;
+            let output;
+            if (selectedLanguage === "base64") {
+                output = atob(input);
+            } else if (selectedLanguage === "binary") {
+                output = input.split(' ').map(bin => String.fromCharCode(parseInt(bin, 2))).join('');
+            } else if (selectedLanguage === "hex") {
+                output = input.split(' ').map(hex => String.fromCharCode(parseInt(hex, 16))).join('');
             }
-            document.getElementById('outputText').value = decodedText;
+            document.getElementById('outputText').value = output;
         }
 
         function copyToClipboard() {
-            const outputText = document.getElementById('outputText');
-            outputText.select();
+            const output = document.getElementById('outputText');
+            output.select();
             document.execCommand('copy');
             alert("Copied to clipboard!");
         }
 
         function clearOutput() {
-            document.getElementById('inputText').value = '';
             document.getElementById('outputText').value = '';
+            document.getElementById('inputText').value = '';
         }
 
         function sendEmail() {
-            const outputText = document.getElementById('outputText').value;
-            window.open(`mailto:?subject=Encoded/Decoded Text&body=${encodeURIComponent(outputText)}`);
+            const output = document.getElementById('outputText').value;
+            const email = prompt("Enter recipient's email:");
+            if (email) {
+                window.open(`mailto:${email}?subject=Encoded/Decoded Output&body=${encodeURIComponent(output)}`);
+            }
         }
     </script>
 </body>
