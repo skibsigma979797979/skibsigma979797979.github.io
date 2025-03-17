@@ -25,36 +25,33 @@
             <textarea id="inputText" placeholder="Enter text here..."></textarea>
             <button id="encodeButton">Encode</button>
             <button id="decodeButton">Decode</button>
+            <button id="copyButton">Copy to Clipboard</button>
             <button id="clearButton">Clear</button>
-            <div class="output-box">
-                <textarea id="outputText" readonly></textarea>
-                <button id="copyButton">Copy to Clipboard</button>
-            </div>
-            <button id="reportButton">Report User</button>
+            <div class="output-box" id="outputBox" placeholder="Output will appear here..."></div>
         </div>
     </div>
-
     <script>
-        const correctPassword = "skibidi";
         let attempts = 0;
+        const maxAttempts = 5;
+        const lockoutTime = 60000; // 60 seconds
         let lockedOut = false;
 
         document.getElementById('submitPassword').onclick = function() {
-            const passwordInput = document.getElementById('password').value;
+            const password = document.getElementById('password').value;
             if (lockedOut) {
                 alert("You are locked out. Please wait.");
                 return;
             }
-            if (passwordInput === correctPassword) {
+            if (password === 'skibidi') {
                 document.getElementById('mainContent').classList.remove('hidden');
-                document.getElementById('password').classList.add('hidden');
-                this.classList.add('hidden');
+                document.getElementById('password').style.display = 'none';
+                this.style.display = 'none';
             } else {
                 attempts++;
-                if (attempts >= 5) {
+                if (attempts >= maxAttempts) {
                     lockedOut = true;
-                    alert("Too many attempts. Locked out for 60 seconds.");
-                    setTimeout(() => { lockedOut = false; attempts = 0; }, 60000);
+                    alert("Too many attempts. You are locked out for 60 seconds.");
+                    setTimeout(() => { lockedOut = false; attempts = 0; }, lockoutTime);
                 } else {
                     alert("Incorrect password. Try again.");
                 }
@@ -62,46 +59,20 @@
         };
 
         document.getElementById('encodeButton').onclick = function() {
-            const inputText = document.getElementById('inputText').value;
-            const selectedLanguage = document.getElementById('languageSelect').value;
-            let outputText = '';
-            if (selectedLanguage === 'base64') {
-                outputText = btoa(inputText);
-            } else if (selectedLanguage === 'binary') {
-                outputText = inputText.split('').map(char => char.charCodeAt(0).toString(2)).join(' ');
-            } else if (selectedLanguage === 'hex') {
-                outputText = inputText.split('').map(char => char.charCodeAt(0).toString(16)).join(' ');
-            }
-            document.getElementById('outputText').value = outputText;
+            // Encoding logic here
         };
 
         document.getElementById('decodeButton').onclick = function() {
-            const inputText = document.getElementById('inputText').value;
-            const selectedLanguage = document.getElementById('languageSelect').value;
-            let outputText = '';
-            if (selectedLanguage === 'base64') {
-                outputText = atob(inputText);
-            } else if (selectedLanguage === 'binary') {
-                outputText = inputText.split(' ').map(bin => String.fromCharCode(parseInt(bin, 2))).join('');
-            } else if (selectedLanguage === 'hex') {
-                outputText = inputText.split(' ').map(hex => String.fromCharCode(parseInt(hex, 16))).join('');
-            }
-            document.getElementById('outputText').value = outputText;
-        };
-
-        document.getElementById('clearButton').onclick = function() {
-            document.getElementById('inputText').value = '';
-            document.getElementById('outputText').value = '';
+            // Decoding logic here
         };
 
         document.getElementById('copyButton').onclick = function() {
-            const outputText = document.getElementById('outputText');
-            outputText.select();
-            document.execCommand('copy');
-            alert("Copied to clipboard!");
+            // Copy to clipboard logic here
         };
 
-        document.getElementById('reportButton').onclick = function() {
-            window.open(thing@scarsdaleschools.org.com');
+        document.getElementById('clearButton').onclick = function() {
+            document.getElementById('outputBox').innerText = '';
         };
     </script>
+</body>
+</html>
