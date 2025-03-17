@@ -3,102 +3,101 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Encoder/Decoder</title>
+    <title>Base64, Binary, and Hex Encoder/Decoder</title>
     <style>
         body { font-family: Arial, sans-serif; }
-        #output { margin-top: 20px; }
-        #passwordSection { display: block; }
-        #mainSection { display: none; }
+        .container { width: 300px; margin: auto; }
+        .output-box { border: 1px solid #ccc; padding: 10px; margin-top: 10px; display: none; }
+        .hidden { display: none; }
     </style>
 </head>
 <body>
-    <div id="passwordSection">
-        <input type="password" id="passwordInput" placeholder="Enter Password">
-        <button onclick="checkPassword()">Submit</button>
-        <p id="attemptsLeft"></p>
-    </div>
-
-    <div id="mainSection">
-        <select id="languageSelect">
-            <option value="base64">Base64</option>
-            <option value="binary">Binary</option>
-            <option value="hex">Hex</option>
-        </select>
-        <textarea id="inputText" placeholder="Enter text here"></textarea>
-        <button onclick="encode()">Encode</button>
-        <button onclick="decode()">Decode</button>
-        <button onclick="copyToClipboard()">Copy to Clipboard</button>
-        <button onclick="clearOutput()">Clear</button>
-        <div id="output"></div>
+    <div class="container">
+        <h1>Encoder/Decoder</h1>
+        <input type="password" id="password" placeholder="Enter Password" />
+        <button id="submitPassword">Submit</button>
+        <div id="error" class="hidden">Too many attempts. Please wait.</div>
+        
+        <div id="mainContent" class="hidden">
+            <select id="language">
+                <option value="base64">Base64</option>
+                <option value="binary">Binary</option>
+                <option value="hex">Hex</option>
+            </select>
+            <textarea id="inputText" placeholder="Enter text here"></textarea>
+            <button id="encode">Encode</button>
+            <button id="decode">Decode</button>
+            <button id="copy">Copy to Clipboard</button>
+            <button id="clear">Clear</button>
+            <div class="output-box" id="outputBox"></div>
+        </div>
     </div>
 
     <script>
-        let attempts = 0;
-        const maxAttempts = 5;
         const correctPassword = "skibidi";
-        let lockout = false;
+        let attempts = 0;
+        let locked = false;
 
-        function checkPassword() {
-            if (lockout) return;
-            const password = document.getElementById("passwordInput").value;
-            if (password === correctPassword) {
-                document.getElementById("passwordSection").style.display = "none";
-                document.getElementById("mainSection").style.display = "block";
-                document.getElementById("attemptsLeft").innerText = "";
+        document.getElementById('submitPassword').onclick = function() {
+            if (locked) return;
+            const passwordInput = document.getElementById('password').value;
+            if (passwordInput === correctPassword) {
+                document.getElementById('mainContent').classList.remove('hidden');
+                document.getElementById('error').classList.add('hidden');
             } else {
                 attempts++;
-                if (attempts >= maxAttempts) {
-                    lockout = true;
-                    document.getElementById("attemptsLeft").innerText = "Locked out for 60 seconds.";
+                if (attempts >= 5) {
+                    locked = true;
+                    document.getElementById('error').classList.remove('hidden');
                     setTimeout(() => {
-                        lockout = false;
+                        locked = false;
                         attempts = 0;
-                        document.getElementById("attemptsLeft").innerText = "";
+                        document.getElementById('error').classList.add('hidden');
                     }, 60000);
-                } else {
-                    document.getElementById("attemptsLeft").innerText = `${maxAttempts - attempts} attempts left.`;
                 }
             }
-            document.getElementById("passwordInput").value = "";
-        }
+        };
 
-        function encode() {
-            const text = document.getElementById("inputText").value;
-            const selectedLanguage = document.getElementById("languageSelect").value;
-            let encodedText;
-            if (selectedLanguage === "base64") {
-                encodedText = btoa(text);
-            } else if (selectedLanguage === "binary") {
-                encodedText = text.split('').map(char => char.charCodeAt(0).toString(2)).join(' ');
-            } else if (selectedLanguage === "hex") {
-                encodedText = text.split('').map(char => char.charCodeAt(0).toString(16)).join(' ');
+        document.getElementById('encode').onclick = function() {
+            const inputText = document.getElementById('inputText').value;
+            const language = document.getElementById('language').value;
+            let output;
+            if (language === "base64") {
+                output = btoa(inputText);
+            } else if (language === "binary") {
+                output = inputText.split('').map(char => char.charCodeAt(0).toString(2)).join(' ');
+            } else if (language === "hex") {
+                output = inputText.split('').map(char => char.charCodeAt(0).toString(16)).join(' ');
             }
-            document.getElementById("output").innerText = encodedText;
-        }
+            document.getElementById('outputBox').innerText = output;
+            document.getElementById('outputBox').style.display = 'block';
+        };
 
-        function decode() {
-            const text = document.getElementById("inputText").value;
-            const selectedLanguage = document.getElementById("languageSelect").value;
-            let decodedText;
-            if (selectedLanguage === "base64") {
-                decodedText = atob(text);
-            } else if (selectedLanguage === "binary") {
-                decodedText = text.split(' ').map(bin => String.fromCharCode(parseInt(bin, 2))).join('');
-            } else if (selectedLanguage === "hex") {
-                decodedText = text.split(' ').map(hex => String.fromCharCode(parseInt(hex, 16))).join('');
+        document.getElementById('decode').onclick = function() {
+            const inputText = document.getElementById('inputText').value;
+            const language = document.getElementById('language').value;
+            let output;
+            if (language === "base64") {
+                output = atob(inputText);
+            } else if (language === "binary") {
+                output = inputText.split(' ').map(bin => String.fromCharCode(parseInt(bin, 2))).join('');
+            } else if (language === "hex") {
+                output = inputText.split(' ').map(hex => String.fromCharCode(parseInt(hex, 16))).join('');
             }
-            document.getElementById("output").innerText = decodedText;
-        }
+            document.getElementById('outputBox').innerText = output;
+            document.getElementById('outputBox').style.display = 'block';
+        };
 
-        function copyToClipboard() {
-            const output = document.getElementById("output");
-            navigator.clipboard.writeText(output.innerText);
-        }
+        document.getElementById('copy').onclick = function() {
+            const outputText = document.getElementById('outputBox').innerText;
+            navigator.clipboard.writeText(outputText);
+        };
 
-        function clearOutput() {
-            document.getElementById("output").innerText = "";
-            document.getElementById("inputText").value = "";
-        }
+        document.getElementById('clear').onclick = function() {
+            document.getElementById('inputText').value = '';
+            document.getElementById('outputBox').innerText = '';
+            document.getElementById('outputBox').style.display = 'none';
+        };
     </script>
 </body>
 </html>
