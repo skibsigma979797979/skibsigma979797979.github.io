@@ -3,30 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Base64, Binary, and Hex Encoder/Decoder</title>
+    <title>Encoder/Decoder</title>
     <style>
         body { font-family: Arial, sans-serif; }
-        #output { margin-top: 20px; }
+        #output { display: none; }
     </style>
 </head>
 <body>
-    <h1>Encoder/Decoder</h1>
+    <h1>Base64, Binary, and Hex Encoder/Decoder</h1>
     <div id="password-section">
-        <input type="password" id="password" placeholder="Enter password">
+        <label for="password">Enter Password:</label>
+        <input type="password" id="password">
         <button onclick="checkPassword()">Submit</button>
     </div>
-    <div id="main-section" style="display:none;">
+    
+    <div id="encoder-decoder" style="display: none;">
         <select id="language">
             <option value="base64">Base64</option>
             <option value="binary">Binary</option>
             <option value="hex">Hex</option>
         </select>
-        <textarea id="input" placeholder="Enter text here"></textarea>
+        <textarea id="input-text" placeholder="Enter text here..."></textarea>
         <button onclick="encode()">Encode</button>
         <button onclick="decode()">Decode</button>
-        <button onclick="copyToClipboard()">Copy to Clipboard</button>
         <button onclick="clearOutput()">Clear</button>
-        <div id="output"></div>
+        <div id="output">
+            <textarea id="output-text" readonly></textarea>
+            <button onclick="copyToClipboard()">Copy to Clipboard</button>
+        </div>
     </div>
 
     <script>
@@ -34,48 +38,57 @@
             const password = document.getElementById('password').value;
             if (password === 'skibidi') {
                 document.getElementById('password-section').style.display = 'none';
-                document.getElementById('main-section').style.display = 'block';
+                document.getElementById('encoder-decoder').style.display = 'block';
             } else {
-                alert('Incorrect password');
+                alert('Incorrect password. Please try again.');
             }
         }
 
         function encode() {
-            const input = document.getElementById('input').value;
+            const text = document.getElementById('input-text').value;
             const language = document.getElementById('language').value;
-            let output;
+            let encodedText;
+
             if (language === 'base64') {
-                output = btoa(input);
+                encodedText = btoa(text);
             } else if (language === 'binary') {
-                output = input.split('').map(char => char.charCodeAt(0).toString(2)).join(' ');
+                encodedText = text.split('').map(char => char.charCodeAt(0).toString(2)).join(' ');
             } else if (language === 'hex') {
-                output = input.split('').map(char => char.charCodeAt(0).toString(16)).join(' ');
+                encodedText = text.split('').map(char => char.charCodeAt(0).toString(16)).join(' ');
             }
-            document.getElementById('output').innerText = output;
+
+            document.getElementById('output-text').value = encodedText;
+            document.getElementById('output').style.display = 'block';
         }
 
         function decode() {
-            const input = document.getElementById('input').value;
+            const text = document.getElementById('input-text').value;
             const language = document.getElementById('language').value;
-            let output;
-            if (language === 'base64') {
-                output = atob(input);
-            } else if (language === 'binary') {
-                output = input.split(' ').map(bin => String.fromCharCode(parseInt(bin, 2))).join('');
-            } else if (language === 'hex') {
-                output = input.split(' ').map(hex => String.fromCharCode(parseInt(hex, 16))).join('');
-            }
-            document.getElementById('output').innerText = output;
-        }
+            let decodedText;
 
-        function copyToClipboard() {
-            const output = document.getElementById('output').innerText;
-            navigator.clipboard.writeText(output);
+            if (language === 'base64') {
+                decodedText = atob(text);
+            } else if (language === 'binary') {
+                decodedText = text.split(' ').map(bin => String.fromCharCode(parseInt(bin, 2))).join('');
+            } else if (language === 'hex') {
+                decodedText = text.split(' ').map(hex => String.fromCharCode(parseInt(hex, 16))).join('');
+            }
+
+            document.getElementById('output-text').value = decodedText;
+            document.getElementById('output').style.display = 'block';
         }
 
         function clearOutput() {
-            document.getElementById('output').innerText = '';
-            document.getElementById('input').value = '';
+            document.getElementById('input-text').value = '';
+            document.getElementById('output-text').value = '';
+            document.getElementById('output').style.display = 'none';
+        }
+
+        function copyToClipboard() {
+            const outputText = document.getElementById('output-text');
+            outputText.select();
+            document.execCommand('copy');
+            alert('Copied to clipboard!');
         }
     </script>
 </body>
