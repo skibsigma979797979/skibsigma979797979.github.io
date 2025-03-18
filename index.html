@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Base64, Binary, and Hex Encoder/Decoder</title>
+    <title>Encoder/Decoder</title>
     <style>
         body { font-family: Arial, sans-serif; }
         .hidden { display: none; }
@@ -11,7 +11,7 @@
     </style>
 </head>
 <body>
-    <h1>Encoder/Decoder</h1>
+    <h1>Base64, Binary, and Hex Encoder/Decoder</h1>
     <div id="passwordBox">
         <input type="password" id="password" placeholder="Enter Password">
         <button onclick="checkPassword()">Submit</button>
@@ -27,20 +27,22 @@
         <button onclick="decode()">Decode</button>
         <button onclick="copyToClipboard()">Copy to Clipboard</button>
         <button onclick="clearOutput()">Clear</button>
-        <input type="file" id="fileInput">
-        <button onclick="encodeFile()">Encode File</button>
         <div class="bordered">
             <textarea id="outputText" placeholder="Output will appear here..." readonly></textarea>
         </div>
-        <small class="hidden" id="warningText">If anyone copies this they are bad at coding.</small>
+        <button onclick="openGmail()">Send to Gmail</button>
+        <p class="hidden" id="warningText">If anyone copies this, they are bad at coding.</p>
+        <button onclick="openSchoology()">Open Schoology</button>
     </div>
     <script>
         let attempts = 0;
-        let locked = false;
+        const maxAttempts = 5;
+        const lockoutTime = 60000; // 60 seconds
+        let lockedOut = false;
 
         function checkPassword() {
             const password = document.getElementById('password').value;
-            if (locked) {
+            if (lockedOut) {
                 alert("You are locked out. Please wait.");
                 return;
             }
@@ -50,10 +52,10 @@
                 document.getElementById('warningText').classList.remove('hidden');
             } else {
                 attempts++;
-                if (attempts >= 5) {
-                    locked = true;
-                    alert("Too many attempts. Locked for 60 seconds.");
-                    setTimeout(() => { locked = false; attempts = 0; }, 60000);
+                if (attempts >= maxAttempts) {
+                    lockedOut = true;
+                    alert("Too many attempts. You are locked out for 60 seconds.");
+                    setTimeout(() => { lockedOut = false; attempts = 0; }, lockoutTime);
                 } else {
                     alert("Incorrect password. Try again.");
                 }
@@ -61,26 +63,52 @@
         }
 
         function encode() {
-            // Encoding logic here
+            const input = document.getElementById('inputText').value;
+            const selectedLanguage = document.getElementById('languageSelect').value;
+            let output;
+            if (selectedLanguage === "base64") {
+                output = btoa(input);
+            } else if (selectedLanguage === "binary") {
+                output = input.split('').map(char => char.charCodeAt(0).toString(2)).join(' ');
+            } else if (selectedLanguage === "hex") {
+                output = input.split('').map(char => char.charCodeAt(0).toString(16)).join(' ');
+            }
+            document.getElementById('outputText').value = output;
         }
 
         function decode() {
-            // Decoding logic here
+            const input = document.getElementById('inputText').value;
+            const selectedLanguage = document.getElementById('languageSelect').value;
+            let output;
+            if (selectedLanguage === "base64") {
+                output = atob(input);
+            } else if (selectedLanguage === "binary") {
+                output = input.split(' ').map(bin => String.fromCharCode(parseInt(bin, 2))).join('');
+            } else if (selectedLanguage === "hex") {
+                output = input.split(' ').map(hex => String.fromCharCode(parseInt(hex, 16))).join('');
+            }
+            document.getElementById('outputText').value = output;
         }
 
         function copyToClipboard() {
             const output = document.getElementById('outputText');
             output.select();
             document.execCommand('copy');
-            alert("Copied to clipboard!");
+            alert("Output copied to clipboard!");
         }
 
         function clearOutput() {
             document.getElementById('outputText').value = '';
+            document.getElementById('inputText').value = '';
         }
 
-        function encodeFile() {
-            // File encoding logic here
+        function openGmail() {
+            const output = document.getElementById('outputText').value;
+            window.open(`mailto:?body=${encodeURIComponent(output)}`);
+        }
+
+        function openSchoology() {
+            window.open('https://www.schoology.com');
         }
     </script>
 </body>
