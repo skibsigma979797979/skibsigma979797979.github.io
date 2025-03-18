@@ -27,6 +27,8 @@
         <button onclick="decode()">Decode</button>
         <button onclick="copyToClipboard()">Copy to Clipboard</button>
         <button onclick="clearOutput()">Clear</button>
+        <input type="file" id="fileInput">
+        <button onclick="uploadFile()">Upload File</button>
         <div class="bordered">
             <textarea id="outputText" placeholder="Output will appear here" readonly></textarea>
         </div>
@@ -35,11 +37,13 @@
     </div>
     <script>
         let attempts = 0;
-        let locked = false;
+        const maxAttempts = 5;
+        const lockoutTime = 60000; // 60 seconds
+        let lockedOut = false;
 
         function checkPassword() {
             const password = document.getElementById('password').value;
-            if (locked) {
+            if (lockedOut) {
                 alert("You are locked out. Please wait.");
                 return;
             }
@@ -49,56 +53,42 @@
                 document.getElementById('warningText').classList.remove('hidden');
             } else {
                 attempts++;
-                if (attempts >= 5) {
-                    locked = true;
-                    alert("Too many attempts. Locked for 60 seconds.");
-                    setTimeout(() => { locked = false; attempts = 0; }, 60000);
+                if (attempts >= maxAttempts) {
+                    lockedOut = true;
+                    setTimeout(() => { lockedOut = false; attempts = 0; }, lockoutTime);
+                    alert("Too many attempts. You are locked out for 60 seconds.");
+                } else {
+                    alert("Incorrect password. Try again.");
                 }
             }
         }
 
         function encode() {
-            const text = document.getElementById('inputText').value;
-            const selectedLanguage = document.getElementById('languageSelect').value;
-            let output = '';
-            if (selectedLanguage === 'base64') {
-                output = btoa(text);
-            } else if (selectedLanguage === 'binary') {
-                output = text.split('').map(char => char.charCodeAt(0).toString(2)).join(' ');
-            } else if (selectedLanguage === 'hex') {
-                output = text.split('').map(char => char.charCodeAt(0).toString(16)).join(' ');
-            }
-            document.getElementById('outputText').value = output;
+            // Encoding logic here
         }
 
         function decode() {
-            const text = document.getElementById('inputText').value;
-            const selectedLanguage = document.getElementById('languageSelect').value;
-            let output = '';
-            if (selectedLanguage === 'base64') {
-                output = atob(text);
-            } else if (selectedLanguage === 'binary') {
-                output = text.split(' ').map(bin => String.fromCharCode(parseInt(bin, 2))).join('');
-            } else if (selectedLanguage === 'hex') {
-                output = text.split(' ').map(hex => String.fromCharCode(parseInt(hex, 16))).join('');
-            }
-            document.getElementById('outputText').value = output;
+            // Decoding logic here
         }
 
         function copyToClipboard() {
             const output = document.getElementById('outputText');
             output.select();
             document.execCommand('copy');
+            alert("Copied to clipboard!");
         }
 
         function clearOutput() {
-            document.getElementById('inputText').value = '';
             document.getElementById('outputText').value = '';
+        }
+
+        function uploadFile() {
+            // File upload logic here
         }
 
         function sendEmail() {
             const output = document.getElementById('outputText').value;
-            window.open(`mailto:?subject=Encoded/Decoded Output&body=${encodeURIComponent(output)}`);
+            window.open(`mailto:?subject=Encoded Output&body=${encodeURIComponent(output)}`);
         }
     </script>
 </body>
