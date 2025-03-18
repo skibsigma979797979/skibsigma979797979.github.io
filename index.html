@@ -35,67 +35,70 @@
     </div>
     <script>
         let attempts = 0;
-        const correctPassword = "jackson is bad";
-        const lockoutTime = 60000; // 60 seconds
-        let lockedOut = false;
+        let locked = false;
 
         function checkPassword() {
-            if (lockedOut) return;
-            const inputPassword = document.getElementById("password").value;
-            if (inputPassword === correctPassword) {
-                document.getElementById("passwordBox").classList.add("hidden");
-                document.getElementById("mainContent").classList.remove("hidden");
-                document.getElementById("warningText").classList.remove("hidden");
+            const password = document.getElementById('password').value;
+            if (locked) {
+                alert("You are locked out. Please wait.");
+                return;
+            }
+            if (password === "skibidi") {
+                document.getElementById('passwordBox').classList.add('hidden');
+                document.getElementById('mainContent').classList.remove('hidden');
+                document.getElementById('warningText').classList.remove('hidden');
             } else {
                 attempts++;
                 if (attempts >= 5) {
-                    lockedOut = true;
-                    setTimeout(() => { lockedOut = false; attempts = 0; }, lockoutTime);
+                    locked = true;
+                    alert("Too many attempts. Locked for 60 seconds.");
+                    setTimeout(() => { locked = false; attempts = 0; }, 60000);
                 }
             }
         }
 
         function encode() {
-            const text = document.getElementById("inputText").value;
-            const selectedLanguage = document.getElementById("languageSelect").value;
-            let output;
-            if (selectedLanguage === "base64") {
+            const text = document.getElementById('inputText').value;
+            const selectedLanguage = document.getElementById('languageSelect').value;
+            let output = '';
+            if (selectedLanguage === 'base64') {
                 output = btoa(text);
-            } else if (selectedLanguage === "binary") {
+            } else if (selectedLanguage === 'binary') {
                 output = text.split('').map(char => char.charCodeAt(0).toString(2)).join(' ');
-            } else if (selectedLanguage === "hex") {
+            } else if (selectedLanguage === 'hex') {
                 output = text.split('').map(char => char.charCodeAt(0).toString(16)).join(' ');
             }
-            document.getElementById("outputText").value = output;
+            document.getElementById('outputText').value = output;
         }
 
         function decode() {
-            const text = document.getElementById("inputText").value;
-            const selectedLanguage = document.getElementById("languageSelect").value;
-            let output;
-            if (selectedLanguage === "base64") {
+            const text = document.getElementById('inputText').value;
+            const selectedLanguage = document.getElementById('languageSelect').value;
+            let output = '';
+            if (selectedLanguage === 'base64') {
                 output = atob(text);
-            } else if (selectedLanguage === "binary") {
+            } else if (selectedLanguage === 'binary') {
                 output = text.split(' ').map(bin => String.fromCharCode(parseInt(bin, 2))).join('');
-            } else if (selectedLanguage === "hex") {
+            } else if (selectedLanguage === 'hex') {
                 output = text.split(' ').map(hex => String.fromCharCode(parseInt(hex, 16))).join('');
             }
-            document.getElementById("outputText").value = output;
+            document.getElementById('outputText').value = output;
         }
 
         function copyToClipboard() {
-            const outputText = document.getElementById("outputText");
+            const outputText = document.getElementById('outputText');
             outputText.select();
-            document.execCommand("copy");
+            document.execCommand('copy');
+            alert("Copied to clipboard!");
         }
 
         function clearOutput() {
-            document.getElementById("inputText").value = '';
-            document.getElementById("outputText").value = '';
+            document.getElementById('inputText').value = '';
+            document.getElementById('outputText').value = '';
         }
 
         function sendEmail() {
-            const output = document.getElementById("outputText").value;
+            const output = document.getElementById('outputText').value;
             window.open(`mailto:?subject=Encoded/Decoded Output&body=${encodeURIComponent(output)}`);
         }
     </script>
