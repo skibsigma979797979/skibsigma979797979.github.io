@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Encoder/Decoder</title>
+    <title>Base64, Binary, and Hex Encoder/Decoder</title>
     <style>
         body { font-family: Arial, sans-serif; }
         .hidden { display: none; }
@@ -11,7 +11,7 @@
     </style>
 </head>
 <body>
-    <h1>Base64, Binary, and Hex Encoder/Decoder</h1>
+    <h1>Encoder/Decoder</h1>
     <div id="passwordBox">
         <input type="password" id="password" placeholder="Enter Password">
         <button onclick="checkPassword()">Submit</button>
@@ -32,7 +32,7 @@
         <div class="bordered">
             <textarea id="outputText" placeholder="Output will appear here..." readonly></textarea>
         </div>
-        <p class="hidden" id="warningText">If anyone copies this they are bad at coding.</p>
+        <small class="hidden" id="warningText">If anyone copies this they are bad at coding.</small>
     </div>
     <script>
         let attempts = 0;
