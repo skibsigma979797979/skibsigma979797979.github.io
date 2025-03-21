@@ -1,5 +1,3 @@
-# Encoder/Decoder
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -27,12 +25,12 @@
         <textarea id="input" placeholder="Enter text here..."></textarea>
         <button onclick="encodeDecode()">Encode/Decode</button>
         <button onclick="clearFields()">Clear</button>
-        <button onclick="copyToClipboard()">Copy to Clipboard</button>
-        <div id="output" placeholder="Output will appear here..."></div>
+        <button onclick="copyToClipboard()">Copy Output</button>
+        <div id="output"></div>
     </div>
     <script>
         let attempts = 0;
-        const correctPassword = "yourPassword";skibidi
+        const correctPassword = "skibidi";
 
         function checkPassword() {
             const password = document.getElementById("password").value;
@@ -42,8 +40,12 @@
             } else {
                 attempts++;
                 if (attempts >= 5) {
-                    alert("Too many attempts. Please wait 60 seconds.");
-                    setTimeout(() => { attempts = 0; }, 60000);
+                    alert("Too many attempts! Please wait 60 seconds.");
+                    document.getElementById("password").disabled = true;
+                    setTimeout(() => {
+                        document.getElementById("password").disabled = false;
+                        attempts = 0;
+                    }, 60000);
                 } else {
                     alert("Incorrect password. Try again.");
                 }
@@ -74,7 +76,7 @@
         function copyToClipboard() {
             const output = document.getElementById("output").innerText;
             navigator.clipboard.writeText(output).then(() => {
-                alert("Copied to clipboard!");
+                alert("Output copied to clipboard!");
             });
         }
     </script>
