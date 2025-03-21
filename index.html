@@ -1,95 +1,78 @@
+# Encoder/Decoder
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Base64 Hex and Binary Encoder/Decoder</title>
+    <title>Encoder/Decoder</title>
     <style>
         body { font-family: Arial, sans-serif; }
-        #output { margin-top: 10px; }
-        #lockout { display: none; color: red; }
+        #output { border: 1px solid #000; padding: 10px; margin-top: 10px; }
     </style>
 </head>
 <body>
-    <h1>Base64 Hex and Binary Encoder/Decoder</h1>
-    <div id="lockout">Too many attempts. Please wait 60 seconds.</div>
-    <input type="password" id="password" placeholder="Enter Password" />
-    <button onclick="checkPassword()">Submit</button>
-    <div id="encoder" style="display:none;">
-        <textarea id="input" placeholder="Enter text to encode/decode"></textarea>
-        <button onclick="encodeBase64()">Encode to Base64</button>
-        <button onclick="decodeBase64()">Decode from Base64</button>
-        <button onclick="encodeHex()">Encode to Hex</button>
-        <button onclick="decodeHex()">Decode from Hex</button>
+    <h1>Encoder/Decoder</h1>
+    <div id="passwordPrompt">
+        <label for="password">Enter Password:</label>
+        <input type="password" id="password">
+        <button onclick="checkPassword()">Submit</button>
+    </div>
+    <div id="encoderDecoder" style="display:none;">
+        <select id="language">
+            <option value="base64">Base64</option>
+            <option value="binary">Binary</option>
+            <option value="hex">Hex</option>
+        </select>
+        <textarea id="input" placeholder="Enter text here..."></textarea>
+        <button onclick="encodeDecode()">Encode/Decode</button>
         <button onclick="clearFields()">Clear</button>
         <button onclick="copyToClipboard()">Copy to Clipboard</button>
-        <div id="output"></div>
+        <div id="output" placeholder="Output will appear here..."></div>
     </div>
     <script>
         let attempts = 0;
-        let lockoutTime = 0;
+        const correctPassword = "yourPassword"; // Set your password here
 
         function checkPassword() {
-            const password = document.getElementById('password').value;
-            if (lockoutTime > 0) {
-                alert("Please wait " + lockoutTime + " seconds.");
-                return;
-            }
-            if (password === "skibidi") {
-                document.getElementById('encoder').style.display = 'block';
-                document.getElementById('password').style.display = 'none';
-                document.querySelector('button').style.display = 'none';
+            const password = document.getElementById("password").value;
+            if (password === correctPassword) {
+                document.getElementById("passwordPrompt").style.display = "none";
+                document.getElementById("encoderDecoder").style.display = "block";
             } else {
                 attempts++;
                 if (attempts >= 5) {
-                    lockoutTime = 60;
-                    document.getElementById('lockout').style.display = 'block';
-                    setTimeout(() => {
-                        lockoutTime = 0;
-                        document.getElementById('lockout').style.display = 'none';
-                    }, 60000);
+                    alert("Too many attempts. Please wait 60 seconds.");
+                    setTimeout(() => { attempts = 0; }, 60000);
+                } else {
+                    alert("Incorrect password. Try again.");
                 }
-                alert("Incorrect password. Attempts: " + attempts);
             }
         }
 
-        function encodeBase64() {
-            const input = document.getElementById('input').value;
-            const output = btoa(input);
-            document.getElementById('output').innerText = output;
-        }
+        function encodeDecode() {
+            const input = document.getElementById("input").value;
+            const language = document.getElementById("language").value;
+            let output = "";
 
-        function decodeBase64() {
-            const input = document.getElementById('input').value;
-            const output = atob(input);
-            document.getElementById('output').innerText = output;
-        }
-
-        function encodeHex() {
-            const input = document.getElementById('input').value;
-            let output = '';
-            for (let i = 0; i < input.length; i++) {
-                output += input.charCodeAt(i).toString(16);
+            if (language === "base64") {
+                output = btoa(input);
+            } else if (language === "binary") {
+                output = input.split('').map(char => char.charCodeAt(0).toString(2)).join(' ');
+            } else if (language === "hex") {
+                output = input.split('').map(char => char.charCodeAt(0).toString(16)).join(' ');
             }
-            document.getElementById('output').innerText = output;
-        }
 
-        function decodeHex() {
-            const input = document.getElementById('input').value;
-            let output = '';
-            for (let i = 0; i < input.length; i += 2) {
-                output += String.fromCharCode(parseInt(input.substr(i, 2), 16));
-            }
-            document.getElementById('output').innerText = output;
+            document.getElementById("output").innerText = output;
         }
 
         function clearFields() {
-            document.getElementById('input').value = '';
-            document.getElementById('output').innerText = '';
+            document.getElementById("input").value = "";
+            document.getElementById("output").innerText = "";
         }
 
         function copyToClipboard() {
-            const output = document.getElementById('output').innerText;
+            const output = document.getElementById("output").innerText;
             navigator.clipboard.writeText(output).then(() => {
                 alert("Copied to clipboard!");
             });
