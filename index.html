@@ -3,19 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Encoder/Decoder</title>
+    <title>Enhanced Encoder/Decoder</title>
     <style>
-        body { font-family: Arial, sans-serif; background-color: #f4f4f4; }
-        #output { border: 1px solid #ccc; padding: 10px; margin-top: 10px; background-color: #fff; }
-        button { margin: 5px; }
+        body { font-family: Arial, sans-serif; }
+        #output { border: 1px solid #ccc; padding: 10px; margin-top: 10px; }
+        .error { color: red; }
     </style>
 </head>
 <body>
-    <h1>Advanced Encoder/Decoder</h1>
+    <h1>Enhanced Encoder/Decoder</h1>
     <div id="passwordPrompt">
         <label for="password">Enter Password:</label>
         <input type="password" id="password">
         <button onclick="checkPassword()">Submit</button>
+        <p id="errorMessage" class="error"></p>
     </div>
     <div id="app" style="display:none;">
         <select id="encodingType">
@@ -41,15 +42,15 @@
                 document.getElementById("app").style.display = "block";
             } else {
                 attempts++;
+                document.getElementById("errorMessage").innerText = "Incorrect password. Try again.";
                 if (attempts >= 5) {
                     alert("Too many incorrect attempts. Please wait 60 seconds.");
                     document.getElementById("password").disabled = true;
                     setTimeout(() => {
                         document.getElementById("password").disabled = false;
                         attempts = 0;
+                        document.getElementById("errorMessage").innerText = "";
                     }, 60000);
-                } else {
-                    alert("Incorrect password. Try again.");
                 }
             }
         }
