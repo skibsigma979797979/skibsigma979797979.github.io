@@ -1,3 +1,5 @@
+# Encoder/Decoder
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -16,17 +18,18 @@
         <input type="password" id="password">
         <button onclick="checkPassword()">Submit</button>
     </div>
-    <div id="encoderDecoder" style="display:none;">
+    <div id="mainContent" style="display:none;">
         <select id="language">
             <option value="base64">Base64</option>
             <option value="binary">Binary</option>
             <option value="hex">Hex</option>
         </select>
         <textarea id="input" placeholder="Enter text here..."></textarea>
-        <button onclick="encodeDecode()">Encode/Decode</button>
+        <button onclick="encode()">Encode</button>
+        <button onclick="decode()">Decode</button>
         <button onclick="clearFields()">Clear</button>
         <button onclick="copyToClipboard()">Copy Output</button>
-        <div id="output"></div>
+        <div id="output" placeholder="Output will appear here..."></div>
     </div>
     <script>
         let attempts = 0;
@@ -36,7 +39,7 @@
             const password = document.getElementById("password").value;
             if (password === correctPassword) {
                 document.getElementById("passwordPrompt").style.display = "none";
-                document.getElementById("encoderDecoder").style.display = "block";
+                document.getElementById("mainContent").style.display = "block";
             } else {
                 attempts++;
                 if (attempts >= 5) {
@@ -52,11 +55,10 @@
             }
         }
 
-        function encodeDecode() {
+        function encode() {
             const input = document.getElementById("input").value;
             const language = document.getElementById("language").value;
-            let output = "";
-
+            let output;
             if (language === "base64") {
                 output = btoa(input);
             } else if (language === "binary") {
@@ -64,13 +66,26 @@
             } else if (language === "hex") {
                 output = input.split('').map(char => char.charCodeAt(0).toString(16)).join(' ');
             }
+            document.getElementById("output").innerText = output;
+        }
 
+        function decode() {
+            const input = document.getElementById("input").value;
+            const language = document.getElementById("language").value;
+            let output;
+            if (language === "base64") {
+                output = atob(input);
+            } else if (language === "binary") {
+                output = input.split(' ').map(bin => String.fromCharCode(parseInt(bin, 2))).join('');
+            } else if (language === "hex") {
+                output = input.split(' ').map(hex => String.fromCharCode(parseInt(hex, 16))).join('');
+            }
             document.getElementById("output").innerText = output;
         }
 
         function clearFields() {
-            document.getElementById("input").value = "";
-            document.getElementById("output").innerText = "";
+            document.getElementById("input").value = '';
+            document.getElementById("output").innerText = '';
         }
 
         function copyToClipboard() {
