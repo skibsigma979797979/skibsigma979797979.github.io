@@ -3,105 +3,96 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Base64, Binary, and Hex Encoder/Decoder</title>
+    <title>Base64 Hex and Binary Encoder/Decoder</title>
     <style>
         body { font-family: Arial, sans-serif; }
-        .hidden { display: none; }
-        .bordered { border: 1px solid #ccc; padding: 10px; margin-top: 10px; }
+        #output { margin-top: 10px; }
+        #lockout { display: none; color: red; }
     </style>
 </head>
 <body>
-    <h1>Encoder/Decoder</h1>
-    <div id="passwordBox">
-        <input type="password" id="password" placeholder="Enter Password">
-        <button onclick="checkPassword()">Submit</button>
-    </div>
-    <div id="mainContent" class="hidden">
-        <select id="languageSelect">
-            <option value="base64">Base64</option>
-            <option value="binary">Binary</option>
-            <option value="hex">Hex</option>
-        </select>
-        <textarea id="inputText" placeholder="Enter text here"></textarea>
-        <button onclick="encode()">Encode</button>
-        <button onclick="decode()">Decode</button>
+    <h1>Base64 Hex and Binary Encoder/Decoder</h1>
+    <div id="lockout">Too many attempts. Please wait 60 seconds.</div>
+    <input type="password" id="password" placeholder="Enter Password" />
+    <button onclick="checkPassword()">Submit</button>
+    <div id="encoder" style="display:none;">
+        <textarea id="input" placeholder="Enter text to encode/decode"></textarea>
+        <button onclick="encodeBase64()">Encode to Base64</button>
+        <button onclick="decodeBase64()">Decode from Base64</button>
+        <button onclick="encodeHex()">Encode to Hex</button>
+        <button onclick="decodeHex()">Decode from Hex</button>
+        <button onclick="clearFields()">Clear</button>
         <button onclick="copyToClipboard()">Copy to Clipboard</button>
-        <button onclick="clearOutput()">Clear</button>
-        <div class="bordered">
-            <textarea id="outputText" readonly placeholder="Output will appear here"></textarea>
-        </div>
-        <button onclick="sendEmail()">Send via Gmail</button>
-        <p class="hidden" id="warningText">If anyone copies this, they are bad at coding.</p>
+        <div id="output"></div>
     </div>
     <script>
         let attempts = 0;
-        let locked = false;
+        let lockoutTime = 0;
 
         function checkPassword() {
             const password = document.getElementById('password').value;
-            if (locked) {
-                alert("You are locked out. Please wait.");
+            if (lockoutTime > 0) {
+                alert("Please wait " + lockoutTime + " seconds.");
                 return;
             }
             if (password === "skibidi") {
-                document.getElementById('passwordBox').classList.add('hidden');
-                document.getElementById('mainContent').classList.remove('hidden');
-                document.getElementById('warningText').classList.remove('hidden');
+                document.getElementById('encoder').style.display = 'block';
+                document.getElementById('password').style.display = 'none';
+                document.querySelector('button').style.display = 'none';
             } else {
                 attempts++;
                 if (attempts >= 5) {
-                    locked = true;
-                    alert("Too many attempts. Locked for 60 seconds.");
-                    setTimeout(() => { locked = false; attempts = 0; }, 60000);
-                } else {
-                    alert("Incorrect password. Try again.");
+                    lockoutTime = 60;
+                    document.getElementById('lockout').style.display = 'block';
+                    setTimeout(() => {
+                        lockoutTime = 0;
+                        document.getElementById('lockout').style.display = 'none';
+                    }, 60000);
                 }
+                alert("Incorrect password. Attempts: " + attempts);
             }
         }
 
-        function encode() {
-            const text = document.getElementById('inputText').value;
-            const selectedLanguage = document.getElementById('languageSelect').value;
-            let output;
-            if (selectedLanguage === "base64") {
-                output = btoa(text);
-            } else if (selectedLanguage === "binary") {
-                output = text.split('').map(char => char.charCodeAt(0).toString(2)).join(' ');
-            } else if (selectedLanguage === "hex") {
-                output = text.split('').map(char => char.charCodeAt(0).toString(16)).join(' ');
-            }
-            document.getElementById('outputText').value = output;
+        function encodeBase64() {
+            const input = document.getElementById('input').value;
+            const output = btoa(input);
+            document.getElementById('output').innerText = output;
         }
 
-        function decode() {
-            const text = document.getElementById('inputText').value;
-            const selectedLanguage = document.getElementById('languageSelect').value;
-            let output;
-            if (selectedLanguage === "base64") {
-                output = atob(text);
-            } else if (selectedLanguage === "binary") {
-                output = text.split(' ').map(bin => String.fromCharCode(parseInt(bin, 2))).join('');
-            } else if (selectedLanguage === "hex") {
-                output = text.split(' ').map(hex => String.fromCharCode(parseInt(hex, 16))).join('');
+        function decodeBase64() {
+            const input = document.getElementById('input').value;
+            const output = atob(input);
+            document.getElementById('output').innerText = output;
+        }
+
+        function encodeHex() {
+            const input = document.getElementById('input').value;
+            let output = '';
+            for (let i = 0; i < input.length; i++) {
+                output += input.charCodeAt(i).toString(16);
             }
-            document.getElementById('outputText').value = output;
+            document.getElementById('output').innerText = output;
+        }
+
+        function decodeHex() {
+            const input = document.getElementById('input').value;
+            let output = '';
+            for (let i = 0; i < input.length; i += 2) {
+                output += String.fromCharCode(parseInt(input.substr(i, 2), 16));
+            }
+            document.getElementById('output').innerText = output;
+        }
+
+        function clearFields() {
+            document.getElementById('input').value = '';
+            document.getElementById('output').innerText = '';
         }
 
         function copyToClipboard() {
-            const outputText = document.getElementById('outputText');
-            outputText.select();
-            document.execCommand('copy');
-            alert("Copied to clipboard!");
-        }
-
-        function clearOutput() {
-            document.getElementById('inputText').value = '';
-            document.getElementById('outputText').value = '';
-        }
-
-        function sendEmail() {
-            const output = document.getElementById('outputText').value;
-            window.open(`mailto:?subject=Encoded/Decoded Output&body=${encodeURIComponent(output)}`);
+            const output = document.getElementById('output').innerText;
+            navigator.clipboard.writeText(output).then(() => {
+                alert("Copied to clipboard!");
+            });
         }
     </script>
 </body>
