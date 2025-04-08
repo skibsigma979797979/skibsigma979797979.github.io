@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -7,12 +7,12 @@
     <style>
         body { font-family: Arial, sans-serif; }
         #board { display: grid; grid-template-columns: repeat(3, 100px); gap: 5px; }
-        .cell { width: 100px; height: 100px; text-align: center; font-size: 24px; border: 1px solid #000; cursor: pointer; }
-        #difficulty { margin-bottom: 20px; }
+        .cell { width: 100px; height: 100px; text-align: center; font-size: 24px; cursor: pointer; border: 1px solid #000; }
+        #score { margin-top: 20px; }
     </style>
 </head>
 <body>
-    <h1>Advanced Tic Tac Toe Against AI</h1>
+    <h1>Advanced Tic Tac Toe</h1>
     <label for="difficulty">Select Difficulty:</label>
     <select id="difficulty">
         <option value="easy">Easy</option>
@@ -20,83 +20,70 @@
         <option value="hard">Hard</option>
         <option value="impossible">Impossible</option>
     </select>
+    <button id="clear">Clear Board</button>
     <div id="board"></div>
+    <div id="score">Score: 0</div>
+
     <script>
         const board = document.getElementById('board');
-        const difficultySelect = document.getElementById('difficulty');
-        let cells = Array(9).fill(null);
-        
+        const clearButton = document.getElementById('clear');
+        const scoreDisplay = document.getElementById('score');
+        let score = 0;
+        let gameBoard = Array(9).fill(null);
+
         function createBoard() {
             board.innerHTML = '';
-            cells.forEach((_, index) => {
+            gameBoard.fill(null);
+            for (let i = 0; i < 9; i++) {
                 const cell = document.createElement('div');
                 cell.className = 'cell';
-                cell.addEventListener('click', () => handleClick(index));
+                cell.addEventListener('click', () => makeMove(i));
                 board.appendChild(cell);
-            });
+            }
         }
 
-        function handleClick(index) {
-            if (!cells[index]) {
-                cells[index] = 'X';
-                render();
-                if (!checkWinner('X')) {
+        function makeMove(index) {
+            if (!gameBoard[index]) {
+                gameBoard[index] = 'X';
+                renderBoard();
+                if (checkWin('X')) {
+                    alert('You win!');
+                    score++;
+                    scoreDisplay.innerText = 'Score: ' + score;
+                    createBoard();
+                } else if (gameBoard.every(cell => cell)) {
+                    alert('It\'s a draw!');
+                    createBoard();
+                } else {
                     aiMove();
                 }
             }
         }
 
         function aiMove() {
-            const difficulty = difficultySelect.value;
-            let index;
-            if (difficulty === 'easy') {
-                index = getRandomMove();
-            } else if (difficulty === 'medium') {
-                index = getStrategicMove();
-            } else if (difficulty === 'hard') {
-                index = getBestMove();
-            } else {
-                index = getImpossibleMove();
-            }
-            if (index !== -1) {
-                cells[index] = 'O';
-                render();
-                checkWinner('O');
-            }
+            // Implement AI logic based on selected difficulty
+            // Update gameBoard and check for win conditions
         }
 
-        function getRandomMove() {
-            const availableMoves = cells.map((cell, index) => cell === null ? index : null).filter(v => v !== null);
-            return availableMoves[Math.floor(Math.random() * availableMoves.length)];
+        function checkWin(player) {
+            const winPatterns = [
+                [0, 1, 2], [3, 4, 5], [6, 7, 8],
+                [0, 3, 6], [1, 4, 7], [2, 5, 8],
+                [0, 4, 8], [2, 4, 6]
+            ];
+            return winPatterns.some(pattern => 
+                pattern.every(index => gameBoard[index] === player)
+            );
         }
 
-        function getStrategicMove() {
-            // Implement medium difficulty logic
-            return getRandomMove(); // Placeholder
-        }
-
-        function getBestMove() {
-            // Implement hard difficulty logic
-            return getRandomMove(); // Placeholder
-        }
-
-        function getImpossibleMove() {
-            // Implement impossible difficulty logic
-            return getBestMove(); // Placeholder
-        }
-
-        function render() {
-            const cellsDivs = document.querySelectorAll('.cell');
+        function renderBoard() {
+            const cells = document.querySelectorAll('.cell');
             cells.forEach((cell, index) => {
-                cellsDivs[index].textContent = cell;
+                cell.innerText = gameBoard[index] || '';
             });
         }
 
-        function checkWinner(player) {
-            // Check winning conditions
-            return false; // Placeholder
-        }
-
+        clearButton.addEventListener('click', createBoard);
         createBoard();
     </script>
 </body>
