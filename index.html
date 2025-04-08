@@ -1,29 +1,44 @@
 <script>
+    document.getElementById('saveGame').onclick = function() {
+        const gameState = {
+            clickAmount: clickAmount,
+            passiveAmount: passiveAmount,
+            clickValue: clickValue,
+            passiveValue: passiveValue
+        };
+        const encodedState = btoa(JSON.stringify(gameState));
+        localStorage.setItem('clickGame', encodedState);
+        alert("Game saved!");
+    };
+
+    document.getElementById('loadGame').onclick = function() {
+        const encodedState = localStorage.getItem('clickGame');
+        if (encodedState) {
+            const gameState = JSON.parse(atob(encodedState));
+            clickAmount = gameState.clickAmount;
+            passiveAmount = gameState.passiveAmount;
+            clickValue = gameState.clickValue;
+            passiveValue = gameState.passiveValue;
+            document.getElementById('clickAmount').innerText = clickAmount;
+            document.getElementById('passiveAmount').innerText = passiveAmount;
+            alert("Game loaded!");
+        } else {
+            alert("No saved game found.");
+        }
+    };
+
     document.getElementById('imageUpload').onchange = function(event) {
         const file = event.target.files[0];
         const reader = new FileReader();
         reader.onload = function(e) {
-            document.getElementById('clickButton').style.backgroundImage = `url(${e.target.result})`;
-            document.getElementById('clickButton').style.backgroundSize = 'cover';
+            const img = document.createElement('img');
+            img.src = e.target.result;
+            img.onclick = function() {
+                clickAmount += clickValue;
+                document.getElementById('clickAmount').innerText = clickAmount;
+            };
+            document.body.appendChild(img);
         };
         reader.readAsDataURL(file);
     };
-
-    function checkWinCondition() {
-        if (money >= 100000) {
-            alert('Congratulations! You have won the game!');
-            resetGame();
-        }
-    }
-
-    function resetGame() {
-        money = 0;
-        clickValue = 1;
-        passiveIncome = 0;
-        document.getElementById('money').innerText = money;
-        document.getElementById('clickValue').innerText = clickValue;
-        document.getElementById('passiveIncome').innerText = passiveIncome;
-    }
-
-    setInterval(checkWinCondition, 1000);
 </script>
