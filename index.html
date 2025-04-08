@@ -3,91 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crossy Road Game</title>
+    <title>Advanced Crossy Road Game</title>
     <style>
-        body {
-            margin: 0;
-            overflow: hidden;
-            background: #87CEEB;
-        }
-        canvas {
-            display: block;
-            margin: auto;
-            background: #228B22;
-        }
+        body { display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #87CEEB; }
+        #game { width: 400px; height: 600px; background-color: #228B22; position: relative; overflow: hidden; }
+        .player { width: 40px; height: 40px; background-color: #FFD700; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); }
+        .car { width: 60px; height: 30px; background-color: #FF4500; position: absolute; }
     </style>
 </head>
 <body>
-    <canvas id="gameCanvas" width="400" height="600"></canvas>
+    <div id="game">
+        <div class="player" id="player"></div>
+        <div class="car" id="car"></div>
+    </div>
     <script>
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
+        const player = document.getElementById('player');
+        const car = document.getElementById('car');
+        let carPosition = 0;
 
-        let player = { x: 200, y: 550, width: 30, height: 30 };
-        let obstacles = [];
-        let score = 0;
-        let gameInterval;
-
-        function drawPlayer() {
-            ctx.fillStyle = 'yellow';
-            ctx.fillRect(player.x, player.y, player.width, player.height);
-        }
-
-        function drawObstacles() {
-            ctx.fillStyle = 'red';
-            obstacles.forEach(obstacle => {
-                ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
-            });
-        }
-
-        function updateObstacles() {
-            obstacles.forEach(obstacle => {
-                obstacle.y += obstacle.speed;
-                if (obstacle.y > canvas.height) {
-                    obstacle.y = -obstacle.height;
-                    obstacle.x = Math.random() * (canvas.width - obstacle.width);
-                    score++;
-                }
-            });
+        function moveCar() {
+            carPosition += 5;
+            if (carPosition > 400) carPosition = -60;
+            car.style.left = carPosition + 'px';
+            checkCollision();
+            requestAnimationFrame(moveCar);
         }
 
         function checkCollision() {
-            obstacles.forEach(obstacle => {
-                if (player.x < obstacle.x + obstacle.width &&
-                    player.x + player.width > obstacle.x &&
-                    player.y < obstacle.y + obstacle.height &&
-                    player.y + player.height > obstacle.y) {
-                    clearInterval(gameInterval);
-                    alert('Game Over! Your score: ' + score);
-                }
-            });
+            const playerRect = player.getBoundingClientRect();
+            const carRect = car.getBoundingClientRect();
+            if (!(playerRect.right < carRect.left || 
+                  playerRect.left > carRect.right || 
+                  playerRect.bottom < carRect.top || 
+                  playerRect.top > carRect.bottom)) {
+                alert("Game Over!");
+                resetGame();
+            }
         }
 
-        function gameLoop() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            drawPlayer();
-            drawObstacles();
-            updateObstacles();
-            checkCollision();
-        }
-
-        function startGame() {
-            obstacles = [
-                { x: Math.random() * (canvas.width - 50), y: -50, width: 50, height: 20, speed: 2 },
-                { x: Math.random() * (canvas.width - 50), y: -150, width: 50, height: 20, speed: 3 },
-                { x: Math.random() * (canvas.width - 50), y: -250, width: 50, height: 20, speed: 4 }
-            ];
-            gameInterval = setInterval(gameLoop, 100);
+        function resetGame() {
+            player.style.bottom = '0px';
+            carPosition = 0;
         }
 
         document.addEventListener('keydown', (event) => {
-            if (event.key === 'ArrowUp' && player.y > 0) player.y -= 20;
-            if (event.key === 'ArrowDown' && player.y < canvas.height - player.height) player.y += 20;
-            if (event.key === 'ArrowLeft' && player.x > 0) player.x -= 20;
-            if (event.key === 'ArrowRight' && player.x < canvas.width - player.width) player.x += 20;
+            if (event.key === 'ArrowUp') {
+                player.style.bottom = (parseInt(player.style.bottom) + 40) + 'px';
+            }
+            if (event.key === 'ArrowDown') {
+                player.style.bottom = (parseInt(player.style.bottom) - 40) + 'px';
+            }
         });
 
-        startGame();
+        moveCar();
     </script>
 </body>
 </html>
