@@ -3,59 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Crossy Road Game</title>
+    <title> Pac-Man Game</title>
     <style>
-        body { display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #87CEEB; }
-        #game { width: 400px; height: 600px; background-color: #228B22; position: relative; overflow: hidden; }
-        .player { width: 40px; height: 40px; background-color: #FFD700; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); }
-        .car { width: 60px; height: 30px; background-color: #FF4500; position: absolute; }
+        body { display: flex; flex-direction: column; align-items: center; height: 100vh; background-color: black; color: white; }
+        #game { position: relative; width: 400px; height: 400px; background-color: blue; }
+        .pacman { position: absolute; width: 40px; height: 40px; background-color: yellow; border-radius: 50%; }
+        .dot { position: absolute; width: 10px; height: 10px; background-color: white; border-radius: 50%; }
     </style>
 </head>
 <body>
+    <h1>Score: <span id="score">0</span></h1>
     <div id="game">
-        <div class="player" id="player"></div>
-        <div class="car" id="car"></div>
+        <div class="pacman" id="pacman"></div>
+        <div class="dot" id="dot" style="top: 50px; left: 50px;"></div>
     </div>
     <script>
-        const player = document.getElementById('player');
-        const car = document.getElementById('car');
-        let carPosition = 0;
-
-        function moveCar() {
-            carPosition += 5;
-            if (carPosition > 400) carPosition = -60;
-            car.style.left = carPosition + 'px';
-            checkCollision();
-            requestAnimationFrame(moveCar);
-        }
-
-        function checkCollision() {
-            const playerRect = player.getBoundingClientRect();
-            const carRect = car.getBoundingClientRect();
-            if (!(playerRect.right < carRect.left || 
-                  playerRect.left > carRect.right || 
-                  playerRect.bottom < carRect.top || 
-                  playerRect.top > carRect.bottom)) {
-                alert("Game Over!");
-                resetGame();
-            }
-        }
-
-        function resetGame() {
-            player.style.bottom = '0px';
-            carPosition = 0;
-        }
+        const pacman = document.getElementById('pacman');
+        const dot = document.getElementById('dot');
+        const scoreDisplay = document.getElementById('score');
+        let posX = 0, posY = 0, score = 0;
 
         document.addEventListener('keydown', (event) => {
-            if (event.key === 'ArrowUp') {
-                player.style.bottom = (parseInt(player.style.bottom) + 40) + 'px';
+            switch(event.key) {
+                case 'ArrowUp': posY -= 10; break;
+                case 'ArrowDown': posY += 10; break;
+                case 'ArrowLeft': posX -= 10; break;
+                case 'ArrowRight': posX += 10; break;
             }
-            if (event.key === 'ArrowDown') {
-                player.style.bottom = (parseInt(player.style.bottom) - 40) + 'px';
-            }
+            pacman.style.transform = `translate(${posX}px, ${posY}px)`;
+            checkCollision();
         });
 
-        moveCar();
+        function checkCollision() {
+            const pacmanRect = pacman.getBoundingClientRect();
+            const dotRect = dot.getBoundingClientRect();
+            if (pacmanRect.x < dotRect.x + dotRect.width &&
+                pacmanRect.x + pacmanRect.width > dotRect.x &&
+                pacmanRect.y < dotRect.y + dotRect.height &&
+                pacmanRect.y + pacmanRect.height > dotRect.y) {
+                score++;
+                scoreDisplay.textContent = score;
+                dot.style.top = Math.random() * 390 + 'px';
+                dot.style.left = Math.random() * 390 + 'px';
+            }
+        }
     </script>
 </body>
 </html>
