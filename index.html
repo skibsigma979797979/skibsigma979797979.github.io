@@ -1,89 +1,67 @@
+# Traffic Jam Game
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Encoder/Decoder</title>
+    <title>Traffic Jam Game</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        textarea { width: 100%; height: 100px; }
-        button { margin-top: 10px; }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+        }
+        #gameArea {
+            width: 600px;
+            height: 400px;
+            border: 2px solid #333;
+            position: relative;
+            margin: 20px auto;
+            background-color: #fff;
+        }
+        .car {
+            width: 50px;
+            height: 30px;
+            position: absolute;
+            background-color: red;
+            border: 1px solid #000;
+        }
     </style>
 </head>
 <body>
-    <h1>Encoder/Decoder Tool</h1>
-    <select id="language">
-        <option value="binary">Binary</option>
-        <option value="javascript">JavaScript</option>
-        <option value="base64">Base64</option>
-        <option value="hexadecimal">Hexadecimal</option>
-        <option value="html">HTML</option>
-    </select>
-    <textarea id="input" placeholder="Enter text here..."></textarea>
-    <button onclick="encode()">Encode</button>
-    <button onclick="decode()">Decode</button>
-    <button onclick="copyToClipboard()">Copy to Clipboard</button>
-    <textarea id="output" placeholder="Output will appear here..." readonly></textarea>
 
-    <script>
-        function encode() {
-            const input = document.getElementById('input').value;
-            const language = document.getElementById('language').value;
-            let output = '';
+<h1>Traffic Jam Game</h1>
+<div id="gameArea">
+    <div class="car" id="car1" style="top: 50px; left: 0;"></div>
+    <div class="car" id="car2" style="top: 100px; left: 100px;"></div>
+    <div class="car" id="car3" style="top: 150px; left: 200px;"></div>
+    <div class="car" id="car4" style="top: 200px; left: 300px;"></div>
+</div>
 
-            switch (language) {
-                case 'binary':
-                    output = input.split('').map(char => char.charCodeAt(0).toString(2)).join(' ');
-                    break;
-                case 'javascript':
-                    output = encodeURIComponent(input);
-                    break;
-                case 'base64':
-                    output = btoa(input);
-                    break;
-                case 'hexadecimal':
-                    output = input.split('').map(char => char.charCodeAt(0).toString(16)).join(' ');
-                    break;
-                case 'html':
-                    output = input.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-                    break;
-            }
-            document.getElementById('output').value = output;
+<script>
+    document.addEventListener('keydown', function(event) {
+        const car1 = document.getElementById('car1');
+        const car2 = document.getElementById('car2');
+        const car3 = document.getElementById('car3');
+        const car4 = document.getElementById('car4');
+        
+        switch(event.key) {
+            case 'ArrowUp':
+                car1.style.top = (parseInt(car1.style.top) - 10) + 'px';
+                break;
+            case 'ArrowDown':
+                car1.style.top = (parseInt(car1.style.top) + 10) + 'px';
+                break;
+            case 'ArrowLeft':
+                car1.style.left = (parseInt(car1.style.left) - 10) + 'px';
+                break;
+            case 'ArrowRight':
+                car1.style.left = (parseInt(car1.style.left) + 10) + 'px';
+                break;
         }
+    });
+</script>
 
-        function decode() {
-            const input = document.getElementById('input').value;
-            const language = document.getElementById('language').value;
-            let output = '';
-
-            switch (language) {
-                case 'binary':
-                    output = input.split(' ').map(bin => String.fromCharCode(parseInt(bin, 2))).join('');
-                    break;
-                case 'javascript':
-                    output = decodeURIComponent(input);
-                    break;
-                case 'base64':
-                    output = atob(input);
-                    break;
-                case 'hexadecimal':
-                    output = input.split(' ').map(hex => String.fromCharCode(parseInt(hex, 16))).join('');
-                    break;
-                case 'html':
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(input, 'text/html');
-                    output = doc.body.textContent;
-                    break;
-            }
-            document.getElementById('output').value = output;
-        }
-
-        function copyToClipboard() {
-            const output = document.getElementById('output');
-            output.select();
-            document.execCommand('copy');
-            alert('Copied to clipboard!');
-        }
-    </script>
 </body>
 </html>
