@@ -1,67 +1,103 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enhanced Pac-Man Game</title>
+    <title>Advanced Tic Tac Toe</title>
     <style>
-        body { display: flex; justify-content: center; align-items: center; height: 100vh; background-color: black; }
-        #game { position: relative; width: 400px; height: 400px; background-color: blue; }
-        .pacman { width: 40px; height: 40px; background-color: yellow; position: absolute; border-radius: 50%; }
-        .ghost { width: 40px; height: 40px; background-color: red; position: absolute; border-radius: 50%; }
+        body { font-family: Arial, sans-serif; }
+        #board { display: grid; grid-template-columns: repeat(3, 100px); gap: 5px; }
+        .cell { width: 100px; height: 100px; text-align: center; font-size: 24px; border: 1px solid #000; cursor: pointer; }
+        #difficulty { margin-bottom: 20px; }
     </style>
 </head>
 <body>
-    <div id="game">
-        <div class="pacman" id="pacman" style="top: 180px; left: 180px;"></div>
-        <div class="ghost" id="ghost1" style="top: 0; left: 0;"></div>
-        <div class="ghost" id="ghost2" style="top: 0; left: 360px;"></div>
-    </div>
+    <h1>Advanced Tic Tac Toe Against AI</h1>
+    <label for="difficulty">Select Difficulty:</label>
+    <select id="difficulty">
+        <option value="easy">Easy</option>
+        <option value="medium">Medium</option>
+        <option value="hard">Hard</option>
+        <option value="impossible">Impossible</option>
+    </select>
+    <div id="board"></div>
     <script>
-        const pacman = document.getElementById('pacman');
-        const ghosts = [document.getElementById('ghost1'), document.getElementById('ghost2')];
-        let pacmanPos = { x: 180, y: 180 };
-        let ghostPositions = [{ x: 0, y: 0 }, { x: 360, y: 0 }];
+        const board = document.getElementById('board');
+        const difficultySelect = document.getElementById('difficulty');
+        let cells = Array(9).fill(null);
+        
+        function createBoard() {
+            board.innerHTML = '';
+            cells.forEach((_, index) => {
+                const cell = document.createElement('div');
+                cell.className = 'cell';
+                cell.addEventListener('click', () => handleClick(index));
+                board.appendChild(cell);
+            });
+        }
 
-        document.addEventListener('keydown', (event) => {
-            switch(event.key) {
-                case 'ArrowUp': pacmanPos.y -= 20; break;
-                case 'ArrowDown': pacmanPos.y += 20; break;
-                case 'ArrowLeft': pacmanPos.x -= 20; break;
-                case 'ArrowRight': pacmanPos.x += 20; break;
-            }
-            pacman.style.top = pacmanPos.y + 'px';
-            pacman.style.left = pacmanPos.x + 'px';
-            moveGhosts();
-        });
-
-        function moveGhosts() {
-            ghosts.forEach((ghost, index) => {
-                if (ghostPositions[index].x < pacmanPos.x) ghostPositions[index].x += 1;
-                if (ghostPositions[index].x > pacmanPos.x) ghostPositions[index].x -= 1;
-                if (ghostPositions[index].y < pacmanPos.y) ghostPositions[index].y += 1;
-                if (ghostPositions[index].y > pacmanPos.y) ghostPositions[index].y -= 1;
-
-                ghost.style.top = ghostPositions[index].y + 'px';
-                ghost.style.left = ghostPositions[index].x + 'px';
-
-                if (pacmanPos.x === ghostPositions[index].x && pacmanPos.y === ghostPositions[index].y) {
-                    alert('Game Over!');
-                    resetGame();
+        function handleClick(index) {
+            if (!cells[index]) {
+                cells[index] = 'X';
+                render();
+                if (!checkWinner('X')) {
+                    aiMove();
                 }
+            }
+        }
+
+        function aiMove() {
+            const difficulty = difficultySelect.value;
+            let index;
+            if (difficulty === 'easy') {
+                index = getRandomMove();
+            } else if (difficulty === 'medium') {
+                index = getStrategicMove();
+            } else if (difficulty === 'hard') {
+                index = getBestMove();
+            } else {
+                index = getImpossibleMove();
+            }
+            if (index !== -1) {
+                cells[index] = 'O';
+                render();
+                checkWinner('O');
+            }
+        }
+
+        function getRandomMove() {
+            const availableMoves = cells.map((cell, index) => cell === null ? index : null).filter(v => v !== null);
+            return availableMoves[Math.floor(Math.random() * availableMoves.length)];
+        }
+
+        function getStrategicMove() {
+            // Implement medium difficulty logic
+            return getRandomMove(); // Placeholder
+        }
+
+        function getBestMove() {
+            // Implement hard difficulty logic
+            return getRandomMove(); // Placeholder
+        }
+
+        function getImpossibleMove() {
+            // Implement impossible difficulty logic
+            return getBestMove(); // Placeholder
+        }
+
+        function render() {
+            const cellsDivs = document.querySelectorAll('.cell');
+            cells.forEach((cell, index) => {
+                cellsDivs[index].textContent = cell;
             });
         }
 
-        function resetGame() {
-            pacmanPos = { x: 180, y: 180 };
-            ghostPositions = [{ x: 0, y: 0 }, { x: 360, y: 0 }];
-            pacman.style.top = pacmanPos.y + 'px';
-            pacman.style.left = pacmanPos.x + 'px';
-            ghosts.forEach((ghost, index) => {
-                ghost.style.top = ghostPositions[index].y + 'px';
-                ghost.style.left = ghostPositions[index].x + 'px';
-            });
+        function checkWinner(player) {
+            // Check winning conditions
+            return false; // Placeholder
         }
+
+        createBoard();
     </script>
 </body>
 </html>
