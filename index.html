@@ -3,95 +3,86 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Encoder/Decoder</title>
+    <title>Encoder/Decoder</title>
     <style>
-        body { font-family: Arial, sans-serif; background-color: #f4f4f4; }
-        #output { border: 1px solid #ccc; padding: 10px; margin-top: 10px; background-color: #fff; }
-        button { margin: 5px; }
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        textarea { width: 100%; height: 100px; }
+        button { margin-top: 10px; }
     </style>
 </head>
 <body>
-    <h1>Advanced Encoder/Decoder</h1>
-    <div id="passwordPrompt">
-        <label for="password">Enter Password:</label>
-        <input type="password" id="password">
-        <button onclick="checkPassword()">Submit</button>
-    </div>
-    <div id="app" style="display:none;">
-        <select id="encodingType">
-            <option value="base64">Base64</option>
-            <option value="binary">Binary</option>
-            <option value="hex">Hexadecimal</option>
-        </select>
-        <textarea id="input" placeholder="Enter text here..."></textarea>
-        <button onclick="encode()">Encode</button>
-        <button onclick="decode()">Decode</button>
-        <button onclick="clearFields()">Clear</button>
-        <button onclick="copyToClipboard()">Copy Output</button>
-        <div id="output"></div>
-    </div>
+    <h1>Encoder/Decoder Tool</h1>
+    <select id="language">
+        <option value="binary">Binary</option>
+        <option value="javascript">JavaScript</option>
+        <option value="base64">Base64</option>
+        <option value="hexadecimal">Hexadecimal</option>
+        <option value="html">HTML</option>
+    </select>
+    <textarea id="input" placeholder="Enter text here..."></textarea>
+    <button onclick="encode()">Encode</button>
+    <button onclick="decode()">Decode</button>
+    <button onclick="copyToClipboard()">Copy to Clipboard</button>
+    <textarea id="output" placeholder="Output will appear here..." readonly></textarea>
+
     <script>
-        let attempts = 0;
-        const correctPassword = "skibidi";
-
-        function checkPassword() {
-            const password = document.getElementById("password").value;
-            if (password === correctPassword) {
-                document.getElementById("passwordPrompt").style.display = "none";
-                document.getElementById("app").style.display = "block";
-            } else {
-                attempts++;
-                if (attempts >= 5) {
-                    alert("Too many incorrect attempts. Please wait 60 seconds.");
-                    document.getElementById("password").disabled = true;
-                    setTimeout(() => {
-                        document.getElementById("password").disabled = false;
-                        attempts = 0;
-                    }, 60000);
-                } else {
-                    alert("Incorrect password. Try again.");
-                }
-            }
-        }
-
         function encode() {
-            const input = document.getElementById("input").value;
-            const type = document.getElementById("encodingType").value;
-            let output;
-            if (type === "base64") {
-                output = btoa(input);
-            } else if (type === "binary") {
-                output = input.split('').map(char => char.charCodeAt(0).toString(2)).join(' ');
-            } else if (type === "hex") {
-                output = input.split('').map(char => char.charCodeAt(0).toString(16)).join(' ');
+            const input = document.getElementById('input').value;
+            const language = document.getElementById('language').value;
+            let output = '';
+
+            switch (language) {
+                case 'binary':
+                    output = input.split('').map(char => char.charCodeAt(0).toString(2)).join(' ');
+                    break;
+                case 'javascript':
+                    output = encodeURIComponent(input);
+                    break;
+                case 'base64':
+                    output = btoa(input);
+                    break;
+                case 'hexadecimal':
+                    output = input.split('').map(char => char.charCodeAt(0).toString(16)).join(' ');
+                    break;
+                case 'html':
+                    output = input.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                    break;
             }
-            document.getElementById("output").innerText = output;
+            document.getElementById('output').value = output;
         }
 
         function decode() {
-            const input = document.getElementById("input").value;
-            const type = document.getElementById("encodingType").value;
-            let output;
-            if (type === "base64") {
-                output = atob(input);
-            } else if (type === "binary") {
-                output = input.split(' ').map(bin => String.fromCharCode(parseInt(bin, 2))).join('');
-            } else if (type === "hex") {
-                output = input.split(' ').map(hex => String.fromCharCode(parseInt(hex, 16))).join('');
-            }
-            document.getElementById("output").innerText = output;
-        }
+            const input = document.getElementById('input').value;
+            const language = document.getElementById('language').value;
+            let output = '';
 
-        function clearFields() {
-            document.getElementById("input").value = '';
-            document.getElementById("output").innerText = '';
+            switch (language) {
+                case 'binary':
+                    output = input.split(' ').map(bin => String.fromCharCode(parseInt(bin, 2))).join('');
+                    break;
+                case 'javascript':
+                    output = decodeURIComponent(input);
+                    break;
+                case 'base64':
+                    output = atob(input);
+                    break;
+                case 'hexadecimal':
+                    output = input.split(' ').map(hex => String.fromCharCode(parseInt(hex, 16))).join('');
+                    break;
+                case 'html':
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(input, 'text/html');
+                    output = doc.body.textContent;
+                    break;
+            }
+            document.getElementById('output').value = output;
         }
 
         function copyToClipboard() {
-            const output = document.getElementById("output").innerText;
-            navigator.clipboard.writeText(output).then(() => {
-                alert("Output copied to clipboard!");
-            });
+            const output = document.getElementById('output');
+            output.select();
+            document.execCommand('copy');
+            alert('Copied to clipboard!');
         }
     </script>
 </body>
