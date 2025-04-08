@@ -3,127 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Tic Tac Toe</title>
+    <title>Advanced Click Game</title>
     <style>
-        body { font-family: Arial, sans-serif; }
-        #board { display: grid; grid-template-columns: repeat(3, 100px); gap: 5px; }
-        .cell { width: 100px; height: 100px; text-align: center; font-size: 24px; cursor: pointer; border: 1px solid #000; }
-        #score { margin-top: 20px; }
+        body { font-family: Arial, sans-serif; text-align: center; }
+        #shop { margin-top: 20px; }
+        .item { display: inline-block; margin: 10px; padding: 10px; border: 1px solid #ccc; }
+        button { margin-top: 5px; }
     </style>
 </head>
 <body>
-    <h1>Advanced Tic Tac Toe Against AI</h1>
-    <select id="difficulty">
-        <option value="easy">Easy</option>
-        <option value="medium">Medium</option>
-        <option value="hard">Hard</option>
-        <option value="impossible">Impossible</option>
-    </select>
-    <button onclick="clearBoard()">Clear Board</button>
-    <div id="board"></div>
-    <div id="score">Score: 0</div>
-    <input type="text" id="password" placeholder="Enter password">
-    <button onclick="setHighScore()">Set High Score</button>
+    <h1>Advanced Click Game</h1>
+    <p>Points: <span id="points">0</span></p>
+    <button id="clickButton">Click Me!</button>
+
+    <div id="shop">
+        <h2>Shop 1</h2>
+        <div id="items1"></div>
+        <h2>Shop 2</h2>
+        <div id="items2"></div>
+    </div>
 
     <script>
-        let score = 0;
-        const board = document.getElementById('board');
-        const scoreDisplay = document.getElementById('score');
-        const passwordInput = document.getElementById('password');
-        let difficulty = 'easy';
+        let points = 0;
+        const pointsDisplay = document.getElementById('points');
+        const clickButton = document.getElementById('clickButton');
+        const itemsContainer1 = document.getElementById('items1');
+        const itemsContainer2 = document.getElementById('items2');
 
-        document.getElementById('difficulty').addEventListener('change', (event) => {
-            difficulty = event.target.value;
+        clickButton.addEventListener('click', () => {
+            points++;
+            pointsDisplay.textContent = points;
         });
 
-        function createBoard() {
-            board.innerHTML = '';
-            for (let i = 0; i < 9; i++) {
-                const cell = document.createElement('div');
-                cell.className = 'cell';
-                cell.onclick = () => playerMove(cell);
-                board.appendChild(cell);
-            }
-        }
+        const items1 = Array.from({ length: 30 }, (_, i) => `Shop 1 Item ${i + 1}`);
+        items1.forEach(item => {
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'item';
+            itemDiv.innerHTML = `<strong>${item}</strong><br>Cost: <span>15</span> points<br><button onclick="buyItem('${item}', 15)">Buy</button>`;
+            itemsContainer1.appendChild(itemDiv);
+        });
 
-        function playerMove(cell) {
-            if (cell.innerHTML === '') {
-                cell.innerHTML = 'X';
-                if (checkWin()) {
-                    alert('You win!');
-                    score++;
-                    updateScore();
-                    createBoard();
-                } else {
-                    aiMove();
-                }
-            }
-        }
+        const items2 = Array.from({ length: 30 }, (_, i) => `Shop 2 Item ${i + 1}`);
+        items2.forEach(item => {
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'item';
+            itemDiv.innerHTML = `<strong>${item}</strong><br>Cost: <span>20</span> points<br><button onclick="buyItem('${item}', 20)">Buy</button>`;
+            itemsContainer2.appendChild(itemDiv);
+        });
 
-        function aiMove() {
-            const emptyCells = [...document.querySelectorAll('.cell')].filter(cell => cell.innerHTML === '');
-            let move;
-            if (difficulty === 'easy') {
-                move = emptyCells[Math.floor(Math.random() * emptyCells.length)];
-            } else if (difficulty === 'medium') {
-                move = mediumAI(emptyCells);
-            } else if (difficulty === 'hard') {
-                move = hardAI(emptyCells);
+        function buyItem(item, cost) {
+            if (points >= cost) {
+                points -= cost;
+                pointsDisplay.textContent = points;
+                alert(`You bought ${item}!`);
             } else {
-                move = impossibleAI(emptyCells);
-            }
-            move.innerHTML = 'O';
-            if (checkWin()) {
-                alert('AI wins!');
-                createBoard();
+                alert('Not enough points!');
             }
         }
-
-        function mediumAI(emptyCells) {
-            // Placeholder for medium AI logic
-            return emptyCells[Math.floor(Math.random() * emptyCells.length)];
-        }
-
-        function hardAI(emptyCells) {
-            // Placeholder for hard AI logic
-            return emptyCells[0]; // Implement actual logic
-        }
-
-        function impossibleAI(emptyCells) {
-            // Placeholder for impossible AI logic
-            return emptyCells[0]; // Implement actual logic
-        }
-
-        function checkWin() {
-            const cells = [...document.querySelectorAll('.cell')];
-            const winningCombinations = [
-                [0, 1, 2], [3, 4, 5], [6, 7, 8],
-                [0, 3, 6], [1, 4, 7], [2, 5, 8],
-                [0, 4, 8], [2, 4, 6]
-            ];
-            return winningCombinations.some(combination => {
-                const [a, b, c] = combination;
-                return cells[a].innerHTML && cells[a].innerHTML === cells[b].innerHTML && cells[a].innerHTML === cells[c].innerHTML;
-            });
-        }
-
-        function clearBoard() {
-            createBoard();
-        }
-
-        function updateScore() {
-            scoreDisplay.innerHTML = 'Score: ' + score;
-        }
-
-        function setHighScore() {
-            if (passwordInput.value === 'hi') {
-                score = 9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999;
-                updateScore();
-                alert('High score set!');
-            }
-        }
-
-        createBoard();
     </script>
 </body>
 </html>
