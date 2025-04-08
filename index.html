@@ -3,49 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> Pac-Man Game</title>
+    <title>Enhanced Pac-Man Game</title>
     <style>
-        body { display: flex; flex-direction: column; align-items: center; height: 100vh; background-color: black; color: white; }
+        body { display: flex; justify-content: center; align-items: center; height: 100vh; background-color: black; }
         #game { position: relative; width: 400px; height: 400px; background-color: blue; }
-        .pacman { position: absolute; width: 40px; height: 40px; background-color: yellow; border-radius: 50%; }
-        .dot { position: absolute; width: 10px; height: 10px; background-color: white; border-radius: 50%; }
+        .pacman { width: 40px; height: 40px; background-color: yellow; position: absolute; border-radius: 50%; }
+        .ghost { width: 40px; height: 40px; background-color: red; position: absolute; border-radius: 50%; }
     </style>
 </head>
 <body>
-    <h1>Score: <span id="score">0</span></h1>
     <div id="game">
-        <div class="pacman" id="pacman"></div>
-        <div class="dot" id="dot" style="top: 50px; left: 50px;"></div>
+        <div class="pacman" id="pacman" style="top: 180px; left: 180px;"></div>
+        <div class="ghost" id="ghost1" style="top: 0; left: 0;"></div>
+        <div class="ghost" id="ghost2" style="top: 0; left: 360px;"></div>
     </div>
     <script>
         const pacman = document.getElementById('pacman');
-        const dot = document.getElementById('dot');
-        const scoreDisplay = document.getElementById('score');
-        let posX = 0, posY = 0, score = 0;
+        const ghosts = [document.getElementById('ghost1'), document.getElementById('ghost2')];
+        let pacmanPos = { x: 180, y: 180 };
+        let ghostPositions = [{ x: 0, y: 0 }, { x: 360, y: 0 }];
 
         document.addEventListener('keydown', (event) => {
             switch(event.key) {
-                case 'ArrowUp': posY -= 10; break;
-                case 'ArrowDown': posY += 10; break;
-                case 'ArrowLeft': posX -= 10; break;
-                case 'ArrowRight': posX += 10; break;
+                case 'ArrowUp': pacmanPos.y -= 20; break;
+                case 'ArrowDown': pacmanPos.y += 20; break;
+                case 'ArrowLeft': pacmanPos.x -= 20; break;
+                case 'ArrowRight': pacmanPos.x += 20; break;
             }
-            pacman.style.transform = `translate(${posX}px, ${posY}px)`;
-            checkCollision();
+            pacman.style.top = pacmanPos.y + 'px';
+            pacman.style.left = pacmanPos.x + 'px';
+            moveGhosts();
         });
 
-        function checkCollision() {
-            const pacmanRect = pacman.getBoundingClientRect();
-            const dotRect = dot.getBoundingClientRect();
-            if (pacmanRect.x < dotRect.x + dotRect.width &&
-                pacmanRect.x + pacmanRect.width > dotRect.x &&
-                pacmanRect.y < dotRect.y + dotRect.height &&
-                pacmanRect.y + pacmanRect.height > dotRect.y) {
-                score++;
-                scoreDisplay.textContent = score;
-                dot.style.top = Math.random() * 390 + 'px';
-                dot.style.left = Math.random() * 390 + 'px';
-            }
+        function moveGhosts() {
+            ghosts.forEach((ghost, index) => {
+                if (ghostPositions[index].x < pacmanPos.x) ghostPositions[index].x += 1;
+                if (ghostPositions[index].x > pacmanPos.x) ghostPositions[index].x -= 1;
+                if (ghostPositions[index].y < pacmanPos.y) ghostPositions[index].y += 1;
+                if (ghostPositions[index].y > pacmanPos.y) ghostPositions[index].y -= 1;
+
+                ghost.style.top = ghostPositions[index].y + 'px';
+                ghost.style.left = ghostPositions[index].x + 'px';
+
+                if (pacmanPos.x === ghostPositions[index].x && pacmanPos.y === ghostPositions[index].y) {
+                    alert('Game Over!');
+                    resetGame();
+                }
+            });
+        }
+
+        function resetGame() {
+            pacmanPos = { x: 180, y: 180 };
+            ghostPositions = [{ x: 0, y: 0 }, { x: 360, y: 0 }];
+            pacman.style.top = pacmanPos.y + 'px';
+            pacman.style.left = pacmanPos.x + 'px';
+            ghosts.forEach((ghost, index) => {
+                ghost.style.top = ghostPositions[index].y + 'px';
+                ghost.style.left = ghostPositions[index].x + 'px';
+            });
         }
     </script>
 </body>
