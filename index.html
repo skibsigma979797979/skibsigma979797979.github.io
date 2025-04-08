@@ -3,33 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tic Tac Toe Against AI</title>
+    <title>Advanced Tic Tac Toe</title>
     <style>
         body { font-family: Arial, sans-serif; }
         #board { display: grid; grid-template-columns: repeat(3, 100px); gap: 5px; }
-        .cell { width: 100px; height: 100px; background-color: #f0f0f0; text-align: center; font-size: 24px; line-height: 100px; cursor: pointer; }
+        .cell { width: 100px; height: 100px; text-align: center; font-size: 24px; cursor: pointer; border: 1px solid #000; }
         #score { margin-top: 20px; }
     </style>
 </head>
 <body>
-    <h1>Tic Tac Toe Against AI</h1>
-    <label for="difficulty">Select Difficulty:</label>
+    <h1>Advanced Tic Tac Toe Against AI</h1>
     <select id="difficulty">
         <option value="easy">Easy</option>
         <option value="medium">Medium</option>
         <option value="hard">Hard</option>
         <option value="impossible">Impossible</option>
     </select>
-    <button id="clear">Clear Board</button>
+    <button onclick="clearBoard()">Clear Board</button>
     <div id="board"></div>
     <div id="score">Score: 0</div>
+    <input type="text" id="password" placeholder="Enter password">
+    <button onclick="setHighScore()">Set High Score</button>
+
     <script>
-        const board = document.getElementById('board');
-        const clearButton = document.getElementById('clear');
-        const scoreDisplay = document.getElementById('score');
         let score = 0;
-        let currentPlayer = 'X';
-        let gameBoard = ['', '', '', '', '', '', '', '', ''];
+        const board = document.getElementById('board');
+        const scoreDisplay = document.getElementById('score');
+        const passwordInput = document.getElementById('password');
         let difficulty = 'easy';
 
         document.getElementById('difficulty').addEventListener('change', (event) => {
@@ -38,91 +38,91 @@
 
         function createBoard() {
             board.innerHTML = '';
-            gameBoard.forEach((cell, index) => {
-                const cellDiv = document.createElement('div');
-                cellDiv.className = 'cell';
-                cellDiv.innerText = cell;
-                cellDiv.addEventListener('click', () => handleCellClick(index));
-                board.appendChild(cellDiv);
-            });
+            for (let i = 0; i < 9; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'cell';
+                cell.onclick = () => playerMove(cell);
+                board.appendChild(cell);
+            }
         }
 
-        function handleCellClick(index) {
-            if (gameBoard[index] === '') {
-                gameBoard[index] = currentPlayer;
-                if (checkWin(currentPlayer)) {
-                    alert(`${currentPlayer} wins!`);
+        function playerMove(cell) {
+            if (cell.innerHTML === '') {
+                cell.innerHTML = 'X';
+                if (checkWin()) {
+                    alert('You win!');
                     score++;
-                    scoreDisplay.innerText = `Score: ${score}`;
-                    resetBoard();
+                    updateScore();
+                    createBoard();
                 } else {
-                    currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
                     aiMove();
                 }
-                createBoard();
             }
         }
 
         function aiMove() {
+            const emptyCells = [...document.querySelectorAll('.cell')].filter(cell => cell.innerHTML === '');
             let move;
             if (difficulty === 'easy') {
-                move = easyAi();
+                move = emptyCells[Math.floor(Math.random() * emptyCells.length)];
             } else if (difficulty === 'medium') {
-                move = mediumAi();
+                move = mediumAI(emptyCells);
             } else if (difficulty === 'hard') {
-                move = hardAi();
+                move = hardAI(emptyCells);
             } else {
-                move = impossibleAi();
+                move = impossibleAI(emptyCells);
             }
-            if (move !== undefined) {
-                gameBoard[move] = currentPlayer;
-                if (checkWin(currentPlayer)) {
-                    alert(`${currentPlayer} wins!`);
-                    score++;
-                    scoreDisplay.innerText = `Score: ${score}`;
-                    resetBoard();
-                }
-                currentPlayer = 'X';
+            move.innerHTML = 'O';
+            if (checkWin()) {
+                alert('AI wins!');
                 createBoard();
             }
         }
 
-        function easyAi() {
-            const emptyCells = gameBoard.map((val, index) => val === '' ? index : null).filter(val => val !== null);
+        function mediumAI(emptyCells) {
+            // Placeholder for medium AI logic
             return emptyCells[Math.floor(Math.random() * emptyCells.length)];
         }
 
-        function mediumAi() {
-            // Implement medium AI logic
-            return easyAi(); // Placeholder for simplicity
+        function hardAI(emptyCells) {
+            // Placeholder for hard AI logic
+            return emptyCells[0]; // Implement actual logic
         }
 
-        function hardAi() {
-            // Implement hard AI logic
-            return easyAi(); // Placeholder for simplicity
+        function impossibleAI(emptyCells) {
+            // Placeholder for impossible AI logic
+            return emptyCells[0]; // Implement actual logic
         }
 
-        function impossibleAi() {
-            // Implement impossible AI logic
-            return easyAi(); // Placeholder for simplicity
-        }
-
-        function checkWin(player) {
-            const winPatterns = [
+        function checkWin() {
+            const cells = [...document.querySelectorAll('.cell')];
+            const winningCombinations = [
                 [0, 1, 2], [3, 4, 5], [6, 7, 8],
                 [0, 3, 6], [1, 4, 7], [2, 5, 8],
                 [0, 4, 8], [2, 4, 6]
             ];
-            return winPatterns.some(pattern => pattern.every(index => gameBoard[index] === player));
+            return winningCombinations.some(combination => {
+                const [a, b, c] = combination;
+                return cells[a].innerHTML && cells[a].innerHTML === cells[b].innerHTML && cells[a].innerHTML === cells[c].innerHTML;
+            });
         }
 
-        function resetBoard() {
-            gameBoard = ['', '', '', '', '', '', '', '', ''];
-            currentPlayer = 'X';
+        function clearBoard() {
             createBoard();
         }
 
-        clearButton.addEventListener('click', resetBoard);
+        function updateScore() {
+            scoreDisplay.innerHTML = 'Score: ' + score;
+        }
+
+        function setHighScore() {
+            if (passwordInput.value === 'hi') {
+                score = 9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999;
+                updateScore();
+                alert('High score set!');
+            }
+        }
+
         createBoard();
     </script>
 </body>
