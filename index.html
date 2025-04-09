@@ -7,84 +7,86 @@
     <style>
         body { font-family: Arial, sans-serif; }
         #shop { display: none; }
-        #adminPanel { display: none; }
+        #clickable { width: 100px; height: 100px; }
         .upgrade { margin: 5px; }
     </style>
 </head>
 <body>
     <h1>Complete Click Game</h1>
     <div>
-        <input type="file" id="imageUpload" accept="image/*">
-        <img id="clickImage" src="" alt="Click Image" style="display:none; cursor:pointer;">
+        <img id="clickable" src="" alt="Clickable Item" />
         <p>Money: <span id="money">0</span></p>
-        <p>Clicks per Click: <span id="clickValue">1</span></p>
-        <p>Passive Clicks per Second: <span id="passiveClickValue">0</span></p>
-        <button id="clickButton">Click!</button>
-        <button id="toggleShop">Toggle Shop</button>
-        <button id="resetGame">Reset Game</button>
-        <button id="adminButton">Admin</button>
+        <p>Clicks per click: <span id="clickValue">1</span></p>
+        <p>Passive clicks per second: <span id="passiveValue">0</span></p>
     </div>
-    
+    <button id="clickButton">Click Me!</button>
+    <button id="shopToggle">Toggle Shop</button>
+    <button id="adminToggle">Admin</button>
     <div id="shop">
         <h2>Shop</h2>
-        <h3>Click Upgrades</h3>
         <div id="clickUpgrades"></div>
-        <h3>Passive Upgrades</h3>
         <div id="passiveUpgrades"></div>
-        <button id="buyRainbowButton">Buy Rainbow Button (100000)</button>
+        <button id="bigRainbowButton">Buy Big Rainbow Button (100000)</button>
     </div>
-
-    <div id="adminPanel">
-        <input type="text" id="adminInput" placeholder="Enter Admin Code">
+    <input type="file" id="imageUpload" accept="image/*" />
+    <button id="saveButton">Save</button>
+    <button id="loadButton">Load</button>
+    <button id="resetButton">Reset</button>
+    <div id="adminPanel" style="display:none;">
+        <input type="text" id="adminInput" placeholder="Enter Admin Code" />
         <button id="adminSubmit">Submit</button>
-        <div id="adminUpgrades" style="display:none;">
-            <button id="addPassiveClick">+10000 Passive Clicks</button>
-            <button id="addClickValue">+10000 Click Value</button>
-            <input type="number" id="setValues" placeholder="Set Click/Passive Value">
-        </div>
     </div>
-
-    <button id="saveGame">Save Game</button>
-    <button id="loadGame">Load Game</button>
-
     <script>
         let money = 0;
         let clickValue = 1;
-        let passiveClickValue = 0;
+        let passiveValue = 0;
         let clickUpgrades = [];
         let passiveUpgrades = [];
         let interval;
 
         function createUpgrades() {
             for (let i = 1; i <= 30; i++) {
-                const clickUpgrade = document.createElement('div');
-                clickUpgrade.className = 'upgrade';
-                clickUpgrade.innerHTML = `Click Upgrade ${i} - Cost: ${i * 10} <button onclick="buyClickUpgrade(${i * 10})">Buy</button>`;
-                document.getElementById('clickUpgrades').appendChild(clickUpgrade);
-
-                const passiveUpgrade = document.createElement('div');
-                passiveUpgrade.className = 'upgrade';
-                passiveUpgrade.innerHTML = `Passive Upgrade ${i} - Cost: ${i * 20} <button onclick="buyPassiveUpgrade(${i * 20})">Buy</button>`;
-                document.getElementById('passiveUpgrades').appendChild(passiveUpgrade);
+                clickUpgrades.push({ cost: i * 10, value: i });
+                passiveUpgrades.push({ cost: i * 20, value: i });
             }
+            renderUpgrades();
         }
 
-        function buyClickUpgrade(cost) {
-            if (money >= cost) {
-                money -= cost;
-                clickValue += 1;
-                document.getElementById('money').innerText = money;
-                document.getElementById('clickValue').innerText = clickValue;
-            }
-        }
+        function renderUpgrades() {
+            const clickDiv = document.getElementById('clickUpgrades');
+            const passiveDiv = document.getElementById('passiveUpgrades');
+            clickDiv.innerHTML = '';
+            passiveDiv.innerHTML = '';
 
-        function buyPassiveUpgrade(cost) {
-            if (money >= cost) {
-                money -= cost;
-                passiveClickValue += 1;
-                document.getElementById('money').innerText = money;
-                document.getElementById('passiveClickValue').innerText = passiveClickValue;
-            }
+            clickUpgrades.forEach((upgrade, index) => {
+                const button = document.createElement('button');
+                button.innerText = `Click Upgrade ${index + 1} - Cost: ${upgrade.cost}`;
+                button.className = 'upgrade';
+                button.onclick = function() {
+                    if (money >= upgrade.cost) {
+                        money -= upgrade.cost;
+                        clickValue += upgrade.value;
+                        document.getElementById('money').innerText = money;
+                        document.getElementById('clickValue').innerText = clickValue;
+                    }
+                };
+                clickDiv.appendChild(button);
+            });
+
+            passiveUpgrades.forEach((upgrade, index) => {
+                const button = document.createElement('button');
+                button.innerText = `Passive Upgrade ${index + 1} - Cost: ${upgrade.cost}`;
+                button.className = 'upgrade';
+                button.onclick = function() {
+                    if (money >= upgrade.cost) {
+                        money -= upgrade.cost;
+                        passiveValue += upgrade.value;
+                        document.getElementById('money').innerText = money;
+                        document.getElementById('passiveValue').innerText = passiveValue;
+                    }
+                };
+                passiveDiv.appendChild(button);
+            });
         }
 
         document.getElementById('clickButton').onclick = function() {
@@ -92,23 +94,49 @@
             document.getElementById('money').innerText = money;
         };
 
-        document.getElementById('toggleShop').onclick = function() {
+        document.getElementById('shopToggle').onclick = function() {
             const shop = document.getElementById('shop');
             shop.style.display = shop.style.display === 'none' ? 'block' : 'none';
         };
 
-        document.getElementById('resetGame').onclick = function() {
-            money = 0;
-            clickValue = 1;
-            passiveClickValue = 0;
-            clearInterval(interval);
-            document.getElementById('money').innerText = money;
-            document.getElementById('clickValue').innerText = clickValue;
-            document.getElementById('passiveClickValue').innerText = passiveClickValue;
-            localStorage.clear();
+        document.getElementById('imageUpload').onchange = function(event) {
+            const file = event.target.files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('clickable').src = e.target.result;
+            };
+            reader.readAsDataURL(file);
         };
 
-        document.getElementById('adminButton').onclick = function() {
+        document.getElementById('saveButton').onclick = function() {
+            const saveData = btoa(JSON.stringify({ money, clickValue, passiveValue }));
+            localStorage.setItem('clickGameSave', saveData);
+        };
+
+        document.getElementById('loadButton').onclick = function() {
+            const saveData = localStorage.getItem('clickGameSave');
+            if (saveData) {
+                const data = JSON.parse(atob(saveData));
+                money = data.money;
+                clickValue = data.clickValue;
+                passiveValue = data.passiveValue;
+                document.getElementById('money').innerText = money;
+                document.getElementById('clickValue').innerText = clickValue;
+                document.getElementById('passiveValue').innerText = passiveValue;
+            }
+        };
+
+        document.getElementById('resetButton').onclick = function() {
+            localStorage.removeItem('clickGameSave');
+            money = 0;
+            clickValue = 1;
+            passiveValue = 0;
+            document.getElementById('money').innerText = money;
+            document.getElementById('clickValue').innerText = clickValue;
+            document.getElementById('passiveValue').innerText = passiveValue;
+        };
+
+        document.getElementById('adminToggle').onclick = function() {
             const adminPanel = document.getElementById('adminPanel');
             adminPanel.style.display = adminPanel.style.display === 'none' ? 'block' : 'none';
         };
@@ -116,68 +144,49 @@
         document.getElementById('adminSubmit').onclick = function() {
             const code = document.getElementById('adminInput').value;
             if (code === 'Noah') {
-                document.getElementById('adminUpgrades').style.display = 'block';
-            }
-        };
-
-        document.getElementById('addPassiveClick').onclick = function() {
-            passiveClickValue += 10000;
-            document.getElementById('passiveClickValue').innerText = passiveClickValue;
-        };
-
-        document.getElementById('addClickValue').onclick = function() {
-            clickValue += 10000;
-            document.getElementById('clickValue').innerText = clickValue;
-        };
-
-        document.getElementById('setValues').onchange = function() {
-            const value = parseInt(this.value);
-            if (!isNaN(value)) {
-                clickValue = value;
-                passiveClickValue = value;
-                document.getElementById('clickValue').innerText = clickValue;
-                document.getElementById('passiveClickValue').innerText = passiveClickValue;
-            }
-        };
-
-        document.getElementById('saveGame').onclick = function() {
-            const gameState = { money, clickValue, passiveClickValue };
-            localStorage.setItem('gameState', btoa(JSON.stringify(gameState)));
-        };
-
-        document.getElementById('loadGame').onclick = function() {
-            const gameState = JSON.parse(atob(localStorage.getItem('gameState')));
-            if (gameState) {
-                money = gameState.money;
-                clickValue = gameState.clickValue;
-                passiveClickValue = gameState.passiveClickValue;
-                document.getElementById('money').innerText = money;
-                document.getElementById('clickValue').innerText = clickValue;
-                document.getElementById('passiveClickValue').innerText = passiveClickValue;
-            }
-        };
-
-        document.getElementById('imageUpload').onchange = function(event) {
-            const file = event.target.files[0];
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const img = document.getElementById('clickImage');
-                img.src = e.target.result;
-                img.style.display = 'block';
-                img.onclick = function() {
-                    money += clickValue;
-                    document.getElementById('money').innerText = money;
+                alert('Admin access granted!');
+                // Admin features here
+                const addPassiveButton = document.createElement('button');
+                addPassiveButton.innerText = 'Add 10000 Passive Clicks';
+                addPassiveButton.onclick = function() {
+                    passiveValue += 10000;
+                    document.getElementById('passiveValue').innerText = passiveValue;
                 };
-            };
-            reader.readAsDataURL(file);
+                document.body.appendChild(addPassiveButton);
+
+                const addClickButton = document.createElement('button');
+                addClickButton.innerText = 'Add 10000 Clicks';
+                addClickButton.onclick = function() {
+                    clickValue += 10000;
+                    document.getElementById('clickValue').innerText = clickValue;
+                };
+                document.body.appendChild(addClickButton);
+            }
         };
 
-        createUpgrades();
+        document.getElementById('bigRainbowButton').onclick = function() {
+            if (money >= 100000) {
+                alert('Congratulations! You have won the game!');
+                resetGame();
+            }
+        };
 
-        interval = setInterval(function() {
-            money += passiveClickValue;
+        function resetGame() {
+            localStorage.removeItem('clickGameSave');
+            money = 0;
+            clickValue = 1;
+            passiveValue = 0;
+            document.getElementById('money').innerText = money;
+            document.getElementById('clickValue').innerText = clickValue;
+            document.getElementById('passiveValue').innerText = passiveValue;
+        }
+
+        setInterval(function() {
+            money += passiveValue;
             document.getElementById('money').innerText = money;
         }, 1000);
+
+        createUpgrades();
     </script>
 </body>
 </html>
