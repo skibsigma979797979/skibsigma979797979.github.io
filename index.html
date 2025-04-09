@@ -1,1 +1,347 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>Click Game</title><style>body{text-align:center;font-family:sans-serif}.s{display:none;margin-top:20px}.b{display:block;margin:5px auto}#i{width:200px;cursor:pointer;margin:20px auto;display:none}#a{display:none;border:1px solid #aaa;padding:10px;margin-top:20px}#x{margin-top:10px;display:none}</style></head><body><h1>Click Game</h1><input type="file" id="u" accept="image/*"><img id="i" src="" alt="Click me!"><h2>Money: <span id="m">0</span></h2><button onclick="t('s1')">Toggle Shop 1</button><button onclick="t('s2')">Toggle Shop 2</button><div id="s1" class="s"></div><div id="s2" class="s"></div><br><button onclick="sv()">Save</button><button onclick="ld()">Load</button><br><br><button onclick="sa()">Admin</button><div id="x"><input type="text" id="c" placeholder="Enter admin code"><button onclick="ac()">Submit</button></div><div id="a"><h3>Admin Panel</h3><button onclick="ap(1e4)">+10000 Passive</button><button onclick="acu(1e4)">+10000 Click Upgrades</button><button onclick="infU()">Infinite Upgrades</button><button onclick="infM()">Infinite Money</button><br><br><button onclick="ha()">Hide Panel</button></div><script>let m=0,c=1,cu=Array(30).fill(0),pu=Array(30).fill(0),inf=false;document.getElementById('u').addEventListener('change',e=>{const r=new FileReader();r.onload=ev=>{const i=document.getElementById('i');i.src=ev.target.result;i.style.display='block'};r.readAsDataURL(e.target.files[0])});document.getElementById('i').addEventListener('click',()=>{if(!inf)m+=c;else m=1/0;u()});function u(){document.getElementById('m').textContent=isFinite(m)?Math.floor(m):'∞'}function t(id){const e=document.getElementById(id);e.style.display=e.style.display==='none'?'block':'none'}function cs(){const s1=document.getElementById('s1'),s2=document.getElementById('s2');for(let i=0;i<30;i++){const cost=2**i,b1=document.createElement('button');b1.className='b';b1.textContent=`Click Upgrade ${i+1} ($${cost})`;b1.onclick=()=>{if(m>=cost||inf){if(!inf)m-=cost;cu[i]++;c++;u()}};s1.appendChild(b1);const b2=document.createElement('button');b2.className='b';b2.textContent=`Passive Upgrade ${i+1} ($${cost})`;b2.onclick=()=>{if(m>=cost||inf){if(!inf)m-=cost;pu[i]++;u()}};s2.appendChild(b2)}}function pi(){const t=pu.reduce((s,v)=>s+v,0);if(!inf)m+=t;else m=1/0;u()}setInterval(pi,1e3);function sv(){const d={m,c,cu,pu},e=btoa(JSON.stringify(d));prompt('Copy your save code:',e)}function ld(){const code=prompt('Paste your save code:');try{const d=JSON.parse(atob(code));m=d.m;c=d.c;cu=d.cu;pu=d.pu;u()}catch{alert('Invalid save code.')}}function sa(){document.getElementById('x').style.display='block'}function ac(){if(document.getElementById('c').value==='Noah')document.getElementById('a').style.display='block';else alert('Wrong code')}function ha(){document.getElementById('a').style.display='none';document.getElementById('x').style.display='none';document.getElementById('c').value=''}function ap(a){for(let i=0;i<pu.length;i++)pu[i]+=a}function acu(a){for(let i=0;i<cu.length;i++){cu[i]+=a;c+=a}}function infU(){inf=true}function infM(){m=1/0;u()}cs();u();</script></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Ultimate Click Game</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Press Start 2P', cursive;
+      background: #111;
+      color: white;
+      text-align: center;
+      overflow-x: hidden;
+    }
+    .container {
+      max-width: 900px;
+      margin: auto;
+      padding: 20px;
+    }
+    h1 {
+      font-size: 1.5rem;
+      margin-bottom: 10px;
+    }
+    .money-display {
+      font-size: 1.2rem;
+      margin: 20px auto;
+      background: black;
+      padding: 10px;
+      display: inline-block;
+      border-radius: 10px;
+      color: #0f0;
+    }
+    #img {
+      width: 150px;
+      cursor: pointer;
+      transition: transform 0.1s ease;
+      display: none;
+    }
+    #img:active {
+      transform: scale(1.1);
+    }
+    .shop, .theme-container {
+      display: none;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      margin: 10px 0;
+    }
+    .upgrade-button {
+      padding: 6px 10px;
+      font-size: 0.6rem;
+      border-radius: 8px;
+      border: none;
+      background-color: #ff9800;
+      color: white;
+      cursor: pointer;
+    }
+    .upgrade-button:hover {
+      background-color: #e65100;
+    }
+    button {
+      font-size: 0.6rem;
+      margin: 5px;
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      background-color: #4caf50;
+      color: white;
+    }
+    button:hover {
+      background-color: #388e3c;
+    }
+    #aP, #aI {
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.1);
+      display: none;
+    }
+    .particle {
+      position: absolute;
+      pointer-events: none;
+      font-size: 16px;
+      color: gold;
+      animation: floatUp 1s ease-out forwards;
+    }
+    @keyframes floatUp {
+      0% { opacity: 1; transform: translateY(0); }
+      100% { opacity: 0; transform: translateY(-50px); }
+    }
+
+    /* THEME STYLES */
+    .theme-space {
+      background: black;
+      background-image: radial-gradient(white 1px, transparent 1px);
+      background-size: 40px 40px;
+      animation: twinkle 3s infinite linear;
+    }
+    .theme-money {
+      background: linear-gradient(#1b5e20, #4caf50);
+    }
+    .theme-confetti {
+      background: repeating-linear-gradient(45deg, #ff0, #f0f 10px, #0ff 20px);
+    }
+    .theme-pixel {
+      background: repeating-linear-gradient(0deg, #222, #333 10px);
+    }
+    .theme-glow {
+      background: #000;
+      box-shadow: inset 0 0 50px #0ff;
+    }
+    @keyframes twinkle {
+      0% { background-position: 0 0; }
+      100% { background-position: 40px 40px; }
+    }
+  </style>
+
+  <!-- AUDIO SETUP -->
+  <audio id="clickS" src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YQAAAAA="></audio>
+  <audio id="upgradeS" src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YQAAAAA="></audio>
+  <audio id="saveS" src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YQAAAAA="></audio>
+</head>
+<body>
+  <div class="container" id="mainGame">
+    <h1>💥 Ultimate Click Game 💥</h1>
+
+    <!-- Upload and Display -->
+    <input type="file" accept="image/*" id="uploader">
+    <br><img id="img">
+
+    <!-- Money -->
+    <div class="money-display" id="moneyDisplay">$0</div>
+
+    <!-- Buttons -->
+    <div>
+      <button onclick="toggleShop()">🛒 Toggle Shop</button>
+      <button onclick="toggleThemeMenu()">🎨 Theme</button>
+      <button onclick="manualSave()">💾 Save</button>
+      <button onclick="manualLoad()">📂 Load</button>
+      <button onclick="toggleAdminInput()">👨‍💼 Admin</button>
+    </div>
+
+    <!-- Theme Selector -->
+    <div class="theme-container" id="themeMenu">
+      <button onclick="setTheme('space')">🌌 Space</button>
+      <button onclick="setTheme('money')">💸 Money</button>
+      <button onclick="setTheme('confetti')">🎉 Confetti</button>
+      <button onclick="setTheme('pixel')">🔥 Pixel</button>
+      <button onclick="setTheme('glow')">✨ Glow</button>
+    </div>
+
+    <!-- Shops -->
+    <div class="shop" id="shop1"></div>
+    <div class="shop" id="shop2"></div>
+
+    <!-- Admin Input -->
+    <div id="adminBox" style="margin-top: 10px;">
+      <input type="text" id="adminInput" placeholder="Enter Admin Code">
+    </div>
+
+    <!-- Admin Panel -->
+    <div id="aP">
+      <h3>Admin Panel</h3>
+      <button onclick="givePassive()">+10,000 Passive</button>
+      <button onclick="giveClick()">+10,000 Click Upgrades</button>
+      <button onclick="setInfinite()">💠 Infinite Mode</button>
+      <button onclick="setInfiniteMoney()">💰 Infinite Money</button>
+      <button onclick="hideAdmin()">Hide Panel</button>
+    </div>
+  </div>
+<script>
+let money = 0;
+let clickValue = 1;
+let cps = 0;
+let clickUpgrades = Array(30).fill(0);
+let passiveUpgrades = Array(30).fill(0);
+let theme = 'space';
+let saveKey = 'ultimate_click_game_save';
+
+function updateMoneyDisplay() {
+  document.getElementById("moneyDisplay").innerText = `$${Math.floor(money)}`;
+}
+
+function addClickParticle(x, y) {
+  let particle = document.createElement("div");
+  particle.className = "particle";
+  particle.style.left = `${x}px`;
+  particle.style.top = `${y}px`;
+  particle.innerText = "+$" + clickValue;
+  document.body.appendChild(particle);
+  setTimeout(() => particle.remove(), 1000);
+}
+
+function clickImage(e) {
+  money += clickValue;
+  document.getElementById("clickS").play();
+  updateMoneyDisplay();
+  addClickParticle(e.clientX, e.clientY);
+}
+
+function toggleShop() {
+  let s1 = document.getElementById("shop1");
+  let s2 = document.getElementById("shop2");
+  s1.style.display = s1.style.display === "flex" ? "none" : "flex";
+  s2.style.display = s2.style.display === "flex" ? "none" : "flex";
+}
+
+function toggleAdminInput() {
+  let input = document.getElementById("adminInput");
+  input.style.display = input.style.display === "none" ? "inline-block" : "none";
+  input.onchange = () => {
+    if (input.value === "Noah") {
+      document.getElementById("aP").style.display = "block";
+      input.value = "";
+      input.style.display = "none";
+    }
+  }
+}
+
+function hideAdmin() {
+  document.getElementById("aP").style.display = "none";
+  document.getElementById("adminInput").value = "";
+  document.getElementById("adminInput").style.display = "none";
+}
+
+function givePassive() {
+  cps += 10000;
+}
+function giveClick() {
+  clickValue += 10000;
+}
+function setInfinite() {
+  clickValue = Infinity;
+  cps = Infinity;
+}
+function setInfiniteMoney() {
+  money = Infinity;
+  updateMoneyDisplay();
+}
+
+function buyUpgrade(index, type) {
+  const basePrice = 10;
+  let level = type === "click" ? clickUpgrades[index] : passiveUpgrades[index];
+  let cost = basePrice * Math.pow(2, level);
+  if (money >= cost) {
+    money -= cost;
+    type === "click" ? clickUpgrades[index]++ : passiveUpgrades[index]++;
+    type === "click" ? clickValue++ : cps++;
+    document.getElementById("upgradeS").play();
+    updateMoneyDisplay();
+    saveGame();
+  }
+}
+
+function createShopButtons() {
+  const s1 = document.getElementById("shop1");
+  const s2 = document.getElementById("shop2");
+  for (let i = 0; i < 30; i++) {
+    const btn1 = document.createElement("button");
+    btn1.className = "upgrade-button";
+    btn1.innerText = `⬆️ Click +1\n$${10 * Math.pow(2, i)}`;
+    btn1.onclick = () => buyUpgrade(i, "click");
+    s1.appendChild(btn1);
+
+    const btn2 = document.createElement("button");
+    btn2.className = "upgrade-button";
+    btn2.innerText = `⏱ Passive +1\n$${10 * Math.pow(2, i)}`;
+    btn2.onclick = () => buyUpgrade(i, "passive");
+    s2.appendChild(btn2);
+  }
+}
+
+setInterval(() => {
+  if (!isNaN(cps)) {
+    money += cps;
+    updateMoneyDisplay();
+  }
+}, 1000);
+
+function setTheme(t) {
+  document.body.className = '';
+  document.body.classList.add("theme-" + t);
+  theme = t;
+  saveGame();
+}
+
+function toggleThemeMenu() {
+  let el = document.getElementById("themeMenu");
+  el.style.display = el.style.display === "flex" ? "none" : "flex";
+}
+
+function saveGame() {
+  const data = {
+    money,
+    clickValue,
+    cps,
+    clickUpgrades,
+    passiveUpgrades,
+    theme
+  };
+  localStorage.setItem(saveKey, JSON.stringify(data));
+  document.getElementById("saveS").play();
+}
+
+function manualSave() {
+  saveGame();
+  alert("Game saved!");
+}
+
+function manualLoad() {
+  const data = JSON.parse(localStorage.getItem(saveKey));
+  if (data) {
+    money = data.money;
+    clickValue = data.clickValue;
+    cps = data.cps;
+    clickUpgrades = data.clickUpgrades;
+    passiveUpgrades = data.passiveUpgrades;
+    setTheme(data.theme || 'space');
+    updateMoneyDisplay();
+  }
+}
+
+window.onload = () => {
+  updateMoneyDisplay();
+  createShopButtons();
+  manualLoad();
+
+  const img = document.getElementById("img");
+  img.addEventListener("click", clickImage);
+
+  const up = document.getElementById("uploader");
+  up.addEventListener("change", (e) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      img.src = reader.result;
+      img.style.display = "block";
+    };
+    reader.readAsDataURL(e.target.files[0]);
+  });
+};
+</script>
+</body>
+</html>
