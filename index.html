@@ -8,6 +8,7 @@
     .shop { display: none; margin-top: 20px; }
     .upgrade-button { display: block; margin: 5px auto; }
     #game-img { width: 200px; cursor: pointer; margin: 20px auto; display: block; }
+    #admin-panel { display: none; margin-top: 20px; border: 1px solid #ccc; padding: 10px; }
   </style>
 </head>
 <body>
@@ -25,11 +26,26 @@
   <button onclick="saveGame()">Save</button>
   <button onclick="loadGame()">Load</button>
 
+  <br><br>
+  <button onclick="showAdminInput()">Admin</button>
+  <div id="admin-input" style="display: none;">
+    <input type="text" id="admin-code" placeholder="Enter admin code">
+    <button onclick="checkAdminCode()">Submit</button>
+  </div>
+  <div id="admin-panel">
+    <h3>Admin Panel</h3>
+    <button onclick="addPassive(10000)">+10000 Passive</button>
+    <button onclick="addClickUpgrades(10000)">+10000 Click Upgrades</button>
+    <button onclick="makeUpgradesInfinite()">Infinite Upgrades</button>
+    <button onclick="makeMoneyInfinite()">Infinite Money</button>
+  </div>
+
   <script>
     let money = 0;
     let clickValue = 1;
     let clickUpgrades = Array(30).fill(0);
     let passiveUpgrades = Array(30).fill(0);
+    let infinite = false;
 
     document.getElementById('upload').addEventListener('change', function(e) {
       const reader = new FileReader();
@@ -40,12 +56,16 @@
     });
 
     document.getElementById('game-img').addEventListener('click', () => {
-      money += clickValue;
+      if (infinite) {
+        money = Infinity;
+      } else {
+        money += clickValue;
+      }
       updateUI();
     });
 
     function updateUI() {
-      document.getElementById('money').textContent = Math.floor(money);
+      document.getElementById('money').textContent = isFinite(money) ? Math.floor(money) : '∞';
     }
 
     function toggleShop(shopId) {
@@ -58,70 +78,4 @@
       const shop2 = document.getElementById('shop2');
       for (let i = 0; i < 30; i++) {
         const btn1 = document.createElement('button');
-        btn1.className = 'upgrade-button';
-        btn1.textContent = `Click Upgrade ${i+1} ($${2 ** i})`;
-        btn1.onclick = () => {
-          const cost = 2 ** i;
-          if (money >= cost) {
-            money -= cost;
-            clickUpgrades[i]++;
-            clickValue += 1;
-            updateUI();
-          }
-        };
-        shop1.appendChild(btn1);
-
-        const btn2 = document.createElement('button');
-        btn2.className = 'upgrade-button';
-        btn2.textContent = `Passive Upgrade ${i+1} ($${2 ** i})`;
-        btn2.onclick = () => {
-          const cost = 2 ** i;
-          if (money >= cost) {
-            money -= cost;
-            passiveUpgrades[i]++;
-            updateUI();
-          }
-        };
-        shop2.appendChild(btn2);
-      }
-    }
-
-    function getPassiveIncome() {
-      let income = 0;
-      passiveUpgrades.forEach(u => { income += u; });
-      money += income;
-      updateUI();
-    }
-
-    setInterval(getPassiveIncome, 1000);
-
-    function saveGame() {
-      const data = {
-        money,
-        clickValue,
-        clickUpgrades,
-        passiveUpgrades
-      };
-      const encoded = btoa(JSON.stringify(data));
-      prompt("Copy your save code:", encoded);
-    }
-
-    function loadGame() {
-      const encoded = prompt("Paste your save code:");
-      try {
-        const data = JSON.parse(atob(encoded));
-        money = data.money;
-        clickValue = data.clickValue;
-        clickUpgrades = data.clickUpgrades;
-        passiveUpgrades = data.passiveUpgrades;
-        updateUI();
-      } catch (e) {
-        alert("Invalid save code.");
-      }
-    }
-
-    createShopButtons();
-    updateUI();
-  </script>
-</body>
-</html>
+        btn1.className = 'upg
