@@ -342,6 +342,172 @@ window.onload = () => {
     reader.readAsDataURL(e.target.files[0]);
   });
 };
+  <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Clicker Game</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #f0f0f0;
+    }
+    #clicker {
+      width: 200px;
+      height: 200px;
+      background-color: #ffcc00;
+      border-radius: 50%;
+      margin: 20px auto;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: bold;
+    }
+    #stats, #achievements {
+      margin-top: 20px;
+    }
+    #achievementsList {
+      list-style-type: none;
+      padding: 0;
+    }
+    #achievementsList li {
+      background-color: #d4edda;
+      margin: 5px;
+      padding: 10px;
+      border-radius: 5px;
+    }
+    #prestigeButton {
+      display: none;
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 18px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>Clicker Game</h1>
+  <div id="clicker" onclick="handleClick()">Click Me!</div>
+  <div id="stats">
+    <p>Money: <span id="money">0</span></p>
+    <p>Money per Click: <span id="moneyPerClick">1</span></p>
+    <p>Money per Second: <span id="moneyPerSecond">0</span></p>
+  </div>
+  <div id="upgrades">
+    <button onclick="buyClickUpgrade()">Upgrade Click (+1 Money per Click)</button>
+    <button onclick="buyAutoClicker()">Buy Auto Clicker (+1 Money per Second)</button>
+  </div>
+  <div id="achievements">
+    <h3>Achievements</h3>
+    <ul id="achievementsList"></ul>
+  </div>
+  <button id="prestigeButton" onclick="prestige()">🌟 Prestige (Reset for Bonus)</button>
+
+  <script>
+    let money = 0;
+    let moneyPerClick = 1;
+    let moneyPerSecond = 0;
+    let totalClicks = 0;
+    let prestigeMultiplier = 1;
+    const prestigeThreshold = 100000; // Money required to enable prestige
+
+    const achievements = [
+      { name: "First Click", condition: () => totalClicks >= 1, achieved: false },
+      { name: "Click Novice", condition: () => totalClicks >= 100, achieved: false },
+      { name: "Click Master", condition: () => totalClicks >= 1000, achieved: false },
+      { name: "First Upgrade", condition: () => moneyPerClick > 1, achieved: false },
+      { name: "Passive Earner", condition: () => moneyPerSecond > 0, achieved: false },
+      // Add more achievements as desired
+    ];
+
+    function handleClick() {
+      totalClicks++;
+      money += moneyPerClick * prestigeMultiplier;
+      updateDisplay();
+      checkAchievements();
+      checkPrestige();
+    }
+
+    function buyClickUpgrade() {
+      const cost = 50; // Example cost
+      if (money >= cost) {
+        money -= cost;
+        moneyPerClick++;
+        updateDisplay();
+        checkAchievements();
+      } else {
+        alert("Not enough money!");
+      }
+    }
+
+    function buyAutoClicker() {
+      const cost = 100; // Example cost
+      if (money >= cost) {
+        money -= cost;
+        moneyPerSecond++;
+        updateDisplay();
+        checkAchievements();
+      } else {
+        alert("Not enough money!");
+      }
+    }
+
+    function checkAchievements() {
+      achievements.forEach(achievement => {
+        if (!achievement.achieved && achievement.condition()) {
+          achievement.achieved = true;
+          displayAchievement(achievement.name);
+        }
+      });
+    }
+
+    function displayAchievement(name) {
+      const list = document.getElementById("achievementsList");
+      const item = document.createElement("li");
+      item.textContent = `🏆 ${name}`;
+      list.appendChild(item);
+    }
+
+    function checkPrestige() {
+      const button = document.getElementById("prestigeButton");
+      if (money >= prestigeThreshold) {
+        button.style.display = "block";
+      } else {
+        button.style.display = "none";
+      }
+    }
+
+    function prestige() {
+      if (money >= prestigeThreshold) {
+        prestigeMultiplier += 0.1; // Increase multiplier by 10%
+        money = 0;
+        moneyPerClick = 1;
+        moneyPerSecond = 0;
+        totalClicks = 0;
+        achievements.forEach(ach => ach.achieved = false);
+        document.getElementById("achievementsList").innerHTML = "";
+        alert("Prestige activated! Enjoy a 10% bonus to earnings.");
+        updateDisplay();
+        checkPrestige();
+      }
+    }
+
+    function updateDisplay() {
+      document.getElementById("money").textContent = money.toFixed(2);
+      document.getElementById("moneyPerClick").textContent = (moneyPerClick * prestigeMultiplier).toFixed(2);
+      document.getElementById("moneyPerSecond").textContent = (moneyPerSecond * prestigeMultiplier).toFixed(2);
+    }
+
+    setInterval(() => {
+      money += moneyPerSecond * prestigeMultiplier;
+      updateDisplay();
+      checkPrestige();
+    }, 1000);
+  
+
 </script>
 </body>
 </html>
