@@ -3,107 +3,160 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Complete Click Game</title>
+    <title>Click Game with Save/Load</title>
     <style>
         body { font-family: Arial, sans-serif; }
         #shop { display: none; }
-        #clickable { width: 100px; height: 100px; }
+        #image { max-width: 200px; }
         .upgrade { margin: 5px; }
     </style>
 </head>
 <body>
-    <h1>Complete Click Game</h1>
+    <h1>Click Game</h1>
     <div>
-        <img id="clickable" src="default.png" alt="Clickable Item" onclick="earnMoney()">
+        <input type="file" id="imageUpload" accept="image/*">
+        <img id="image" src="" alt="Click Image">
         <p>Money: <span id="money">0</span></p>
         <p>Clicks per click: <span id="clickValue">1</span></p>
         <p>Passive clicks per second: <span id="passiveValue">0</span></p>
+        <button id="toggleShop">Toggle Shop</button>
+        <button id="reset">Reset</button>
+        <button id="adminButton">Admin</button>
+        <button id="save">Save</button>
+        <button id="load">Load</button>
     </div>
-    <button onclick="toggleShop()">Toggle Shop</button>
     <div id="shop">
         <h2>Shop</h2>
+        <h3>Click Upgrades</h3>
         <div id="clickUpgrades"></div>
+        <h3>Passive Upgrades</h3>
         <div id="passiveUpgrades"></div>
-        <button onclick="buyRainbowButton()">Buy Rainbow Button (100000)</button>
     </div>
-    <input type="file" id="imageUpload" accept="image/*" onchange="loadImage(event)">
-    <button onclick="saveGame()">Save</button>
-    <button onclick="loadGame()">Load</button>
-    <button onclick="resetGame()">Reset</button>
-    <button onclick="adminPanel()">Admin</button>
-    <div id="admin" style="display:none;">
+    <div id="adminPanel" style="display:none;">
         <input type="text" id="adminInput" placeholder="Enter Admin Code">
-        <button onclick="checkAdmin()">Submit</button>
+        <button id="adminSubmit">Submit</button>
     </div>
+    <button id="winButton" style="display:none;">Win!</button>
     <script>
         let money = 0;
         let clickValue = 1;
         let passiveValue = 0;
-        let clickUpgrades = [];
-        let passiveUpgrades = [];
         let interval;
+
+        document.getElementById('imageUpload').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('image').src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+
+        document.getElementById('toggleShop').addEventListener('click', function() {
+            const shop = document.getElementById('shop');
+            shop.style.display = shop.style.display === 'none' ? 'block' : 'none';
+        });
+
+        document.getElementById('reset').addEventListener('click', function() {
+            money = 0;
+            clickValue = 1;
+            passiveValue = 0;
+            clearInterval(interval);
+            document.getElementById('money').innerText = money;
+            document.getElementById('clickValue').innerText = clickValue;
+            document.getElementById('passiveValue').innerText = passiveValue;
+            localStorage.clear();
+        });
+
+        document.getElementById('adminButton').addEventListener('click', function() {
+            document.getElementById('adminPanel').style.display = 'block';
+        });
+
+        document.getElementById('adminSubmit').addEventListener('click', function() {
+            const code = document.getElementById('adminInput').value;
+            if (code === 'Noah') {
+                // Admin features
+                const addPassive = document.createElement('button');
+                addPassive.innerText = 'Add 10000 Passive Clicks';
+                addPassive.onclick = function() { passiveValue += 10000; };
+                document.getElementById('adminPanel').appendChild(addPassive);
+                
+                const addClick = document.createElement('button');
+                addClick.innerText = 'Add 10000 Clicks';
+                addClick.onclick = function() { clickValue += 10000; };
+                document.getElementById('adminPanel').appendChild(addClick);
+            }
+        });
 
         function earnMoney() {
             money += clickValue;
             document.getElementById('money').innerText = money;
         }
 
-        function toggleShop() {
-            const shop = document.getElementById('shop');
-            shop.style.display = shop.style.display === 'none' ? 'block' : 'none';
-        }
+        document.getElementById('image').addEventListener('click', earnMoney);
 
-        function loadImage(event) {
-            const img = document.getElementById('clickable');
-            img.src = URL.createObjectURL(event.target.files[0]);
-        }
-
-        function saveGame() {
-            const gameState = btoa(JSON.stringify({ money, clickValue, passiveValue }));
-            localStorage.setItem('clickGame', gameState);
-        }
-
-        function loadGame() {
-            const gameState = JSON.parse(atob(localStorage.getItem('clickGame')));
-            money = gameState.money;
-            clickValue = gameState.clickValue;
-            passiveValue = gameState.passiveValue;
+        function updatePassiveIncome() {
+            money += passiveValue;
             document.getElementById('money').innerText = money;
-            document.getElementById('clickValue').innerText = clickValue;
-            document.getElementById('passiveValue').innerText = passiveValue;
         }
 
-        function resetGame() {
-            money = 0;
-            clickValue = 1;
-            passiveValue = 0;
-            localStorage.removeItem('clickGame');
-            document.getElementById('money').innerText = money;
-            document.getElementById('clickValue').innerText = clickValue;
-            document.getElementById('passiveValue').innerText = passiveValue;
-        }
+        interval = setInterval(updatePassiveIncome, 1000);
 
-        function adminPanel() {
-            document.getElementById('admin').style.display = 'block';
-        }
+        function createUpgrades() {
+            for (let i = 1; i <= 30; i++) {
+                const clickUpgrade = document.createElement('div');
+                clickUpgrade.className = 'upgrade';
+                clickUpgrade.innerHTML = `Click Upgrade ${i} - Cost: ${i * 10} <button onclick="buyClickUpgrade(${i * 10})">Buy</button>`;
+                document.getElementById('clickUpgrades').appendChild(clickUpgrade);
 
-        function checkAdmin() {
-            const input = document.getElementById('adminInput').value;
-            if (input === 'Noah') {
-                // Show admin features
-                alert('Admin access granted!');
+                const passiveUpgrade = document.createElement('div');
+                passiveUpgrade.className = 'upgrade';
+                passiveUpgrade.innerHTML = `Passive Upgrade ${i} - Cost: ${i * 500} <button onclick="buyPassiveUpgrade(${i * 20})">Buy</button>`;
+                document.getElementById('passiveUpgrades').appendChild(passiveUpgrade);
             }
         }
 
-        // Passive earning logic
-        function startPassiveEarning() {
-            interval = setInterval(() => {
-                money += passiveValue;
+        function buyClickUpgrade(cost) {
+            if (money >= cost) {
+                money -= cost;
+                clickValue += 1;
                 document.getElementById('money').innerText = money;
-            }, 1000);
+                document.getElementById('clickValue').innerText = clickValue;
+            }
         }
 
-        startPassiveEarning();
+        function buyPassiveUpgrade(cost) {
+            if (money >= cost) {
+                money -= cost;
+                passiveValue += 1;
+                document.getElementById('money').innerText = money;
+                document.getElementById('passiveValue').innerText = passiveValue;
+            }
+        }
+
+        document.getElementById('save').addEventListener('click', function() {
+            const saveData = {
+                money: money,
+                clickValue: clickValue,
+                passiveValue: passiveValue
+            };
+            localStorage.setItem('clickGameSave', btoa(JSON.stringify(saveData)));
+        });
+
+        document.getElementById('load').addEventListener('click', function() {
+            const saveData = localStorage.getItem('clickGameSave');
+            if (saveData) {
+                const data = JSON.parse(atob(saveData));
+                money = data.money;
+                clickValue = data.clickValue;
+                passiveValue = data.passiveValue;
+                document.getElementById('money').innerText = money;
+                document.getElementById('clickValue').innerText = clickValue;
+                document.getElementById('passiveValue').innerText = passiveValue;
+            }
+        });
+
+        createUpgrades();
     </script>
 </body>
 </html>
