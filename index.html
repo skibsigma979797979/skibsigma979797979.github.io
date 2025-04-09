@@ -17,7 +17,7 @@
 
   <input type="file" id="upload" accept="image/*">
   <img id="game-img" src="" alt="Click me!">
-  
+
   <h2>Money: <span id="money">0</span></h2>
 
   <button onclick="toggleShop('shop1')">Toggle Shop 1 (Click Upgrades)</button>
@@ -43,6 +43,8 @@
     <button onclick="addClickUpgrades(10000)">+10000 Click Upgrades</button>
     <button onclick="makeUpgradesInfinite()">Infinite Upgrades</button>
     <button onclick="makeMoneyInfinite()">Infinite Money</button>
+    <br><br>
+    <button onclick="hideAdminPanel()">Hide Panel</button>
   </div>
 
   <script>
@@ -181,6 +183,10 @@
     function makeMoneyInfinite() {
       money = Infinity;
       updateUI();
+    }
+
+    function hideAdminPanel() {
+      document.getElementById('admin-panel').style.display = 'none';
     }
 
     createShops();
