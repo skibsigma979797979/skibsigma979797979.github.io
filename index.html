@@ -17,7 +17,7 @@
 
   <input type="file" id="upload" accept="image/*">
   <img id="game-img" src="" alt="Click me!">
-  
+
   <h2>Money: <span id="money">0</span></h2>
 
   <button onclick="toggleShop('shop1')">Toggle Shop 1 (Click Upgrades)</button>
@@ -65,11 +65,8 @@
     });
 
     document.getElementById('game-img').addEventListener('click', () => {
-      if (infinite) {
-        money = Infinity;
-      } else {
-        money += clickValue;
-      }
+      money += infinite ? 0 : clickValue;
+      if (infinite) money = Infinity;
       updateUI();
     });
 
@@ -165,6 +162,7 @@
 
     function hideAdminPanel() {
       document.getElementById('admin-panel').style.display = 'none';
+      document.getElementById('admin-input').style.display = 'none';
       document.getElementById('admin-code').value = '';
     }
 
