@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Final Click Game</title>
+    <title>Click Game</title>
     <style>
         body { font-family: Arial, sans-serif; }
         #shop { display: none; }
@@ -11,7 +11,7 @@
     </style>
 </head>
 <body>
-    <h1>Final Click Game</h1>
+    <h1>Click Game</h1>
     <input type="file" id="imageUpload" accept="image/*">
     <div>
         <h2>Stats</h2>
@@ -46,55 +46,7 @@
         let passiveClicks = 0;
         let clickValue = 1;
         let passiveValue = 0;
-        let clickUpgrades = [];
-        let passiveUpgrades = [];
-
-        function createUpgrades() {
-            for (let i = 1; i <= 30; i++) {
-                clickUpgrades.push({ cost: Math.pow(2, i) * 10, value: i });
-                passiveUpgrades.push({ cost: Math.pow(2, i) * 20, value: i });
-            }
-            renderUpgrades();
-        }
-
-        function renderUpgrades() {
-            const clickDiv = document.getElementById('clickUpgrades');
-            const passiveDiv = document.getElementById('passiveUpgrades');
-            clickDiv.innerHTML = '';
-            passiveDiv.innerHTML = '';
-
-            clickUpgrades.forEach((upgrade, index) => {
-                const button = document.createElement('button');
-                button.innerText = `Upgrade Click: Cost ${upgrade.cost}`;
-                button.onclick = () => buyClickUpgrade(index);
-                clickDiv.appendChild(button);
-            });
-
-            passiveUpgrades.forEach((upgrade, index) => {
-                const button = document.createElement('button');
-                button.innerText = `Upgrade Passive: Cost ${upgrade.cost}`;
-                button.onclick = () => buyPassiveUpgrade(index);
-                passiveDiv.appendChild(button);
-            });
-        }
-
-        function buyClickUpgrade(index) {
-            if (clicks >= clickUpgrades[index].cost) {
-                clicks -= clickUpgrades[index].cost;
-                clickValue += clickUpgrades[index].value;
-                document.getElementById('clicks').innerText = clicks;
-                renderUpgrades();
-            }
-        }
-
-        function buyPassiveUpgrade(index) {
-            if (clicks >= passiveUpgrades[index].cost) {
-                clicks -= passiveUpgrades[index].cost;
-                passiveValue += passiveUpgrades[index].value;
-                document.getElementById('clicks').innerText = clicks;
-                renderUpgrades();
-            }
-        }
+        let upgrades = { click: [], passive: [] };
 
         document.getElementById('clickButton').onclick = function() {
             clicks += clickValue;
@@ -143,8 +95,6 @@
             clicks += passiveValue;
             document.getElementById('clicks').innerText = clicks;
         }, 1000);
-
-        createUpgrades();
     </script>
 </body>
 </html>
