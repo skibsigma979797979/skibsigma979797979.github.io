@@ -176,6 +176,173 @@
 let money = 0;
 let clickValue = 1;
 let cps = 0;
+let clickUpgrades = Array(30).fill(0);
+let passiveUpgrades = Array(30).fill(0);
+let theme = 'space';
+let saveKey = 'ultimate_click_game_save';
 
-::contentReference[oaicite:0]{index=0}
- 
+function updateMoneyDisplay() {
+  document.getElementById("moneyDisplay").innerText = `$${Math.floor(money)}`;
+}
+
+function addClickParticle(x, y) {
+  let particle = document.createElement("div");
+  particle.className = "particle";
+  particle.style.left = `${x}px`;
+  particle.style.top = `${y}px`;
+  particle.innerText = "+$" + clickValue;
+  document.body.appendChild(particle);
+  setTimeout(() => particle.remove(), 1000);
+}
+
+function clickImage(e) {
+  money += clickValue;
+  document.getElementById("clickS").play();
+  updateMoneyDisplay();
+  addClickParticle(e.clientX, e.clientY);
+}
+
+function toggleShop() {
+  let s1 = document.getElementById("shop1");
+  let s2 = document.getElementById("shop2");
+  s1.style.display = s1.style.display === "flex" ? "none" : "flex";
+  s2.style.display = s2.style.display === "flex" ? "none" : "flex";
+}
+
+function toggleAdminInput() {
+  let input = document.getElementById("adminInput");
+  input.style.display = input.style.display === "none" ? "inline-block" : "none";
+  input.onchange = () => {
+    if (input.value === "Noah") {
+      document.getElementById("aP").style.display = "block";
+      input.value = "";
+      input.style.display = "none";
+    }
+  }
+}
+
+function hideAdmin() {
+  document.getElementById("aP").style.display = "none";
+  document.getElementById("adminInput").value = "";
+  document.getElementById("adminInput").style.display = "none";
+}
+
+function givePassive() {
+  cps += 10000;
+}
+function giveClick() {
+  clickValue += 10000;
+}
+function setInfinite() {
+  clickValue = Infinity;
+  cps = Infinity;
+}
+function setInfiniteMoney() {
+  money = Infinity;
+  updateMoneyDisplay();
+}
+
+function buyUpgrade(index, type) {
+  const basePrice = 10;
+  let level = type === "click" ? clickUpgrades[index] : passiveUpgrades[index];
+  let cost = basePrice * Math.pow(2, level);
+  if (money >= cost) {
+    money -= cost;
+    type === "click" ? clickUpgrades[index]++ : passiveUpgrades[index]++;
+    type === "click" ? clickValue++ : cps++;
+    document.getElementById("upgradeS").play();
+    updateMoneyDisplay();
+    saveGame();
+  }
+}
+
+function createShopButtons() {
+  const s1 = document.getElementById("shop1");
+  const s2 = document.getElementById("shop2");
+  for (let i = 0; i < 30; i++) {
+    const btn1 = document.createElement("button");
+    btn1.className = "upgrade-button";
+    btn1.innerText = `⬆️ Click +1\n$${10 * Math.pow(2, i)}`;
+    btn1.onclick = () => buyUpgrade(i, "click");
+    s1.appendChild(btn1);
+
+    const btn2 = document.createElement("button");
+    btn2.className = "upgrade-button";
+    btn2.innerText = `⏱ Passive +1\n$${10 * Math.pow(2, i)}`;
+    btn2.onclick = () => buyUpgrade(i, "passive");
+    s2.appendChild(btn2);
+  }
+}
+
+setInterval(() => {
+  if (!isNaN(cps)) {
+    money += cps;
+    updateMoneyDisplay();
+  }
+}, 1000);
+
+function setTheme(t) {
+  document.body.className = '';
+  document.body.classList.add("theme-" + t);
+  theme = t;
+  saveGame();
+}
+
+function toggleThemeMenu() {
+  let el = document.getElementById("themeMenu");
+  el.style.display = el.style.display === "flex" ? "none" : "flex";
+}
+
+function saveGame() {
+  const data = {
+    money,
+    clickValue,
+    cps,
+    clickUpgrades,
+    passiveUpgrades,
+    theme
+  };
+  localStorage.setItem(saveKey, JSON.stringify(data));
+  document.getElementById("saveS").play();
+}
+
+function manualSave() {
+  saveGame();
+  alert("Game saved!");
+}
+
+function manualLoad() {
+  const data = JSON.parse(localStorage.getItem(saveKey));
+  if (data) {
+    money = data.money;
+    clickValue = data.clickValue;
+    cps = data.cps;
+    clickUpgrades = data.clickUpgrades;
+    passiveUpgrades = data.passiveUpgrades;
+    setTheme(data.theme || 'space');
+    updateMoneyDisplay();
+  }
+}
+
+window.onload = () => {
+  updateMoneyDisplay();
+  createShopButtons();
+  manualLoad();
+
+  const img = document.getElementById("img");
+  img.addEventListener("click", clickImage);
+
+  const up = document.getElementById("uploader");
+  up.addEventListener("change", (e) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      img.src = reader.result;
+      img.style.display = "block";
+    };
+    reader.readAsDataURL(e.target.files[0]);
+  });
+};
+</script>
+</body>
+</html>
+
