@@ -135,14 +135,23 @@
     <!-- Money -->
     <div class="money-display" id="moneyDisplay">$0</div>
 
-    <!-- Buttons -->
-    <div>
-      <button onclick="toggleShop()">🛒 Toggle Shop</button>
-      <button onclick="toggleThemeMenu()">🎨 Theme</button>
-      <button onclick="manualSave()">💾 Save</button>
-      <button onclick="manualLoad()">📂 Load</button>
-      <button onclick="toggleAdminInput()">👨‍💼 Admin</button>
-    </div>
+   <!-- Buttons -->
+<div>
+  <button onclick="toggleShop()">🛒 Toggle Shop</button>
+  <button onclick="toggleThemeMenu()">🎨 Theme</button>
+  <button onclick="manualSave()">💾 Save</button>
+  <button onclick="manualLoad()">📂 Load</button>
+  <button onclick="toggleAdminInput()">👨‍💼 Admin</button>
+  <button onclick="toggleLore()">📜 Toggle Lore</button>
+</div>
+
+<!-- Lore Box -->
+<div id="loreBox" style="display: none; background: rgba(0,0,0,0.8); border: 2px solid #0f0; border-radius: 10px; padding: 20px; margin: 10px auto; max-width: 800px; font-size: 0.6rem; line-height: 1.5;">
+  <p>
+    🌌 <strong>LORE:</strong> In a forgotten corner of the digital universe, a mysterious relic known as the <strong>Click Core</strong> emerged from the remnants of ancient code. Those who harness its power are granted the ability to manipulate currency with a single touch. You, the Chosen Clicker, must awaken dormant power buried deep in the relic. Each upgrade you purchase rewrites part of reality, unlocking the path toward financial omnipotence.<br><br>
+    ⚠️ But beware—the relic is sentient. The more you click, the more it remembers. Legends speak of a final form... one that no one has lived to monetize.
+  </p>
+</div>
 
     <!-- Theme Selector -->
     <div class="theme-container" id="themeMenu">
@@ -171,6 +180,7 @@
       <button onclick="setInfiniteMoney()">💰 Infinite Money</button>
       <button onclick="hideAdmin()">Hide Panel</button>
     </div>
+
   </div>
 <script>
 let money = 0;
