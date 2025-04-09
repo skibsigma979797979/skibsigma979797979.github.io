@@ -17,7 +17,7 @@
 
   <input type="file" id="upload" accept="image/*">
   <img id="game-img" src="" alt="Click me!">
-
+  
   <h2>Money: <span id="money">0</span></h2>
 
   <button onclick="toggleShop('shop1')">Toggle Shop 1 (Click Upgrades)</button>
@@ -163,6 +163,11 @@
       }
     }
 
+    function hideAdminPanel() {
+      document.getElementById('admin-panel').style.display = 'none';
+      document.getElementById('admin-code').value = '';
+    }
+
     function addPassive(amount) {
       for (let i = 0; i < passiveUpgrades.length; i++) {
         passiveUpgrades[i] += amount;
@@ -183,10 +188,6 @@
     function makeMoneyInfinite() {
       money = Infinity;
       updateUI();
-    }
-
-    function hideAdminPanel() {
-      document.getElementById('admin-panel').style.display = 'none';
     }
 
     createShops();
