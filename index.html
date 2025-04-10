@@ -140,12 +140,19 @@
   <audio id="sound-rare" src="rare.mp3" preload="auto"></audio>
   <audio id="sound-epic" src="epic.mp3" preload="auto"></audio>
   <audio id="sound-legendary" src="legendary.mp3" preload="auto"></audio>
-  <audio id="bg-music" src="music1.mp3" loop autoplay></audio>
+  <audio id="bg-music" preload="auto"></audio>
   <script>
-    let clickCount = 0;
-    let coins = 0;
-    let upgrades = 0;
-    let prestiges = 0;
+    let clickCount = parseInt(localStorage.getItem('clickCount') || '0');
+    let coins = parseInt(localStorage.getItem('coins') || '0');
+    let upgrades = parseInt(localStorage.getItem('upgrades') || '0');
+    let prestiges = parseInt(localStorage.getItem('prestiges') || '0');
+
+    function saveProgress() {
+      localStorage.setItem('clickCount', clickCount);
+      localStorage.setItem('coins', coins);
+      localStorage.setItem('upgrades', upgrades);
+      localStorage.setItem('prestiges', prestiges);
+    }
 
     function playPowerupSound(rarity) {
       const sound = document.getElementById(`sound-${rarity}`);
@@ -157,8 +164,10 @@
 
     function changeMusic(track) {
       const music = document.getElementById('bg-music');
+      music.pause();
       music.src = track;
-      music.play();
+      music.load();
+      music.play().catch(e => console.log("Music play error:", e));
     }
 
     function unlockAchievement(id, message) {
@@ -196,11 +205,21 @@
       coins += 1;
       document.getElementById('coin-count').textContent = coins;
       trackAchievements();
+      saveProgress();
     }
 
     window.onload = () => {
+      document.getElementById('coin-count').textContent = coins;
       loadAchievements();
     };
+
+    function uploadMusic(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const url = URL.createObjectURL(file);
+        changeMusic(url);
+      }
+    }
   </script>
 </head>
 <body>
@@ -215,14 +234,5 @@
   <h2>Coins: <span id="coin-count">0</span></h2>
   <div id="achievement-panel" class="achievement-panel"></div>
   <button onclick="simulateClick()">Simulate Click</button>
-  <script>
-    function uploadMusic(event) {
-      const file = event.target.files[0];
-      if (file) {
-        const url = URL.createObjectURL(file);
-        changeMusic(url);
-      }
-    }
-  </script>
 </body>
 </html>
