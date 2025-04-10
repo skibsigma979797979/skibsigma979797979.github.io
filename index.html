@@ -2,357 +2,245 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Click Game</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ultimate Click Game</title>
   <style>
     body {
-      background: linear-gradient(to right, #1f1c2c, #928dab);
       font-family: 'Segoe UI', sans-serif;
-      color: white;
       text-align: center;
-      margin: 0;
-      padding: 20px;
+      overflow: hidden;
+      transition: background 0.5s ease;
     }
-
-    h1 {
-      font-size: 3rem;
-      margin-bottom: 10px;
-      text-shadow: 2px 2px #000;
-    }
-
-    #uploadInput {
-      margin-bottom: 15px;
-    }
-
-    #clickImage {
-      width: 220px;
-      height: 220px;
+    .clickable {
+      width: 200px;
+      height: 200px;
       object-fit: contain;
-      border: 4px solid #fff;
-      border-radius: 20px;
-      box-shadow: 0 0 20px #fff;
-      transition: transform 0.1s ease;
       cursor: pointer;
+      animation: pulse 1.5s infinite;
     }
-
-    #clickImage:active {
-      transform: scale(0.95);
-    }
-
-    .money-display {
-      font-size: 1.8em;
-      margin: 15px 0;
-      text-shadow: 1px 1px #000;
-    }
-
-    .shop-toggle {
-      margin: 15px;
-    }
-
-    .shop-toggle button {
-      margin: 5px;
-      padding: 12px 20px;
-      font-size: 1em;
-      border: none;
-      border-radius: 10px;
-      background-color: #6c5ce7;
-      color: white;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-
-    .shop-toggle button:hover {
-      background-color: #a29bfe;
-      transform: scale(1.05);
-    }
-
-    .shop {
+    .shop, .shop2 {
       display: none;
-      margin: 20px auto;
-      padding: 15px;
-      max-width: 850px;
-      background: rgba(0, 0, 0, 0.3);
-      border-radius: 12px;
-      box-shadow: 0 0 12px rgba(255, 255, 255, 0.2);
     }
-
-    .shop button {
+    .upgrade-button {
       margin: 5px;
       padding: 10px;
-      border: none;
-      border-radius: 8px;
-      background-color: #00cec9;
+      border-radius: 10px;
+      background-color: #8bc34a;
       color: white;
-      font-weight: bold;
+      border: none;
       cursor: pointer;
-      transition: 0.2s ease;
+      transition: transform 0.2s;
     }
-
-    .shop button:hover {
-      background-color: #81ecec;
-      transform: scale(1.03);
+    .upgrade-button:hover {
+      transform: scale(1.1);
     }
-
-    #achievements {
-      display: none;
-      margin: 20px auto;
-      padding: 15px;
-      max-width: 700px;
-      background: rgba(255, 215, 0, 0.1);
-      border-radius: 12px;
+    .theme-button {
+      margin: 5px;
+      padding: 10px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
     }
-
-    .achievement {
-      margin: 6px;
-      padding: 8px;
-      background: rgba(255, 255, 255, 0.1);
-      border-left: 5px solid gold;
+    .music-select {
+      margin-top: 10px;
+    }
+    .achievement-panel {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      width: 200px;
+      background: rgba(0, 0, 0, 0.6);
+      color: white;
+      padding: 10px;
+      border-radius: 10px;
+      max-height: 300px;
+      overflow-y: auto;
+      font-size: 14px;
       text-align: left;
     }
-
-    .admin-trigger {
-      margin-top: 30px;
-    }
-
-    .admin-trigger input {
-      padding: 8px;
-      border-radius: 6px;
-      border: none;
-      margin-right: 8px;
-    }
-
-    .admin-panel {
-      display: none;
-      margin-top: 20px;
-      padding: 15px;
-      background: rgba(255, 0, 0, 0.1);
-      border: 1px solid red;
-      border-radius: 10px;
-      max-width: 700px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    .admin-panel button {
-      margin: 5px;
-      padding: 10px;
-      background-color: crimson;
-      color: white;
-      border: none;
-      border-radius: 8px;
+    .powerup {
+      position: absolute;
+      top: 0;
+      font-size: 30px;
+      animation: fall 6s linear forwards, glowPulse 2s infinite;
       cursor: pointer;
+      border-radius: 50%;
+      padding: 5px;
     }
-
-    .admin-panel button:hover {
-      background-color: #ff6b6b;
+    .common {
+      background: radial-gradient(circle, #aaffaa 0%, transparent 70%);
+      box-shadow: 0 0 15px #aaffaa;
+    }
+    .rare {
+      background: radial-gradient(circle, #88ccff 0%, transparent 70%);
+      box-shadow: 0 0 15px #88ccff;
+    }
+    .epic {
+      background: radial-gradient(circle, #cc88ff 0%, transparent 70%);
+      box-shadow: 0 0 20px #cc88ff;
+    }
+    .legendary {
+      color: gold;
+      text-shadow: 0 0 10px orange;
+      font-size: 40px;
+      animation: fall 8s ease-in-out forwards, pulse 2s infinite, glowPulse 1.5s infinite;
+      transform: scale(1.5);
+      font-weight: bold;
+      position: relative;
+      background: radial-gradient(circle, gold 0%, transparent 70%);
+      box-shadow: 0 0 25px gold;
+    }
+    .legendary::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 50%;
+      width: 8px;
+      height: 8px;
+      background: radial-gradient(circle, gold 0%, transparent 70%);
+      border-radius: 50%;
+      animation: sparkle 1s infinite ease-in-out;
+      transform: translateX(-50%) translateY(-50%);
+    }
+    .floating-text {
+      position: absolute;
+      font-size: 20px;
+      font-weight: bold;
+      animation: floatUp 1s ease-out forwards;
+      pointer-events: none;
+    }
+    @keyframes fall {
+      to { top: 100vh; }
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+    @keyframes sparkle {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.3; transform: scale(2); }
+    }
+    @keyframes floatUp {
+      0% { opacity: 1; transform: translateY(0); }
+      100% { opacity: 0; transform: translateY(-50px); }
+    }
+    @keyframes glowPulse {
+      0%, 100% {
+        box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+        transform: scale(1);
+      }
+      50% {
+        box-shadow: 0 0 30px rgba(255, 255, 255, 0.8);
+        transform: scale(1.1);
+      }
     }
   </style>
+  <audio id="sound-common" src="common.mp3" preload="auto"></audio>
+  <audio id="sound-rare" src="rare.mp3" preload="auto"></audio>
+  <audio id="sound-epic" src="epic.mp3" preload="auto"></audio>
+  <audio id="sound-legendary" src="legendary.mp3" preload="auto"></audio>
+  <audio id="bg-music" preload="auto"></audio>
+  <script>
+    let clickCount = parseInt(localStorage.getItem('clickCount') || '0');
+    let coins = parseInt(localStorage.getItem('coins') || '0');
+    let upgrades = parseInt(localStorage.getItem('upgrades') || '0');
+    let prestiges = parseInt(localStorage.getItem('prestiges') || '0');
+
+    function saveProgress() {
+      localStorage.setItem('clickCount', clickCount);
+      localStorage.setItem('coins', coins);
+      localStorage.setItem('upgrades', upgrades);
+      localStorage.setItem('prestiges', prestiges);
+    }
+
+    function playPowerupSound(rarity) {
+      const sound = document.getElementById(`sound-${rarity}`);
+      if (sound) {
+        sound.currentTime = 0;
+        sound.play();
+      }
+    }
+
+    function changeMusic(track) {
+      const music = document.getElementById('bg-music');
+      music.pause();
+      music.src = track;
+      music.load();
+      music.play().catch(e => console.log("Music play error:", e));
+    }
+
+    function unlockAchievement(id, message) {
+      const achieved = JSON.parse(localStorage.getItem('achievements') || '{}');
+      if (!achieved[id]) {
+        achieved[id] = true;
+        localStorage.setItem('achievements', JSON.stringify(achieved));
+        showAchievement(id, message);
+      }
+    }
+
+    function showAchievement(id, message) {
+      const panel = document.getElementById('achievement-panel');
+      const entry = document.createElement('div');
+      entry.textContent = `🏆 ${message}`;
+      panel.appendChild(entry);
+    }
+
+    function loadAchievements() {
+      const achieved = JSON.parse(localStorage.getItem('achievements') || '{}');
+      for (const id in achieved) {
+        if (achieved[id]) showAchievement(id, id);
+      }
+    }
+
+    function trackAchievements() {
+      if (clickCount >= 1) unlockAchievement('first-click', 'First Click!');
+      if (coins >= 1000) unlockAchievement('thousand-coins', '1,000 Coins!');
+      if (upgrades >= 10) unlockAchievement('upgrade-master', '10 Upgrades Bought!');
+      if (prestiges >= 1) unlockAchievement('prestige-unlocked', 'Prestige Unlocked!');
+    }
+
+    function simulateClick() {
+      clickCount++;
+      coins += 1;
+      document.getElementById('coin-count').textContent = coins;
+      trackAchievements();
+      saveProgress();
+    }
+
+    function resetGame() {
+      if (confirm("Are you sure you want to reset your progress? This cannot be undone.")) {
+        localStorage.clear();
+        location.reload();
+      }
+    }
+
+    window.onload = () => {
+      document.getElementById('coin-count').textContent = coins;
+      loadAchievements();
+    };
+
+    function uploadMusic(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const url = URL.createObjectURL(file);
+        changeMusic(url);
+      }
+    }
+  </script>
 </head>
 <body>
-  <h1>Ultimate Click Game</h1>
-
-  <input type="file" id="uploadInput" accept="image/*"><br><br>
-  <img id="clickImage" src="" alt="Click to earn money"><br>
-
-  <div class="money-display">
-    💰 Money: <span id="money">0</span> | ⏱️ Passive: <span id="passive">0</span>
+  <div class="music-select">
+    <button onclick="changeMusic('music1.mp3')">Music 1</button>
+    <button onclick="changeMusic('music2.mp3')">Music 2</button>
+    <button onclick="changeMusic('music3.mp3')">Music 3</button>
+    <button onclick="changeMusic('music4.mp3')">Music 4</button>
+    <button onclick="changeMusic('music5.mp3')">Music 5</button>
+    <input type="file" accept="audio/*" onchange="uploadMusic(event)">
   </div>
-
-  <div class="shop-toggle">
-    <button onclick="toggleShop('click')">🛒 Toggle Click Shop</button>
-    <button onclick="toggleShop('passive')">🛍️ Toggle Passive Shop</button>
-  </div>
-
-  <div id="clickShop" class="shop"></div>
-  <div id="passiveShop" class="shop"></div>
-
-  <br>
-  <button onclick="saveGame()">💾 Save</button>
-  <button onclick="loadGame()">📂 Load</button>
-  <button onclick="prestige()">🌟 Prestige</button>
-
-  <div id="achievements">
-    <h3>🏆 Achievements</h3>
-    <div id="achievementList"></div>
-  </div>
-
-  <div class="admin-trigger">
-    <input type="text" id="adminCode" placeholder="Enter admin code..." />
-    <button onclick="checkAdmin()">Enter</button>
-  </div>
-
-  <div id="adminPanel" class="admin-panel">
-    <h3>👑 Admin Panel</h3>
-    <button onclick="addMoney(10000)">+10,000 Money</button>
-    <button onclick="addPassive(10000)">+10,000 Passive</button>
-    <button onclick="hideAdmin()">Hide Panel</button>
-    <button onclick="rainbows()">🌈 Summon Rainbows</button>
-    <button onclick="logState()">🛠 Log Game State</button>
-  </div>
-
-  <script>
-    let money = 0;
-    let moneyPerClick = 1;
-    let passiveIncome = 0;
-    let prestigeLevel = 0;
-    let clickUpgrades = Array(30).fill(0);
-    let passiveUpgrades = Array(30).fill(0);
-    let achievements = [];
-
-    const moneyDisplay = document.getElementById('money');
-    const passiveDisplay = document.getElementById('passive');
-    const clickShop = document.getElementById('clickShop');
-    const passiveShop = document.getElementById('passiveShop');
-    const clickImage = document.getElementById('clickImage');
-    const uploadInput = document.getElementById('uploadInput');
-    const achievementList = document.getElementById('achievementList');
-    const adminPanel = document.getElementById('adminPanel');
-
-    uploadInput.addEventListener('change', e => {
-      const file = e.target.files[0];
-      const reader = new FileReader();
-      reader.onload = () => clickImage.src = reader.result;
-      reader.readAsDataURL(file);
-    });
-
-    clickImage.addEventListener('click', () => {
-      money += moneyPerClick;
-      updateDisplay();
-      checkAchievements();
-      playSound();
-    });
-
-    function playSound() {
-      const audio = new Audio("https://cdn.pixabay.com/download/audio/2022/10/26/audio_3baae92d8c.mp3?filename=click-tone-132101.mp3");
-      audio.volume = 0.1;
-      audio.play();
-    }
-
-    function updateDisplay() {
-      moneyDisplay.textContent = money.toFixed(2);
-      passiveDisplay.textContent = passiveIncome.toFixed(2);
-    }
-
-    function toggleShop(type) {
-      document.getElementById(type + "Shop").style.display =
-        document.getElementById(type + "Shop").style.display === 'block' ? 'none' : 'block';
-    }
-
-    function generateShop(type) {
-      const shop = type === 'click' ? clickShop : passiveShop;
-      for (let i = 0; i < 30; i++) {
-        const btn = document.createElement('button');
-        const basePrice = 10 * Math.pow(2, i);
-        btn.textContent = `${type.charAt(0).toUpperCase() + type.slice(1)} Upgrade ${i + 1} - $${basePrice}`;
-        btn.onclick = () => buyUpgrade(type, i, basePrice);
-        shop.appendChild(btn);
-      }
-    }
-
-    function buyUpgrade(type, index, basePrice) {
-      const level = type === 'click' ? clickUpgrades[index] : passiveUpgrades[index];
-      const price = basePrice * Math.pow(2, level);
-      if (money >= price) {
-        money -= price;
-        if (type === 'click') {
-          moneyPerClick += 1 + prestigeLevel;
-          clickUpgrades[index]++;
-        } else {
-          passiveIncome += 1 + prestigeLevel;
-          passiveUpgrades[index]++;
-        }
-        updateDisplay();
-      }
-    }
-
-    setInterval(() => {
-      money += passiveIncome;
-      updateDisplay();
-    }, 1000);
-
-    function saveGame() {
-      const saveData = {
-        money, moneyPerClick, passiveIncome, prestigeLevel,
-        clickUpgrades, passiveUpgrades
-      };
-      const encoded = btoa(JSON.stringify(saveData));
-      localStorage.setItem("clickGameSave", encoded);
-      alert("Game saved!");
-    }
-
-    function loadGame() {
-      const encoded = localStorage.getItem("clickGameSave");
-      if (encoded) {
-        const saveData = JSON.parse(atob(encoded));
-        Object.assign(window, saveData);
-        updateDisplay();
-        alert("Game loaded!");
-      }
-    }
-
-    function prestige() {
-      if (money >= 100000) {
-        prestigeLevel++;
-        money = 0;
-        moneyPerClick = 1;
-        passiveIncome = 0;
-        clickUpgrades.fill(0);
-        passiveUpgrades.fill(0);
-        updateDisplay();
-        alert(`Prestiged! Level ${prestigeLevel}`);
-      }
-    }
-
-    function checkAchievements() {
-      const goals = [100, 1000, 10000, 50000];
-      goals.forEach(g => {
-        if (money >= g && !achievements.includes(g)) {
-          achievements.push(g);
-          const el = document.createElement('div');
-          el.className = 'achievement';
-          el.textContent = `💎 Earned $${g}`;
-          achievementList.appendChild(el);
-          document.getElementById('achievements').style.display = 'block';
-        }
-      });
-    }
-
-    function checkAdmin() {
-      const code = document.getElementById('adminCode').value;
-      if (code === "Noah") {
-        adminPanel.style.display = 'block';
-      }
-    }
-
-    function addMoney(amount) {
-      money += amount;
-      updateDisplay();
-    }
-
-    function addPassive(amount) {
-      passiveIncome += amount;
-      updateDisplay();
-    }
-
-    function hideAdmin() {
-      adminPanel.style.display = 'none';
-      document.getElementById('adminCode').style.display = 'none';
-    }
-
-    function rainbows() {
-      document.body.style.background = 'linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet)';
-    }
-
-    function logState() {
-      console.log({
-        money, moneyPerClick, passiveIncome,
-        prestigeLevel, clickUpgrades, passiveUpgrades
-      });
-    }
-
-    // Initialize shops + UI
-    generateShop('click');
-    generateShop('passive');
-    updateDisplay();
-  </script>
+  <h2>Coins: <span id="coin-count">0</span></h2>
+  <div id="achievement-panel" class="achievement-panel"></div>
+  <button onclick="simulateClick()">Simulate Click</button>
+  <button onclick="resetGame()">Reset Progress</button>
 </body>
 </html>
