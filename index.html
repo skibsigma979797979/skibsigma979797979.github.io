@@ -1,246 +1,35 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ultimate Click Game</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      text-align: center;
-      overflow: hidden;
-      transition: background 0.5s ease;
-    }
-    .clickable {
-      width: 200px;
-      height: 200px;
-      object-fit: contain;
-      cursor: pointer;
-      animation: pulse 1.5s infinite;
-    }
-    .shop, .shop2 {
-      display: none;
-    }
-    .upgrade-button {
-      margin: 5px;
-      padding: 10px;
-      border-radius: 10px;
-      background-color: #8bc34a;
-      color: white;
-      border: none;
-      cursor: pointer;
-      transition: transform 0.2s;
-    }
-    .upgrade-button:hover {
-      transform: scale(1.1);
-    }
-    .theme-button {
-      margin: 5px;
-      padding: 10px;
-      border-radius: 10px;
-      border: none;
-      cursor: pointer;
-    }
-    .music-select {
-      margin-top: 10px;
-    }
-    .achievement-panel {
-      position: fixed;
-      top: 10px;
-      right: 10px;
-      width: 200px;
-      background: rgba(0, 0, 0, 0.6);
-      color: white;
-      padding: 10px;
-      border-radius: 10px;
-      max-height: 300px;
-      overflow-y: auto;
-      font-size: 14px;
-      text-align: left;
-    }
-    .powerup {
-      position: absolute;
-      top: 0;
-      font-size: 30px;
-      animation: fall 6s linear forwards, glowPulse 2s infinite;
-      cursor: pointer;
-      border-radius: 50%;
-      padding: 5px;
-    }
-    .common {
-      background: radial-gradient(circle, #aaffaa 0%, transparent 70%);
-      box-shadow: 0 0 15px #aaffaa;
-    }
-    .rare {
-      background: radial-gradient(circle, #88ccff 0%, transparent 70%);
-      box-shadow: 0 0 15px #88ccff;
-    }
-    .epic {
-      background: radial-gradient(circle, #cc88ff 0%, transparent 70%);
-      box-shadow: 0 0 20px #cc88ff;
-    }
-    .legendary {
-      color: gold;
-      text-shadow: 0 0 10px orange;
-      font-size: 40px;
-      animation: fall 8s ease-in-out forwards, pulse 2s infinite, glowPulse 1.5s infinite;
-      transform: scale(1.5);
-      font-weight: bold;
-      position: relative;
-      background: radial-gradient(circle, gold 0%, transparent 70%);
-      box-shadow: 0 0 25px gold;
-    }
-    .legendary::after {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 50%;
-      width: 8px;
-      height: 8px;
-      background: radial-gradient(circle, gold 0%, transparent 70%);
-      border-radius: 50%;
-      animation: sparkle 1s infinite ease-in-out;
-      transform: translateX(-50%) translateY(-50%);
-    }
-    .floating-text {
-      position: absolute;
-      font-size: 20px;
-      font-weight: bold;
-      animation: floatUp 1s ease-out forwards;
-      pointer-events: none;
-    }
-    @keyframes fall {
-      to { top: 100vh; }
-    }
-    @keyframes pulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.1); }
-      100% { transform: scale(1); }
-    }
-    @keyframes sparkle {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.3; transform: scale(2); }
-    }
-    @keyframes floatUp {
-      0% { opacity: 1; transform: translateY(0); }
-      100% { opacity: 0; transform: translateY(-50px); }
-    }
-    @keyframes glowPulse {
-      0%, 100% {
-        box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
-        transform: scale(1);
-      }
-      50% {
-        box-shadow: 0 0 30px rgba(255, 255, 255, 0.8);
-        transform: scale(1.1);
-      }
-    }
-  </style>
-  <audio id="sound-common" src="common.mp3" preload="auto"></audio>
-  <audio id="sound-rare" src="rare.mp3" preload="auto"></audio>
-  <audio id="sound-epic" src="epic.mp3" preload="auto"></audio>
-  <audio id="sound-legendary" src="legendary.mp3" preload="auto"></audio>
-  <audio id="bg-music" preload="auto"></audio>
-  <script>
-    let clickCount = parseInt(localStorage.getItem('clickCount') || '0');
-    let coins = parseInt(localStorage.getItem('coins') || '0');
-    let upgrades = parseInt(localStorage.getItem('upgrades') || '0');
-    let prestiges = parseInt(localStorage.getItem('prestiges') || '0');
-
-    function saveProgress() {
-      localStorage.setItem('clickCount', clickCount);
-      localStorage.setItem('coins', coins);
-      localStorage.setItem('upgrades', upgrades);
-      localStorage.setItem('prestiges', prestiges);
-    }
-
-    function playPowerupSound(rarity) {
-      const sound = document.getElementById(`sound-${rarity}`);
-      if (sound) {
-        sound.currentTime = 0;
-        sound.play();
-      }
-    }
-
-    function changeMusic(track) {
-      const music = document.getElementById('bg-music');
-      music.pause();
-      music.src = track;
-      music.load();
-      music.play().catch(e => console.log("Music play error:", e));
-    }
-
-    function unlockAchievement(id, message) {
-      const achieved = JSON.parse(localStorage.getItem('achievements') || '{}');
-      if (!achieved[id]) {
-        achieved[id] = true;
-        localStorage.setItem('achievements', JSON.stringify(achieved));
-        showAchievement(id, message);
-      }
-    }
-
-    function showAchievement(id, message) {
-      const panel = document.getElementById('achievement-panel');
-      const entry = document.createElement('div');
-      entry.textContent = `🏆 ${message}`;
-      panel.appendChild(entry);
-    }
-
-    function loadAchievements() {
-      const achieved = JSON.parse(localStorage.getItem('achievements') || '{}');
-      for (const id in achieved) {
-        if (achieved[id]) showAchievement(id, id);
-      }
-    }
-
-    function trackAchievements() {
-      if (clickCount >= 1) unlockAchievement('first-click', 'First Click!');
-      if (coins >= 1000) unlockAchievement('thousand-coins', '1,000 Coins!');
-      if (upgrades >= 10) unlockAchievement('upgrade-master', '10 Upgrades Bought!');
-      if (prestiges >= 1) unlockAchievement('prestige-unlocked', 'Prestige Unlocked!');
-    }
-
-    function simulateClick() {
-      clickCount++;
-      coins += 1;
-      document.getElementById('coin-count').textContent = coins;
-      trackAchievements();
-      saveProgress();
-    }
-
-    function resetGame() {
-      if (confirm("Are you sure you want to reset your progress? This cannot be undone.")) {
-        localStorage.clear();
-        location.reload();
-      }
-    }
-
-    window.onload = () => {
-      document.getElementById('coin-count').textContent = coins;
-      loadAchievements();
-    };
-
-    function uploadMusic(event) {
-      const file = event.target.files[0];
-      if (file) {
-        const url = URL.createObjectURL(file);
-        changeMusic(url);
-      }
-    }
-  </script>
+    <title>Simple Platformer</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #333;
+        }
+        canvas {
+            display: block;
+            margin: 20px auto;
+            background-color: #87CEEB;
+        }
+        #gameInfo {
+            color: white;
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
+    </style>
 </head>
 <body>
-  <div class="music-select">
-    <button onclick="changeMusic('music1.mp3')">Music 1</button>
-    <button onclick="changeMusic('music2.mp3')">Music 2</button>
-    <button onclick="changeMusic('music3.mp3')">Music 3</button>
-    <button onclick="changeMusic('music4.mp3')">Music 4</button>
-    <button onclick="changeMusic('music5.mp3')">Music 5</button>
-    <input type="file" accept="audio/*" onchange="uploadMusic(event)">
-  </div>
-  <h2>Coins: <span id="coin-count">0</span></h2>
-  <div id="achievement-panel" class="achievement-panel"></div>
-  <button onclick="simulateClick()">Simulate Click</button>
-  <button onclick="resetGame()">Reset Progress</button>
-</body>
-</html>
+    <div id="gameInfo">
+        <h1>Simple Platformer</h1>
+        <p>Use arrow keys to move. Space to jump.</p>
+    </div>
+    <canvas id="gameCanvas" width="800" height="500"></canvas>
+
+    <script>
+        // Game canvas setup
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Game state
