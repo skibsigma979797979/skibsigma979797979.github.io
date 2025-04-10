@@ -33,3 +33,152 @@
         const ctx = canvas.getContext('2d');
 
         // Game state
+        const game = {
+            gravity: 0.5,
+            friction: 0.9,
+            player: {
+                x: 50,
+                y: 100,
+                width: 30,
+                height: 50,
+                color: '#FF0000',
+                velocityX: 0,
+                velocityY: 0,
+                speed: 5,
+                jumpForce: 12,
+                isJumping: false
+            },
+            platforms: [
+                { x: 0, y: 450, width: 200, height: 20, color: '#00AA00' },
+                { x: 250, y: 400, width: 200, height: 20, color: '#00AA00' },
+                { x: 500, y: 350, width: 200, height: 20, color: '#00AA00' },
+                { x: 300, y: 250, width: 200, height: 20, color: '#00AA00' },
+                { x: 50, y: 200, width: 200, height: 20, color: '#00AA00' },
+                { x: 550, y: 150, width: 200, height: 20, color: '#00AA00' }
+            ],
+            keys: {
+                left: false,
+                right: false,
+                up: false
+            },
+            score: 0
+        };
+
+        // Event listeners for keyboard
+        window.addEventListener('keydown', function(e) {
+            switch(e.key) {
+                case 'ArrowLeft':
+                    game.keys.left = true;
+                    break;
+                case 'ArrowRight':
+                    game.keys.right = true;
+                    break;
+                case 'ArrowUp':
+                case ' ':
+                    game.keys.up = true;
+                    break;
+            }
+        });
+
+        window.addEventListener('keyup', function(e) {
+            switch(e.key) {
+                case 'ArrowLeft':
+                    game.keys.left = false;
+                    break;
+                case 'ArrowRight':
+                    game.keys.right = false;
+                    break;
+                case 'ArrowUp':
+                case ' ':
+                    game.keys.up = false;
+                    break;
+            }
+        });
+
+        // Collision detection
+        function checkCollision(player, platform) {
+            return player.x < platform.x + platform.width &&
+                   player.x + player.width > platform.x &&
+                   player.y < platform.y + platform.height &&
+                   player.y + player.height > platform.y;
+        }
+
+        // Game loop
+        function gameLoop() {
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Handle player movement
+            if (game.keys.left) {
+                game.player.velocityX = -game.player.speed;
+            } else if (game.keys.right) {
+                game.player.velocityX = game.player.speed;
+            } else {
+                game.player.velocityX *= game.friction;
+            }
+            
+            // Handle jumping
+            if (game.keys.up && !game.player.isJumping) {
+                game.player.velocityY = -game.player.jumpForce;
+                game.player.isJumping = true;
+            }
+            
+            // Apply gravity
+            game.player.velocityY += game.gravity;
+            
+            // Update player position
+            game.player.x += game.player.velocityX;
+            game.player.y += game.player.velocityY;
+            
+            // Check for collisions with platforms
+            let onPlatform = false;
+            for (let platform of game.platforms) {
+                if (checkCollision(game.player, platform)) {
+                    // Check if player is landing on top of platform
+                    if (game.player.velocityY > 0 && game.player.y + game.player.height < platform.y + platform.height/2) {
+                        game.player.y = platform.y - game.player.height;
+                        game.player.velocityY = 0;
+                        game.player.isJumping = false;
+                        onPlatform = true;
+                    }
+                }
+            }
+            
+            // If not on a platform, player is jumping/falling
+            if (!onPlatform) {
+                game.player.isJumping = true;
+            }
+            
+            // Boundary checks
+            if (game.player.x < 0) game.player.x = 0;
+            if (game.player.x + game.player.width > canvas.width) {
+                game.player.x = canvas.width - game.player.width;
+            }
+            
+            // Draw platforms
+            for (let platform of game.platforms) {
+                ctx.fillStyle = platform.color;
+                ctx.fillRect(platform.x, platform.y, platform.width, platform.height);
+            }
+            
+            // Draw player
+            ctx.fillStyle = game.player.color;
+            ctx.fillRect(game.player.x, game.player.y, game.player.width, game.player.height);
+            
+            // Draw score
+            ctx.fillStyle = '#000000';
+            ctx.font = '20px Arial';
+            ctx.fillText('Score: ' + game.score, 20, 30);
+            
+            // Increment score
+            game.score++;
+            
+            // Continue game loop
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Start the game
+        gameLoop();
+    </script>
+</body>
+</html>
