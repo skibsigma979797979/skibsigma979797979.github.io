@@ -1,358 +1,246 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Ultimate Click Game</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <title>Click Game Deluxe</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
-    * { box-sizing: border-box; }
     body {
-      margin: 0;
-      font-family: 'Press Start 2P', cursive;
-      background: #111;
-      color: white;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to bottom, #0f2027, #203a43, #2c5364);
+      color: #fff;
       text-align: center;
-      overflow-x: hidden;
+      margin: 0;
+      padding: 0;
     }
-    .container {
-      max-width: 900px;
-      margin: auto;
-      padding: 20px;
-    }
+
     h1 {
-      font-size: 1.5rem;
-      margin-bottom: 10px;
+      margin-top: 10px;
+      font-size: 3em;
+      text-shadow: 2px 2px #000;
     }
-    .money-display {
-      font-size: 1.2rem;
-      margin: 20px auto;
-      background: black;
-      padding: 10px;
-      display: inline-block;
-      border-radius: 10px;
-      color: #0f0;
-    }
-    #img {
-      width: 150px;
+
+    #clickable-image {
+      width: 200px;
+      height: 200px;
+      object-fit: contain;
+      border: 3px solid white;
+      border-radius: 15px;
+      margin-top: 10px;
+      transition: transform 0.1s;
       cursor: pointer;
-      transition: transform 0.1s ease;
-      display: none;
     }
-    #img:active {
-      transform: scale(1.1);
+
+    #clickable-image:active {
+      transform: scale(0.95);
     }
-    .shop, .theme-container {
+
+    .panel, .admin-panel {
+      background: rgba(0, 0, 0, 0.5);
+      margin: 10px auto;
+      padding: 10px;
+      border-radius: 15px;
+      width: 80%;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+    }
+
+    button {
+      background: #1abc9c;
+      border: none;
+      padding: 10px 20px;
+      margin: 5px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 1em;
+      transition: background 0.3s, transform 0.1s;
+    }
+
+    button:hover {
+      background: #16a085;
+    }
+
+    button:active {
+      transform: scale(0.95);
+    }
+
+    .shop {
       display: none;
       flex-wrap: wrap;
-      gap: 8px;
       justify-content: center;
-      margin: 10px 0;
     }
+
     .upgrade-button {
-      padding: 6px 10px;
-      font-size: 0.6rem;
-      border-radius: 8px;
-      border: none;
-      background-color: #ff9800;
-      color: white;
-      cursor: pointer;
-    }
-    .upgrade-button:hover {
-      background-color: #e65100;
-    }
-    button {
-      font-size: 0.6rem;
+      width: 150px;
       margin: 5px;
-      padding: 8px 12px;
-      border-radius: 6px;
-      border: none;
-      cursor: pointer;
-      background-color: #4caf50;
-      color: white;
     }
-    button:hover {
-      background-color: #388e3c;
-    }
-    #aP, #aI {
-      margin-top: 10px;
-      padding: 10px;
-      border-radius: 10px;
-      background: rgba(255,255,255,0.1);
+
+    .admin-panel {
       display: none;
     }
-    .particle {
-      position: absolute;
-      pointer-events: none;
-      font-size: 16px;
-      color: gold;
-      animation: floatUp 1s ease-out forwards;
-    }
-    @keyframes floatUp {
-      0% { opacity: 1; transform: translateY(0); }
-      100% { opacity: 0; transform: translateY(-50px); }
-    }
 
-    /* THEME STYLES */
-    .theme-space {
-      background: black;
-      background-image: radial-gradient(white 1px, transparent 1px);
-      background-size: 40px 40px;
-      animation: twinkle 3s infinite linear;
-    }
-    .theme-money {
-      background: linear-gradient(#1b5e20, #4caf50);
-    }
-    .theme-confetti {
-      background: repeating-linear-gradient(45deg, #ff0, #f0f 10px, #0ff 20px);
-    }
-    .theme-pixel {
-      background: repeating-linear-gradient(0deg, #222, #333 10px);
-    }
-    .theme-glow {
-      background: #000;
-      box-shadow: inset 0 0 50px #0ff;
-    }
-    @keyframes twinkle {
-      0% { background-position: 0 0; }
-      100% { background-position: 40px 40px; }
+    input[type="file"], input[type="text"] {
+      margin-top: 10px;
     }
   </style>
-
-  <!-- AUDIO SETUP -->
-  <audio id="clickS" src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YQAAAAA="></audio>
-  <audio id="upgradeS" src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YQAAAAA="></audio>
-  <audio id="saveS" src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YQAAAAA="></audio>
 </head>
 <body>
-  <div class="container" id="mainGame">
-    <h1>💥 Ultimate Click Game 💥</h1>
+  <h1>Click Game Deluxe</h1>
 
-    <!-- Upload and Display -->
-    <input type="file" accept="image/*" id="uploader">
-    <br><img id="img">
-
-    <!-- Money -->
-    <div class="money-display" id="moneyDisplay">$0</div>
-
-   <!-- Buttons -->
-<div>
-  <button onclick="toggleShop()">🛒 Toggle Shop</button>
-  <button onclick="toggleThemeMenu()">🎨 Theme</button>
-  <button onclick="manualSave()">💾 Save</button>
-  <button onclick="manualLoad()">📂 Load</button>
-  <button onclick="toggleAdminInput()">👨‍💼 Admin</button>
-  <button onclick="toggleLore()">📜 Toggle Lore</button>
-</div>
-
-<!-- Lore Box -->
-<div id="loreBox" style="display: none; background: rgba(0,0,0,0.8); border: 2px solid #0f0; border-radius: 10px; padding: 20px; margin: 10px auto; max-width: 800px; font-size: 0.6rem; line-height: 1.5;">
-  <p>
-    🌌 <strong>LORE:</strong> In a forgotten corner of the digital universe, a mysterious relic known as the <strong>Click Core</strong> emerged from the remnants of ancient code. Those who harness its power are granted the ability to manipulate currency with a single touch. You, the Chosen Clicker, must awaken dormant power buried deep in the relic. Each upgrade you purchase rewrites part of reality, unlocking the path toward financial omnipotence.<br><br>
-    ⚠️ But beware—the relic is sentient. The more you click, the more it remembers. Legends speak of a final form... one that no one has lived to monetize.
-  </p>
-</div>
-
-    <!-- Theme Selector -->
-    <div class="theme-container" id="themeMenu">
-      <button onclick="setTheme('space')">🌌 Space</button>
-      <button onclick="setTheme('money')">💸 Money</button>
-      <button onclick="setTheme('confetti')">🎉 Confetti</button>
-      <button onclick="setTheme('pixel')">🔥 Pixel</button>
-      <button onclick="setTheme('glow')">✨ Glow</button>
-    </div>
-
-    <!-- Shops -->
-    <div class="shop" id="shop1"></div>
-    <div class="shop" id="shop2"></div>
-
-    <!-- Admin Input -->
-    <div id="adminBox" style="margin-top: 10px;">
-      <input type="text" id="adminInput" placeholder="Enter Admin Code">
-    </div>
-
-    <!-- Admin Panel -->
-    <div id="aP">
-      <h3>Admin Panel</h3>
-      <button onclick="givePassive()">+10,000 Passive</button>
-      <button onclick="giveClick()">+10,000 Click Upgrades</button>
-      <button onclick="setInfinite()">💠 Infinite Mode</button>
-      <button onclick="setInfiniteMoney()">💰 Infinite Money</button>
-      <button onclick="hideAdmin()">Hide Panel</button>
-    </div>
-
+  <div>
+    <input type="file" id="imageUpload" accept="image/*">
+    <br>
+    <img id="clickable-image" src="https://via.placeholder.com/200" alt="Click Me">
   </div>
-<script>
-let money = 0;
-let clickValue = 1;
-let cps = 0;
-let clickUpgrades = Array(30).fill(0);
-let passiveUpgrades = Array(30).fill(0);
-let theme = 'space';
-let saveKey = 'ultimate_click_game_save';
 
-function updateMoneyDisplay() {
-  document.getElementById("moneyDisplay").innerText = `$${Math.floor(money)}`;
-}
+  <div class="panel">
+    <p><strong>Money:</strong> $<span id="money">0</span></p>
+    <p><strong>Per Click:</strong> <span id="perClick">1</span> | <strong>Passive:</strong> <span id="perSecond">0</span>/sec</p>
+    <button onclick="toggleShop(1)">Toggle Click Upgrades</button>
+    <button onclick="toggleShop(2)">Toggle Passive Upgrades</button>
+    <button onclick="saveGame()">Save</button>
+    <button onclick="loadGame()">Load</button>
+    <button onclick="prestige()">Prestige</button>
+  </div>
 
-function addClickParticle(x, y) {
-  let particle = document.createElement("div");
-  particle.className = "particle";
-  particle.style.left = `${x}px`;
-  particle.style.top = `${y}px`;
-  particle.innerText = "+$" + clickValue;
-  document.body.appendChild(particle);
-  setTimeout(() => particle.remove(), 1000);
-}
+  <div id="shop1" class="shop panel"></div>
+  <div id="shop2" class="shop panel"></div>
 
-function clickImage(e) {
-  money += clickValue;
-  document.getElementById("clickS").play();
-  updateMoneyDisplay();
-  addClickParticle(e.clientX, e.clientY);
-}
+  <div class="panel">
+    <input type="text" id="adminPassword" placeholder="Admin Password">
+    <button onclick="checkAdmin()">Enter Admin</button>
+  </div>
 
-function toggleShop() {
-  let s1 = document.getElementById("shop1");
-  let s2 = document.getElementById("shop2");
-  s1.style.display = s1.style.display === "flex" ? "none" : "flex";
-  s2.style.display = s2.style.display === "flex" ? "none" : "flex";
-}
+  <div id="adminPanel" class="admin-panel panel">
+    <button onclick="giveMoney(10000)">+10,000 Money</button>
+    <button onclick="givePassive(10000)">+10,000 Passive</button>
+    <button onclick="hideAdmin()">Hide Admin Panel</button>
+    <button onclick="resetGame()">Reset Game</button>
+    <button onclick="unlockAllUpgrades()">Unlock All Upgrades</button>
+  </div>
 
-function toggleAdminInput() {
-  let input = document.getElementById("adminInput");
-  input.style.display = input.style.display === "none" ? "inline-block" : "none";
-  input.onchange = () => {
-    if (input.value === "Noah") {
-      document.getElementById("aP").style.display = "block";
-      input.value = "";
-      input.style.display = "none";
-    }
-  }
-}
+  <script>
+    let money = 0, perClick = 1, perSecond = 0, prestigeLevel = 0;
 
-function hideAdmin() {
-  document.getElementById("aP").style.display = "none";
-  document.getElementById("adminInput").value = "";
-  document.getElementById("adminInput").style.display = "none";
-}
+    const moneySpan = document.getElementById('money');
+    const perClickSpan = document.getElementById('perClick');
+    const perSecondSpan = document.getElementById('perSecond');
 
-function givePassive() {
-  cps += 10000;
-}
-function giveClick() {
-  clickValue += 10000;
-}
-function setInfinite() {
-  clickValue = Infinity;
-  cps = Infinity;
-}
-function setInfiniteMoney() {
-  money = Infinity;
-  updateMoneyDisplay();
-}
-
-function buyUpgrade(index, type) {
-  const basePrice = 10;
-  let level = type === "click" ? clickUpgrades[index] : passiveUpgrades[index];
-  let cost = basePrice * Math.pow(2, level);
-  if (money >= cost) {
-    money -= cost;
-    type === "click" ? clickUpgrades[index]++ : passiveUpgrades[index]++;
-    type === "click" ? clickValue++ : cps++;
-    document.getElementById("upgradeS").play();
-    updateMoneyDisplay();
-    saveGame();
-  }
-}
-
-function createShopButtons() {
-  const s1 = document.getElementById("shop1");
-  const s2 = document.getElementById("shop2");
-  for (let i = 0; i < 30; i++) {
-    const btn1 = document.createElement("button");
-    btn1.className = "upgrade-button";
-    btn1.innerText = `⬆️ Click +1\n$${10 * Math.pow(2, i)}`;
-    btn1.onclick = () => buyUpgrade(i, "click");
-    s1.appendChild(btn1);
-
-    const btn2 = document.createElement("button");
-    btn2.className = "upgrade-button";
-    btn2.innerText = `⏱ Passive +1\n$${10 * Math.pow(2, i)}`;
-    btn2.onclick = () => buyUpgrade(i, "passive");
-    s2.appendChild(btn2);
-  }
-}
-
-setInterval(() => {
-  if (!isNaN(cps)) {
-    money += cps;
-    updateMoneyDisplay();
-  }
-}, 1000);
-
-function setTheme(t) {
-  document.body.className = '';
-  document.body.classList.add("theme-" + t);
-  theme = t;
-  saveGame();
-}
-
-function toggleThemeMenu() {
-  let el = document.getElementById("themeMenu");
-  el.style.display = el.style.display === "flex" ? "none" : "flex";
-}
-
-function saveGame() {
-  const data = {
-    money,
-    clickValue,
-    cps,
-    clickUpgrades,
-    passiveUpgrades,
-    theme
-  };
-  localStorage.setItem(saveKey, JSON.stringify(data));
-  document.getElementById("saveS").play();
-}
-
-function manualSave() {
-  saveGame();
-  alert("Game saved!");
-}
-
-function manualLoad() {
-  const data = JSON.parse(localStorage.getItem(saveKey));
-  if (data) {
-    money = data.money;
-    clickValue = data.clickValue;
-    cps = data.cps;
-    clickUpgrades = data.clickUpgrades;
-    passiveUpgrades = data.passiveUpgrades;
-    setTheme(data.theme || 'space');
-    updateMoneyDisplay();
-  }
-}
-
-window.onload = () => {
-  updateMoneyDisplay();
-  createShopButtons();
-  manualLoad();
-
-  const img = document.getElementById("img");
-  img.addEventListener("click", clickImage);
-
-  const up = document.getElementById("uploader");
-  up.addEventListener("change", (e) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      img.src = reader.result;
-      img.style.display = "block";
+    document.getElementById('clickable-image').onclick = () => {
+      money += perClick;
+      updateDisplay();
     };
-    reader.readAsDataURL(e.target.files[0]);
-  });
-};
-</script>
+
+    document.getElementById('imageUpload').onchange = function(event) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        document.getElementById('clickable-image').src = e.target.result;
+      };
+      reader.readAsDataURL(event.target.files[0]);
+    };
+
+    function toggleShop(n) {
+      document.getElementById('shop1').style.display = n === 1 ? (shop1.style.display === 'flex' ? 'none' : 'flex') : 'none';
+      document.getElementById('shop2').style.display = n === 2 ? (shop2.style.display === 'flex' ? 'none' : 'flex') : 'none';
+    }
+
+    function buyUpgrade(type, i) {
+      const cost = Math.pow(2, i + 1);
+      if (money >= cost) {
+        money -= cost;
+        if (type === 'click') perClick += (1 + prestigeLevel);
+        if (type === 'passive') perSecond += (1 + prestigeLevel);
+        updateDisplay();
+      }
+    }
+
+    function saveGame() {
+      const data = btoa(JSON.stringify({ money, perClick, perSecond, prestigeLevel }));
+      localStorage.setItem('clickGameSave', data);
+      alert("Game Saved!");
+    }
+
+    function loadGame() {
+      const data = localStorage.getItem('clickGameSave');
+      if (data) {
+        const save = JSON.parse(atob(data));
+        money = save.money;
+        perClick = save.perClick;
+        perSecond = save.perSecond;
+        prestigeLevel = save.prestigeLevel;
+        updateDisplay();
+        alert("Game Loaded!");
+      }
+    }
+
+    function prestige() {
+      if (money >= 1000000) {
+        prestigeLevel++;
+        money = 0;
+        perClick = 1;
+        perSecond = 0;
+        alert("Prestige! Bonus gained.");
+        updateDisplay();
+      }
+    }
+
+    function checkAdmin() {
+      if (document.getElementById('adminPassword').value === 'Noah') {
+        document.getElementById('adminPanel').style.display = 'block';
+      }
+    }
+
+    function giveMoney(amount) {
+      money += amount;
+      updateDisplay();
+    }
+
+    function givePassive(amount) {
+      perSecond += amount;
+      updateDisplay();
+    }
+
+    function hideAdmin() {
+      document.getElementById('adminPanel').style.display = 'none';
+      document.getElementById('adminPassword').style.display = 'none';
+    }
+
+    function resetGame() {
+      money = 0; perClick = 1; perSecond = 0; prestigeLevel = 0;
+      updateDisplay();
+    }
+
+    function unlockAllUpgrades() {
+      perClick += 30;
+      perSecond += 30;
+      updateDisplay();
+    }
+
+    function updateDisplay() {
+      moneySpan.textContent = Math.floor(money);
+      perClickSpan.textContent = perClick;
+      perSecondSpan.textContent = perSecond;
+    }
+
+    // Passive income
+    setInterval(() => {
+      money += perSecond;
+      updateDisplay();
+    }, 1000);
+
+    // Populate Shops
+    for (let i = 0; i < 30; i++) {
+      const cost = Math.pow(2, i + 1);
+      const btn1 = document.createElement('button');
+      btn1.className = 'upgrade-button';
+      btn1.textContent = `+1 Click ($${cost})`;
+      btn1.onclick = () => buyUpgrade('click', i);
+      document.getElementById('shop1').appendChild(btn1);
+
+      const btn2 = document.createElement('button');
+      btn2.className = 'upgrade-button';
+      btn2.textContent = `+1 Passive ($${cost})`;
+      btn2.onclick = () => buyUpgrade('passive', i);
+      document.getElementById('shop2').appendChild(btn2);
+    }
+  </script>
 </body>
 </html>
-
