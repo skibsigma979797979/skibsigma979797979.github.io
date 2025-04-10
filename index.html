@@ -1,246 +1,218 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Click Game Deluxe</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ultimate Click Game</title>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(to bottom, #0f2027, #203a43, #2c5364);
-      color: #fff;
       text-align: center;
-      margin: 0;
-      padding: 0;
+      overflow: hidden;
+      transition: background 0.5s ease;
     }
-
-    h1 {
-      margin-top: 10px;
-      font-size: 3em;
-      text-shadow: 2px 2px #000;
-    }
-
-    #clickable-image {
+    .clickable {
       width: 200px;
       height: 200px;
       object-fit: contain;
-      border: 3px solid white;
-      border-radius: 15px;
-      margin-top: 10px;
-      transition: transform 0.1s;
       cursor: pointer;
+      animation: pulse 1.5s infinite;
     }
-
-    #clickable-image:active {
-      transform: scale(0.95);
-    }
-
-    .panel, .admin-panel {
-      background: rgba(0, 0, 0, 0.5);
-      margin: 10px auto;
-      padding: 10px;
-      border-radius: 15px;
-      width: 80%;
-      box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
-    }
-
-    button {
-      background: #1abc9c;
-      border: none;
-      padding: 10px 20px;
-      margin: 5px;
-      border-radius: 10px;
-      cursor: pointer;
-      font-size: 1em;
-      transition: background 0.3s, transform 0.1s;
-    }
-
-    button:hover {
-      background: #16a085;
-    }
-
-    button:active {
-      transform: scale(0.95);
-    }
-
-    .shop {
+    .shop, .shop2 {
       display: none;
-      flex-wrap: wrap;
-      justify-content: center;
     }
-
     .upgrade-button {
-      width: 150px;
       margin: 5px;
+      padding: 10px;
+      border-radius: 10px;
+      background-color: #8bc34a;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.2s;
     }
-
-    .admin-panel {
-      display: none;
+    .upgrade-button:hover {
+      transform: scale(1.1);
     }
-
-    input[type="file"], input[type="text"] {
+    .theme-button {
+      margin: 5px;
+      padding: 10px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+    }
+    .music-select {
       margin-top: 10px;
+    }
+    .achievement-panel {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      width: 200px;
+      background: rgba(0, 0, 0, 0.6);
+      color: white;
+      padding: 10px;
+      border-radius: 10px;
+      max-height: 300px;
+      overflow-y: auto;
+      font-size: 14px;
+      text-align: left;
+    }
+    .powerup {
+      position: absolute;
+      top: 0;
+      font-size: 30px;
+      animation: fall 6s linear forwards, glowPulse 2s infinite;
+      cursor: pointer;
+      border-radius: 50%;
+      padding: 5px;
+    }
+    .common {
+      background: radial-gradient(circle, #aaffaa 0%, transparent 70%);
+      box-shadow: 0 0 15px #aaffaa;
+    }
+    .rare {
+      background: radial-gradient(circle, #88ccff 0%, transparent 70%);
+      box-shadow: 0 0 15px #88ccff;
+    }
+    .epic {
+      background: radial-gradient(circle, #cc88ff 0%, transparent 70%);
+      box-shadow: 0 0 20px #cc88ff;
+    }
+    .legendary {
+      color: gold;
+      text-shadow: 0 0 10px orange;
+      font-size: 40px;
+      animation: fall 8s ease-in-out forwards, pulse 2s infinite, glowPulse 1.5s infinite;
+      transform: scale(1.5);
+      font-weight: bold;
+      position: relative;
+      background: radial-gradient(circle, gold 0%, transparent 70%);
+      box-shadow: 0 0 25px gold;
+    }
+    .legendary::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 50%;
+      width: 8px;
+      height: 8px;
+      background: radial-gradient(circle, gold 0%, transparent 70%);
+      border-radius: 50%;
+      animation: sparkle 1s infinite ease-in-out;
+      transform: translateX(-50%) translateY(-50%);
+    }
+    .floating-text {
+      position: absolute;
+      font-size: 20px;
+      font-weight: bold;
+      animation: floatUp 1s ease-out forwards;
+      pointer-events: none;
+    }
+    @keyframes fall {
+      to { top: 100vh; }
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+    @keyframes sparkle {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.3; transform: scale(2); }
+    }
+    @keyframes floatUp {
+      0% { opacity: 1; transform: translateY(0); }
+      100% { opacity: 0; transform: translateY(-50px); }
+    }
+    @keyframes glowPulse {
+      0%, 100% {
+        box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+        transform: scale(1);
+      }
+      50% {
+        box-shadow: 0 0 30px rgba(255, 255, 255, 0.8);
+        transform: scale(1.1);
+      }
     }
   </style>
+  <audio id="sound-common" src="common.mp3" preload="auto"></audio>
+  <audio id="sound-rare" src="rare.mp3" preload="auto"></audio>
+  <audio id="sound-epic" src="epic.mp3" preload="auto"></audio>
+  <audio id="sound-legendary" src="legendary.mp3" preload="auto"></audio>
+  <audio id="bg-music" src="music1.mp3" loop autoplay></audio>
+  <script>
+    let clickCount = 0;
+    let coins = 0;
+    let upgrades = 0;
+    let prestiges = 0;
+
+    function playPowerupSound(rarity) {
+      const sound = document.getElementById(`sound-${rarity}`);
+      if (sound) {
+        sound.currentTime = 0;
+        sound.play();
+      }
+    }
+
+    function changeMusic(track) {
+      const music = document.getElementById('bg-music');
+      music.src = track;
+      music.play();
+    }
+
+    function unlockAchievement(id, message) {
+      const achieved = JSON.parse(localStorage.getItem('achievements') || '{}');
+      if (!achieved[id]) {
+        achieved[id] = true;
+        localStorage.setItem('achievements', JSON.stringify(achieved));
+        showAchievement(id, message);
+      }
+    }
+
+    function showAchievement(id, message) {
+      const panel = document.getElementById('achievement-panel');
+      const entry = document.createElement('div');
+      entry.textContent = `🏆 ${message}`;
+      panel.appendChild(entry);
+    }
+
+    function loadAchievements() {
+      const achieved = JSON.parse(localStorage.getItem('achievements') || '{}');
+      for (const id in achieved) {
+        if (achieved[id]) showAchievement(id, id);
+      }
+    }
+
+    function trackAchievements() {
+      if (clickCount >= 1) unlockAchievement('first-click', 'First Click!');
+      if (coins >= 1000) unlockAchievement('thousand-coins', '1,000 Coins!');
+      if (upgrades >= 10) unlockAchievement('upgrade-master', '10 Upgrades Bought!');
+      if (prestiges >= 1) unlockAchievement('prestige-unlocked', 'Prestige Unlocked!');
+    }
+
+    function simulateClick() {
+      clickCount++;
+      coins += 1;
+      document.getElementById('coin-count').textContent = coins;
+      trackAchievements();
+    }
+
+    window.onload = () => {
+      loadAchievements();
+    };
+  </script>
 </head>
 <body>
-  <h1>Click Game Deluxe</h1>
-
-  <div>
-    <input type="file" id="imageUpload" accept="image/*">
-    <br>
-    <img id="clickable-image" src="https://via.placeholder.com/200" alt="Click Me">
+  <div class="music-select">
+    <button onclick="changeMusic('music1.mp3')">Music 1</button>
+    <button onclick="changeMusic('music2.mp3')">Music 2</button>
+    <button onclick="changeMusic('music3.mp3')">Music 3</button>
+    <button onclick="changeMusic('music4.mp3')">Music 4</button>
+    <button onclick="changeMusic('music5.mp3')">Music 5</button>
   </div>
-
-  <div class="panel">
-    <p><strong>Money:</strong> $<span id="money">0</span></p>
-    <p><strong>Per Click:</strong> <span id="perClick">1</span> | <strong>Passive:</strong> <span id="perSecond">0</span>/sec</p>
-    <button onclick="toggleShop(1)">Toggle Click Upgrades</button>
-    <button onclick="toggleShop(2)">Toggle Passive Upgrades</button>
-    <button onclick="saveGame()">Save</button>
-    <button onclick="loadGame()">Load</button>
-    <button onclick="prestige()">Prestige</button>
-  </div>
-
-  <div id="shop1" class="shop panel"></div>
-  <div id="shop2" class="shop panel"></div>
-
-  <div class="panel">
-    <input type="text" id="adminPassword" placeholder="Admin Password">
-    <button onclick="checkAdmin()">Enter Admin</button>
-  </div>
-
-  <div id="adminPanel" class="admin-panel panel">
-    <button onclick="giveMoney(10000)">+10,000 Money</button>
-    <button onclick="givePassive(10000)">+10,000 Passive</button>
-    <button onclick="hideAdmin()">Hide Admin Panel</button>
-    <button onclick="resetGame()">Reset Game</button>
-    <button onclick="unlockAllUpgrades()">Unlock All Upgrades</button>
-  </div>
-
-  <script>
-    let money = 0, perClick = 1, perSecond = 0, prestigeLevel = 0;
-
-    const moneySpan = document.getElementById('money');
-    const perClickSpan = document.getElementById('perClick');
-    const perSecondSpan = document.getElementById('perSecond');
-
-    document.getElementById('clickable-image').onclick = () => {
-      money += perClick;
-      updateDisplay();
-    };
-
-    document.getElementById('imageUpload').onchange = function(event) {
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        document.getElementById('clickable-image').src = e.target.result;
-      };
-      reader.readAsDataURL(event.target.files[0]);
-    };
-
-    function toggleShop(n) {
-      document.getElementById('shop1').style.display = n === 1 ? (shop1.style.display === 'flex' ? 'none' : 'flex') : 'none';
-      document.getElementById('shop2').style.display = n === 2 ? (shop2.style.display === 'flex' ? 'none' : 'flex') : 'none';
-    }
-
-    function buyUpgrade(type, i) {
-      const cost = Math.pow(2, i + 1);
-      if (money >= cost) {
-        money -= cost;
-        if (type === 'click') perClick += (1 + prestigeLevel);
-        if (type === 'passive') perSecond += (1 + prestigeLevel);
-        updateDisplay();
-      }
-    }
-
-    function saveGame() {
-      const data = btoa(JSON.stringify({ money, perClick, perSecond, prestigeLevel }));
-      localStorage.setItem('clickGameSave', data);
-      alert("Game Saved!");
-    }
-
-    function loadGame() {
-      const data = localStorage.getItem('clickGameSave');
-      if (data) {
-        const save = JSON.parse(atob(data));
-        money = save.money;
-        perClick = save.perClick;
-        perSecond = save.perSecond;
-        prestigeLevel = save.prestigeLevel;
-        updateDisplay();
-        alert("Game Loaded!");
-      }
-    }
-
-    function prestige() {
-      if (money >= 1000000) {
-        prestigeLevel++;
-        money = 0;
-        perClick = 1;
-        perSecond = 0;
-        alert("Prestige! Bonus gained.");
-        updateDisplay();
-      }
-    }
-
-    function checkAdmin() {
-      if (document.getElementById('adminPassword').value === 'Noah') {
-        document.getElementById('adminPanel').style.display = 'block';
-      }
-    }
-
-    function giveMoney(amount) {
-      money += amount;
-      updateDisplay();
-    }
-
-    function givePassive(amount) {
-      perSecond += amount;
-      updateDisplay();
-    }
-
-    function hideAdmin() {
-      document.getElementById('adminPanel').style.display = 'none';
-      document.getElementById('adminPassword').style.display = 'none';
-    }
-
-    function resetGame() {
-      money = 0; perClick = 1; perSecond = 0; prestigeLevel = 0;
-      updateDisplay();
-    }
-
-    function unlockAllUpgrades() {
-      perClick += 30;
-      perSecond += 30;
-      updateDisplay();
-    }
-
-    function updateDisplay() {
-      moneySpan.textContent = Math.floor(money);
-      perClickSpan.textContent = perClick;
-      perSecondSpan.textContent = perSecond;
-    }
-
-    // Passive income
-    setInterval(() => {
-      money += perSecond;
-      updateDisplay();
-    }, 1000);
-
-    // Populate Shops
-    for (let i = 0; i < 30; i++) {
-      const cost = Math.pow(2, i + 1);
-      const btn1 = document.createElement('button');
-      btn1.className = 'upgrade-button';
-      btn1.textContent = `+1 Click ($${cost})`;
-      btn1.onclick = () => buyUpgrade('click', i);
-      document.getElementById('shop1').appendChild(btn1);
-
-      const btn2 = document.createElement('button');
-      btn2.className = 'upgrade-button';
-      btn2.textContent = `+1 Passive ($${cost})`;
-      btn2.onclick = () => buyUpgrade('passive', i);
-      document.getElementById('shop2').appendChild(btn2);
-    }
-  </script>
+  <h2>Coins: <span id="coin-count">0</span></h2>
+  <div id="achievement-panel" class="achievement-panel"></div>
+  <button onclick="simulateClick()">Simulate Click</button>
 </body>
 </html>
