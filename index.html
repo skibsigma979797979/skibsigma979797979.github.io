@@ -210,9 +210,19 @@
     <button onclick="changeMusic('music3.mp3')">Music 3</button>
     <button onclick="changeMusic('music4.mp3')">Music 4</button>
     <button onclick="changeMusic('music5.mp3')">Music 5</button>
+    <input type="file" accept="audio/*" onchange="uploadMusic(event)">
   </div>
   <h2>Coins: <span id="coin-count">0</span></h2>
   <div id="achievement-panel" class="achievement-panel"></div>
   <button onclick="simulateClick()">Simulate Click</button>
+  <script>
+    function uploadMusic(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const url = URL.createObjectURL(file);
+        changeMusic(url);
+      }
+    }
+  </script>
 </body>
 </html>
