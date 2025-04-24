@@ -1,184 +1,207 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Simple Platformer</title>
-    <style>
-        body {
-            margin: 0;
-            overflow: hidden;
-            background-color: #333;
-        }
-        canvas {
-            display: block;
-            margin: 20px auto;
-            background-color: #87CEEB;
-        }
-        #gameInfo {
-            color: white;
-            text-align: center;
-            font-family: Arial, sans-serif;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ultimate Platformer</title>
+  <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
+  <style>
+    body { margin: 0; }
+    canvas { display: block; margin: 0 auto; }
+    #skinSelect {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      z-index: 10;
+    }
+  </style>
 </head>
 <body>
-    <div id="gameInfo">
-        <h1>Simple Platformer</h1>
-        <p>Use arrow keys to move. Space to jump.</p>
-    </div>
-    <canvas id="gameCanvas" width="800" height="500"></canvas>
+<select id="skinSelect">
+  <option value="dude">Default</option>
+  <option value="enemy">Enemy Skin</option>
+</select>
+<script>
+  const config = {
+    type: Phaser.AUTO,
+    width: 800,
+    height: 600,
+    physics: {
+      default: 'arcade',
+      arcade: {
+        gravity: { y: 300 },
+        debug: false
+      }
+    },
+    scene: {
+      preload,
+      create,
+      update
+    }
+  };
 
-    <script>
-        // Game canvas setup
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
+  const game = new Phaser.Game(config);
 
-        // Game state
-        const game = {
-            gravity: 0.5,
-            friction: 0.9,
-            player: {
-                x: 50,
-                y: 100,
-                width: 30,
-                height: 50,
-                color: '#FF0000',
-                velocityX: 0,
-                velocityY: 0,
-                speed: 5,
-                jumpForce: 12,
-                isJumping: false
-            },
-            platforms: [
-                { x: 0, y: 450, width: 200, height: 20, color: '#00AA00' },
-                { x: 250, y: 400, width: 200, height: 20, color: '#00AA00' },
-                { x: 500, y: 350, width: 200, height: 20, color: '#00AA00' },
-                { x: 300, y: 250, width: 200, height: 20, color: '#00AA00' },
-                { x: 50, y: 200, width: 200, height: 20, color: '#00AA00' },
-                { x: 550, y: 150, width: 200, height: 20, color: '#00AA00' }
-            ],
-            keys: {
-                left: false,
-                right: false,
-                up: false
-            },
-            score: 0
-        };
+  let player, cursors, stars, bombs, score = 0, scoreText, platforms, music;
+  let powerUps, enemies, health = 3, healthText, level = 1, selectedSkin = 'dude', boss;
 
-        // Event listeners for keyboard
-        window.addEventListener('keydown', function(e) {
-            switch(e.key) {
-                case 'ArrowLeft':
-                    game.keys.left = true;
-                    break;
-                case 'ArrowRight':
-                    game.keys.right = true;
-                    break;
-                case 'ArrowUp':
-                case ' ':
-                    game.keys.up = true;
-                    break;
-            }
-        });
+  function preload() {
+    this.load.image('sky', 'https://labs.phaser.io/assets/skies/space3.png');
+    this.load.image('ground', 'https://labs.phaser.io/assets/sprites/platform.png');
+    this.load.image('star', 'https://labs.phaser.io/assets/sprites/star.png');
+    this.load.image('bomb', 'https://labs.phaser.io/assets/sprites/bomb.png');
+    this.load.image('powerup', 'https://labs.phaser.io/assets/sprites/powerup.png');
+    this.load.spritesheet('dude', 'https://labs.phaser.io/assets/sprites/dude.png', { frameWidth: 32, frameHeight: 48 });
+    this.load.audio('bgmusic', 'https://labs.phaser.io/assets/audio/loop.ogg');
+    this.load.spritesheet('enemy', 'https://labs.phaser.io/assets/sprites/baddie.png', { frameWidth: 32, frameHeight: 32 });
+    this.load.spritesheet('boss', 'https://labs.phaser.io/assets/sprites/mushroom-32x32.png', { frameWidth: 32, frameHeight: 32 });
+  }
 
-        window.addEventListener('keyup', function(e) {
-            switch(e.key) {
-                case 'ArrowLeft':
-                    game.keys.left = false;
-                    break;
-                case 'ArrowRight':
-                    game.keys.right = false;
-                    break;
-                case 'ArrowUp':
-                case ' ':
-                    game.keys.up = false;
-                    break;
-            }
-        });
+  function create() {
+    selectedSkin = document.getElementById('skinSelect').value;
 
-        // Collision detection
-        function checkCollision(player, platform) {
-            return player.x < platform.x + platform.width &&
-                   player.x + player.width > platform.x &&
-                   player.y < platform.y + platform.height &&
-                   player.y + player.height > platform.y;
-        }
+    this.add.image(400, 300, 'sky');
+    music = this.sound.add('bgmusic', { loop: true });
+    music.play();
 
-        // Game loop
-        function gameLoop() {
-            // Clear canvas
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            // Handle player movement
-            if (game.keys.left) {
-                game.player.velocityX = -game.player.speed;
-            } else if (game.keys.right) {
-                game.player.velocityX = game.player.speed;
-            } else {
-                game.player.velocityX *= game.friction;
-            }
-            
-            // Handle jumping
-            if (game.keys.up && !game.player.isJumping) {
-                game.player.velocityY = -game.player.jumpForce;
-                game.player.isJumping = true;
-            }
-            
-            // Apply gravity
-            game.player.velocityY += game.gravity;
-            
-            // Update player position
-            game.player.x += game.player.velocityX;
-            game.player.y += game.player.velocityY;
-            
-            // Check for collisions with platforms
-            let onPlatform = false;
-            for (let platform of game.platforms) {
-                if (checkCollision(game.player, platform)) {
-                    // Check if player is landing on top of platform
-                    if (game.player.velocityY > 0 && game.player.y + game.player.height < platform.y + platform.height/2) {
-                        game.player.y = platform.y - game.player.height;
-                        game.player.velocityY = 0;
-                        game.player.isJumping = false;
-                        onPlatform = true;
-                    }
-                }
-            }
-            
-            // If not on a platform, player is jumping/falling
-            if (!onPlatform) {
-                game.player.isJumping = true;
-            }
-            
-            // Boundary checks
-            if (game.player.x < 0) game.player.x = 0;
-            if (game.player.x + game.player.width > canvas.width) {
-                game.player.x = canvas.width - game.player.width;
-            }
-            
-            // Draw platforms
-            for (let platform of game.platforms) {
-                ctx.fillStyle = platform.color;
-                ctx.fillRect(platform.x, platform.y, platform.width, platform.height);
-            }
-            
-            // Draw player
-            ctx.fillStyle = game.player.color;
-            ctx.fillRect(game.player.x, game.player.y, game.player.width, game.player.height);
-            
-            // Draw score
-            ctx.fillStyle = '#000000';
-            ctx.font = '20px Arial';
-            ctx.fillText('Score: ' + game.score, 20, 30);
-            
-            // Increment score
-            game.score++;
-            
-            // Continue game loop
-            requestAnimationFrame(gameLoop);
-        }
+    platforms = this.physics.add.staticGroup();
+    createLevel(this);
 
-        // Start the game
-        gameLoop();
-    </script>
+    player = this.physics.add.sprite(100, 450, selectedSkin);
+    player.setBounce(0.2);
+    player.setCollideWorldBounds(true);
+
+    this.anims.create({ key: 'left', frames: this.anims.generateFrameNumbers(selectedSkin, { start: 0, end: 3 }), frameRate: 10, repeat: -1 });
+    this.anims.create({ key: 'turn', frames: [ { key: selectedSkin, frame: 4 } ], frameRate: 20 });
+    this.anims.create({ key: 'right', frames: this.anims.generateFrameNumbers(selectedSkin, { start: 5, end: 8 }), frameRate: 10, repeat: -1 });
+
+    this.physics.add.collider(player, platforms);
+    cursors = this.input.keyboard.createCursorKeys();
+
+    stars = this.physics.add.group();
+    this.physics.add.collider(stars, platforms);
+    this.physics.add.overlap(player, stars, collectStar, null, this);
+
+    scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '24px', fill: '#fff' });
+    healthText = this.add.text(16, 48, 'Health: 3', { fontSize: '24px', fill: '#fff' });
+
+    bombs = this.physics.add.group();
+    this.physics.add.collider(bombs, platforms);
+    this.physics.add.collider(player, bombs, takeDamage, null, this);
+
+    powerUps = this.physics.add.group();
+    this.physics.add.collider(powerUps, platforms);
+    this.physics.add.overlap(player, powerUps, collectPowerUp, null, this);
+
+    enemies = this.physics.add.group();
+    this.physics.add.collider(enemies, platforms);
+    this.physics.add.collider(player, enemies, takeDamage, null, this);
+
+    boss = this.physics.add.sprite(700, 100, 'boss').setScale(2);
+    boss.setBounce(1);
+    boss.setCollideWorldBounds(true);
+    boss.setVelocity(Phaser.Math.Between(-150, 150), 20);
+    boss.setVisible(false);
+    this.physics.add.collider(boss, platforms);
+    this.physics.add.collider(player, boss, takeDamage, null, this);
+
+    loadEntities(this);
+
+    // Save/load functionality
+    window.addEventListener('beforeunload', () => {
+      localStorage.setItem('saveScore', score);
+      localStorage.setItem('saveLevel', level);
+      localStorage.setItem('saveHealth', health);
+    });
+
+    // Load saved game
+    if (localStorage.getItem('saveScore')) {
+      score = parseInt(localStorage.getItem('saveScore'));
+      level = parseInt(localStorage.getItem('saveLevel'));
+      health = parseInt(localStorage.getItem('saveHealth'));
+      scoreText.setText('Score: ' + score);
+      healthText.setText('Health: ' + health);
+    }
+  }
+
+  function update() {
+    if (cursors.left.isDown) {
+      player.setVelocityX(-160);
+      player.anims.play('left', true);
+    } else if (cursors.right.isDown) {
+      player.setVelocityX(160);
+      player.anims.play('right', true);
+    } else {
+      player.setVelocityX(0);
+      player.anims.play('turn');
+    }
+
+    if ((cursors.up.isDown || this.input.activePointer.isDown) && player.body.touching.down) {
+      player.setVelocityY(-330);
+    }
+  }
+
+  function collectStar(player, star) {
+    star.disableBody(true, true);
+    score += 10;
+    scoreText.setText('Score: ' + score);
+
+    if (stars.countActive(true) === 0) {
+      level++;
+      createLevel(this);
+      loadEntities(this);
+      if (level === 3) {
+        boss.setVisible(true);
+      }
+    }
+  }
+
+  function collectPowerUp(player, powerup) {
+    powerup.disableBody(true, true);
+    score += 50;
+    player.setTint(0x00ff00);
+    this.time.delayedCall(2000, () => player.clearTint(), [], this);
+    scoreText.setText('Score: ' + score);
+  }
+
+  function takeDamage(player, enemy) {
+    health--;
+    healthText.setText('Health: ' + health);
+    player.setTint(0xff0000);
+    this.time.delayedCall(1000, () => player.clearTint(), [], this);
+    if (health <= 0) {
+      this.physics.pause();
+      player.anims.play('turn');
+      music.stop();
+      scoreText.setText('Game Over! Final Score: ' + score);
+    }
+  }
+
+  function createLevel(scene) {
+    platforms.clear(true, true);
+    platforms.create(400, 568, 'ground').setScale(2).refreshBody();
+    platforms.create(600, 400 - (level * 20), 'ground');
+    platforms.create(50, 250 - (level * 10), 'ground');
+    platforms.create(750, 220 - (level * 10), 'ground');
+  }
+
+  function loadEntities(scene) {
+    stars.clear(true, true);
+    bombs.clear(true, true);
+    powerUps.clear(true, true);
+    enemies.clear(true, true);
+
+    for (let i = 0; i < 12; i++) {
+      stars.create(Phaser.Math.Between(0, 800), 0, 'star').setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
+    }
+
+    powerUps.create(Phaser.Math.Between(100, 700), 0, 'powerup').setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
+
+    const enemy = enemies.create(Phaser.Math.Between(100, 700), 0, 'enemy');
+    enemy.setBounce(1);
+    enemy.setCollideWorldBounds(true);
+    enemy.setVelocity(Phaser.Math.Between(-100, 100), 20);
+  }
+</script>
 </body>
 </html>
