@@ -1,150 +1,335 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BitLife Game</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            text-align: center;
-            margin-top: 50px;
-        }
-        
-        #game-container {
-            margin-top: 50px;
-        }
-        
-        #player-info p {
-            font-size: 1.2em;
-        }
-        
-        button {
-            padding: 10px 20px;
-            margin: 10px;
-            font-size: 1em;
-            cursor: pointer;
-        }
-        
-        #admin-panel {
-            margin-top: 20px;
-        }
-        
-        #admin-panel input {
-            padding: 10px;
-            font-size: 1em;
-            margin-right: 10px;
-        }
+  <meta charset="UTF-8" />
+  <title>BitLife JS - Ultimate Edition</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #121212;
+      --fg: #ffffff;
+      --accent: #4caf50;
+    }
 
-        #events {
-            margin-top: 20px;
-        }
-    </style>
+    body.light {
+      --bg: #f5f5f5;
+      --fg: #111;
+      --accent: #007bff;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg);
+      color: var(--fg);
+      padding: 20px;
+      max-width: 900px;
+      margin: auto;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    .stats, .options, .admin-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .log {
+      background: rgba(255,255,255,0.05);
+      padding: 10px;
+      border-radius: 10px;
+      height: 200px;
+      overflow-y: auto;
+      margin-top: 20px;
+    }
+
+    button {
+      padding: 10px;
+      background: var(--accent);
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 8px;
+      flex-grow: 1;
+      min-width: 100px;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+
+    #admin-panel {
+      display: none;
+      position: absolute;
+      top: 200px;
+      left: 50px;
+      background: rgba(0,0,0,0.9);
+      padding: 15px;
+      border-radius: 10px;
+      z-index: 999;
+      color: white;
+      cursor: move;
+    }
+
+    .admin-buttons button {
+      flex: 1 1 140px;
+    }
+
+    .theme-toggle {
+      float: right;
+      font-size: 1.2em;
+      cursor: pointer;
+    }
+
+    audio {
+      display: none;
+    }
+  </style>
 </head>
 <body>
-    <div id="game-container">
-        <h1>BitLife Game</h1>
-        <div id="player-info">
-            <p>Name: <span id="player-name">John Doe</span></p>
-            <p>Age: <span id="player-age">18</span></p>
-            <p>Money: <span id="player-money">$1000</span></p>
-            <p>Job: <span id="player-job">Unemployed</span></p>
-            <p>Relationship: <span id="player-relationship">None</span></p>
-        </div>
-        
-        <div id="events">
-            <button onclick="ageUp()">Age Up</button>
-            <button onclick="getJob()">Get Job</button>
-            <button onclick="commitCrime()">Commit Crime</button>
-            <button onclick="getMarried()">Get Married</button>
-        </div>
+  <h1>BitLife JS <span class="theme-toggle bi bi-sun-fill" onclick="toggleTheme()"></span></h1>
 
-        <div id="admin-panel" style="display: none;">
-            <h2>Admin Panel</h2>
-            <input type="password" id="admin-password" placeholder="Enter password">
-            <button onclick="checkAdminPassword()">Login</button>
-        </div>
+  <div>
+    <strong>Name:</strong> <span id="name"></span><br>
+    <strong>Age:</strong> <span id="age">0</span><br>
+    <strong>Education:</strong> <span id="education">None</span><br>
+    <strong>Career:</strong> <span id="career">Unemployed</span>
+  </div>
 
-        <div id="game-over" style="display: none;">
-            <h2>Game Over</h2>
-            <p>You've lived a full life!</p>
-        </div>
+  <div class="stats">
+    <div>❤️ Health: <span id="health">100</span></div>
+    <div>😊 Happiness: <span id="happiness">100</span></div>
+    <div>🧠 Smarts: <span id="smarts">50</span></div>
+    <div>😎 Looks: <span id="looks">50</span></div>
+    <div>💰 Money: $<span id="money">0</span></div>
+  </div>
+
+  <div class="options">
+    <button onclick="playClick(); ageUp()">Age Up</button>
+    <button onclick="playClick(); goToSchool()">School</button>
+    <button onclick="playClick(); applyForJob()">Get Job</button>
+    <button onclick="playClick(); commitCrime()">Commit Crime</button>
+    <button onclick="playClick(); makeFriend()">Make Friend</button>
+    <button onclick="playClick(); saveGame()">💾 Save</button>
+    <button onclick="playClick(); loadGame()">📂 Load</button>
+    <button onclick="playClick(); showAdmin()">⚙️ Admin</button>
+  </div>
+
+  <div class="log" id="log"></div>
+
+  <!-- 🎮 Admin Panel -->
+  <div id="admin-panel">
+    <h3><i class="bi bi-tools"></i> Admin Panel</h3>
+    <div class="admin-buttons">
+      <button onclick="player.age += 5; updateUI();">+5 Years</button>
+      <button onclick="player.money += 1000; updateUI();">+ $1000</button>
+      <button onclick="player.health = 100; updateUI();">Max Health</button>
+      <button onclick="player.happiness = 100; updateUI();">Max Happiness</button>
+      <button onclick="player.smarts = 100; updateUI();">Max Smarts</button>
+      <button onclick="player.looks = 100; updateUI();">Max Looks</button>
+      <button onclick="player.education = 'PhD'; updateUI();">Set PhD</button>
+      <button onclick="player.career = 'CEO'; updateUI();">Set CEO</button>
+      <button onclick="player.health = 0; updateUI();">Kill Player</button>
+      <button onclick="player.name = prompt('New name:'); updateUI();">Rename</button>
+      <button onclick="player.age = 0; updateUI();">Reset Age</button>
+      <button onclick="player.money = 0; updateUI();">Reset Money</button>
+      <button onclick="player.career = 'Unemployed'; updateUI();">Clear Job</button>
+      <button onclick="player.education = 'None'; updateUI();">Clear Education</button>
+      <button onclick="document.getElementById('log').innerHTML = '';">Clear Log</button>
     </div>
+  </div>
 
-    <script>
-        let player = {
-            name: "John Doe",
-            age: 18,
-            money: 1000,
-            job: "",
-            relationship: null
-        };
+  <!-- 🎵 Sound & Music -->
+  <audio id="music" autoplay loop>
+    <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="click-sound">
+    <source src="https://www.soundjay.com/buttons/sounds/button-29.mp3" type="audio/mpeg">
+  </audio>
 
-        let gameOver = false;
+  <script>
+    const names = ["Alex", "Jordan", "Taylor", "Morgan", "Casey", "Riley"];
+    const jobs = ["Cashier", "Janitor", "Software Dev", "Influencer", "Chef"];
+    const crimes = ["rob a store", "pickpocket someone", "steal a car"];
+    const schoolEvents = ["You passed a math test.", "You got detention.", "You made the honor roll."];
 
-        // Function to age the player up
-        function ageUp() {
-            if (!gameOver) {
-                player.age++;
-                player.money -= 50;  // Player spends money as they age (simulate expenses)
-                document.getElementById("player-age").innerText = player.age;
-                document.getElementById("player-money").innerText = "$" + player.money;
-                
-                if (player.age > 100) {
-                    gameOver = true;
-                    document.getElementById("game-over").style.display = "block";
-                }
-            }
+    let player = {
+      name: names[Math.floor(Math.random() * names.length)],
+      age: 0,
+      health: 100,
+      happiness: 100,
+      smarts: 50,
+      looks: 50,
+      education: "None",
+      career: "Unemployed",
+      money: 0
+    };
+
+    function updateUI() {
+      for (const key in player) {
+        if (document.getElementById(key)) {
+          document.getElementById(key).innerText = player[key];
         }
+      }
+    }
 
-        // Function to get a job
-        function getJob() {
-            if (!gameOver && player.job === "") {
-                player.job = "Software Developer";
-                document.getElementById("player-job").innerText = player.job;
-            }
-        }
+    function logEvent(text) {
+      const log = document.getElementById("log");
+      log.innerHTML = `<p>Age ${player.age}: ${text}</p>` + log.innerHTML;
+    }
 
-        // Function to commit a crime
-        function commitCrime() {
-            if (!gameOver) {
-                const crimeChance = Math.random();
-                if (crimeChance < 0.5) {
-                    player.money -= 200;  // Fined for committing a crime
-                    alert("You got caught committing a crime! Fine: $200.");
-                } else {
-                    alert("You successfully committed a crime!");
-                }
-                document.getElementById("player-money").innerText = "$" + player.money;
-            }
-        }
+    function ageUp() {
+      player.age++;
+      player.health -= Math.floor(Math.random() * 5);
+      player.happiness += Math.floor(Math.random() * 3) - 1;
+      player.smarts += Math.floor(Math.random() * 2);
+      player.looks += Math.floor(Math.random() * 2) - 1;
+      player.health = Math.max(0, Math.min(100, player.health));
+      player.happiness = Math.max(0, Math.min(100, player.happiness));
+      const events = [
+        "You watched cartoons.",
+        "You took up painting.",
+        "You joined a soccer club.",
+        "You got into an argument.",
+        "You felt happy today."
+      ];
+      logEvent(events[Math.floor(Math.random() * events.length)]);
+      if (player.health <= 0) {
+        alert(`${player.name} has passed away at age ${player.age}.`);
+        localStorage.clear();
+        location.reload();
+      }
+      updateUI();
+    }
 
-        // Function to get married
-        function getMarried() {
-            if (!gameOver && !player.relationship) {
-                player.relationship = "Married to Jane Doe";
-                document.getElementById("player-relationship").innerText = player.relationship;
-                alert("You got married to Jane Doe!");
-            }
-        }
+    function goToSchool() {
+      if (player.age < 6) {
+        logEvent("You're too young for school.");
+        return;
+      }
+      const success = Math.random() < 0.8;
+      if (success) {
+        player.smarts += 2;
+        player.education = "In School";
+        logEvent(schoolEvents[Math.floor(Math.random() * schoolEvents.length)]);
+      } else {
+        logEvent("You skipped school.");
+      }
+      updateUI();
+    }
 
-        // Admin Panel Functions
-        function checkAdminPassword() {
-            const password = document.getElementById("admin-password").value;
-            if (password === "Noah") {
-                alert("Access granted to the Admin Panel.");
-                // Show hidden admin features here (you can add more admin actions)
-            } else {
-                alert("Incorrect password.");
-            }
-        }
+    function applyForJob() {
+      if (player.age < 18) {
+        logEvent("You're too young to work.");
+        return;
+      }
+      const job = jobs[Math.floor(Math.random() * jobs.length)];
+      player.career = job;
+      player.money += Math.floor(Math.random() * 500) + 500;
+      logEvent(`You got a job as a ${job}.`);
+      updateUI();
+    }
 
-        // Admin login functionality
-        document.addEventListener("DOMContentLoaded", function() {
-            // Show the admin panel for demo purposes (you can hide this part based on a condition)
-            document.getElementById("admin-panel").style.display = "block";
-        });
-    </script>
+    function commitCrime() {
+      const crime = crimes[Math.floor(Math.random() * crimes.length)];
+      const success = Math.random() < 0.4;
+      if (success) {
+        const earnings = Math.floor(Math.random() * 1000) + 200;
+        player.money += earnings;
+        logEvent(`You managed to ${crime} and made $${earnings}.`);
+      } else {
+        player.health -= 20;
+        player.happiness -= 15;
+        logEvent(`You were caught trying to ${crime} and got hurt.`);
+      }
+      updateUI();
+    }
+
+    function makeFriend() {
+      const outcomes = [
+        "You made a new friend.",
+        "You had a fight.",
+        "You felt lonely.",
+        "You went to a party.",
+        "You joined a club."
+      ];
+      logEvent(outcomes[Math.floor(Math.random() * outcomes.length)]);
+      player.happiness += Math.random() < 0.7 ? 5 : -5;
+      updateUI();
+    }
+
+    function saveGame() {
+      localStorage.setItem("bitlifeSave", JSON.stringify(player));
+      logEvent("Game saved.");
+    }
+
+    function loadGame() {
+      const saved = localStorage.getItem("bitlifeSave");
+      if (saved) {
+        player = JSON.parse(saved);
+        logEvent("Game loaded.");
+        updateUI();
+      } else {
+        alert("No save found.");
+      }
+    }
+
+    function showAdmin() {
+      const pw = prompt("Enter admin password:");
+      if (pw === "Noah") {
+        document.getElementById("admin-panel").style.display = "block";
+        logEvent("Admin access granted.");
+      } else {
+        alert("Incorrect password.");
+      }
+    }
+
+    function toggleTheme() {
+      document.body.classList.toggle("light");
+      document.querySelector(".theme-toggle").classList.toggle("bi-sun-fill");
+      document.querySelector(".theme-toggle").classList.toggle("bi-moon-fill");
+    }
+
+    function playClick() {
+      document.getElementById("click-sound").play();
+    }
+
+    // Drag admin panel
+    const panel = document.getElementById("admin-panel");
+    panel.onmousedown = function (event) {
+      let shiftX = event.clientX - panel.getBoundingClientRect().left;
+      let shiftY = event.clientY - panel.getBoundingClientRect().top;
+      document.body.append(panel);
+      moveAt(event.pageX, event.pageY);
+
+      function moveAt(pageX, pageY) {
+        panel.style.left = pageX - shiftX + 'px';
+        panel.style.top = pageY - shiftY + 'px';
+      }
+
+      function onMouseMove(event) {
+        moveAt(event.pageX, event.pageY);
+      }
+
+      document.addEventListener('mousemove', onMouseMove);
+
+      panel.onmouseup = function () {
+        document.removeEventListener('mousemove', onMouseMove);
+        panel.onmouseup = null;
+      };
+    };
+
+    panel.ondragstart = () => false;
+
+    // Init
+    document.getElementById("name").innerText = player.name;
+    updateUI();
+  </script>
 </body>
 </html>
