@@ -3,117 +3,247 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Mini BitLife</title>
+  <title>BitLife JS - Admin Version</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #222;
+      background: #111;
       color: white;
       padding: 20px;
-      max-width: 600px;
+      max-width: 800px;
       margin: auto;
     }
-    .stats {
+    .stats, .options, .admin-buttons {
       display: flex;
-      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
     }
     .log {
       margin-top: 20px;
-      background: #333;
+      background: #222;
       padding: 10px;
       border-radius: 5px;
       height: 200px;
       overflow-y: auto;
     }
     button {
-      margin-top: 10px;
       padding: 10px;
-      width: 100%;
       background: #4CAF50;
       border: none;
       color: white;
-      font-size: 16px;
+      font-size: 14px;
       cursor: pointer;
+      border-radius: 5px;
     }
     button:hover {
-      background: #45a049;
+      background: #3e8e41;
+    }
+    #admin-panel {
+      display: none;
+      margin-top: 20px;
+      border-top: 1px solid #444;
+      padding-top: 10px;
     }
   </style>
 </head>
 <body>
 
-  <h1>Mini BitLife</h1>
-  <div>
-    <strong>Name:</strong> <span id="name">Loading...</span><br>
-    <strong>Age:</strong> <span id="age">0</span>
-  </div>
+<h1>BitLife JS - Admin Edition</h1>
 
-  <div class="stats">
-    <div>❤️ Health: <span id="health">100</span></div>
-    <div>😊 Happiness: <span id="happiness">100</span></div>
-    <div>🧠 Smarts: <span id="smarts">50</span></div>
-    <div>😎 Looks: <span id="looks">50</span></div>
-  </div>
+<div>
+  <strong>Name:</strong> <span id="name">Loading...</span><br>
+  <strong>Age:</strong> <span id="age">0</span><br>
+  <strong>Education:</strong> <span id="education">None</span><br>
+  <strong>Career:</strong> <span id="career">Unemployed</span>
+</div>
 
+<div class="stats">
+  <div>❤️ Health: <span id="health">100</span></div>
+  <div>😊 Happiness: <span id="happiness">100</span></div>
+  <div>🧠 Smarts: <span id="smarts">50</span></div>
+  <div>😎 Looks: <span id="looks">50</span></div>
+  <div>💰 Money: $<span id="money">0</span></div>
+</div>
+
+<div class="options">
   <button onclick="ageUp()">Age Up</button>
+  <button onclick="goToSchool()">School</button>
+  <button onclick="applyForJob()">Get Job</button>
+  <button onclick="commitCrime()">Commit Crime</button>
+  <button onclick="makeFriend()">Make Friend</button>
+  <button onclick="saveGame()">💾 Save</button>
+  <button onclick="loadGame()">📂 Load</button>
+  <button onclick="showAdmin()">⚙️ Admin Panel</button>
+</div>
 
-  <div class="log" id="log"></div>
+<!-- Admin Panel -->
+<div id="admin-panel">
+  <h3>🔐 Admin Controls</h3>
+  <div class="admin-buttons">
+    <button onclick="player.age += 5; updateUI();">+5 Years</button>
+    <button onclick="player.money += 1000; updateUI();">+ $1000</button>
+    <button onclick="player.health = 100; updateUI();">Max Health</button>
+    <button onclick="player.happiness = 100; updateUI();">Max Happiness</button>
+    <button onclick="player.smarts = 100; updateUI();">Max Smarts</button>
+    <button onclick="player.looks = 100; updateUI();">Max Looks</button>
+    <button onclick="player.education = 'PhD'; updateUI();">Set Education: PhD</button>
+    <button onclick="player.career = 'CEO'; updateUI();">Set Career: CEO</button>
+    <button onclick="player.health = 0; updateUI();">Kill Character</button>
+    <button onclick="player.name = prompt('New name:'); updateUI();">Rename</button>
+    <button onclick="player.age = 0; updateUI();">Reset Age</button>
+    <button onclick="player.money = 0; updateUI();">Reset Money</button>
+    <button onclick="player.career = 'Unemployed'; updateUI();">Clear Job</button>
+    <button onclick="player.education = 'None'; updateUI();">Clear Education</button>
+    <button onclick="document.getElementById('log').innerHTML = '';">Clear Log</button>
+    <button onclick="commitCrime();">Simulate Crime</button>
+  </div>
+</div>
 
-  <script>
-    const names = ["Alex", "Jordan", "Taylor", "Morgan", "Casey", "Riley"];
-    const events = [
-      "You learned to walk.",
-      "You made a new friend.",
-      "You caught the flu.",
-      "You got an award at school.",
-      "You got into a fight.",
-      "You discovered a love for music.",
-      "You broke your arm.",
-      "You got a pet cat."
-    ];
+<div class="log" id="log"></div>
 
-    let age = 0;
-    let health = 100;
-    let happiness = 100;
-    let smarts = 50;
-    let looks = 50;
-    let name = names[Math.floor(Math.random() * names.length)];
+<script>
+  const names = ["Alex", "Jordan", "Taylor", "Morgan", "Casey", "Riley"];
+  const jobs = ["Cashier", "Janitor", "Software Dev", "Influencer", "Chef"];
+  const crimes = ["rob a store", "pickpocket someone", "steal a car"];
+  const schoolEvents = ["You passed a math test.", "You got detention.", "You made the honor roll."];
 
-    document.getElementById("name").innerText = name;
+  let player = {
+    name: names[Math.floor(Math.random() * names.length)],
+    age: 0,
+    health: 100,
+    happiness: 100,
+    smarts: 50,
+    looks: 50,
+    education: "None",
+    career: "Unemployed",
+    money: 0
+  };
 
-    function ageUp() {
-      age++;
-      document.getElementById("age").innerText = age;
-
-      // Random stat change
-      health -= Math.floor(Math.random() * 5);
-      happiness += Math.floor(Math.random() * 3) - 1;
-      smarts += Math.floor(Math.random() * 2);
-      looks += Math.floor(Math.random() * 2) - 1;
-
-      // Clamp stats
-      health = Math.max(0, Math.min(100, health));
-      happiness = Math.max(0, Math.min(100, happiness));
-      smarts = Math.max(0, Math.min(100, smarts));
-      looks = Math.max(0, Math.min(100, looks));
-
-      // Update UI
-      document.getElementById("health").innerText = health;
-      document.getElementById("happiness").innerText = happiness;
-      document.getElementById("smarts").innerText = smarts;
-      document.getElementById("looks").innerText = looks;
-
-      // Add random event
-      const event = events[Math.floor(Math.random() * events.length)];
-      const log = document.getElementById("log");
-      log.innerHTML = `<p>Age ${age}: ${event}</p>` + log.innerHTML;
-
-      // Check for death
-      if (health <= 0) {
-        alert(`${name} has died at age ${age}. Game over.`);
-        location.reload();
+  function updateUI() {
+    for (const key in player) {
+      if (document.getElementById(key)) {
+        document.getElementById(key).innerText = player[key];
       }
     }
-  </script>
+  }
+
+  function logEvent(text) {
+    const log = document.getElementById("log");
+    log.innerHTML = `<p>Age ${player.age}: ${text}</p>` + log.innerHTML;
+  }
+
+  function ageUp() {
+    player.age++;
+    player.health -= Math.floor(Math.random() * 5);
+    player.happiness += Math.floor(Math.random() * 3) - 1;
+    player.smarts += Math.floor(Math.random() * 2);
+    player.looks += Math.floor(Math.random() * 2) - 1;
+    player.health = Math.max(0, Math.min(100, player.health));
+    player.happiness = Math.max(0, Math.min(100, player.happiness));
+    const lifeEvents = [
+      "You watched cartoons.",
+      "You took up painting.",
+      "You joined a soccer club.",
+      "You got into an argument.",
+      "You felt happy today."
+    ];
+    logEvent(lifeEvents[Math.floor(Math.random() * lifeEvents.length)]);
+    if (player.health <= 0) {
+      alert(`${player.name} has passed away at age ${player.age}.`);
+      localStorage.clear();
+      location.reload();
+    }
+    updateUI();
+  }
+
+  function goToSchool() {
+    if (player.age < 6) {
+      logEvent("You're too young for school.");
+      return;
+    }
+    const success = Math.random() < 0.8;
+    if (success) {
+      player.smarts += 2;
+      player.education = "In School";
+      logEvent(schoolEvents[Math.floor(Math.random() * schoolEvents.length)]);
+    } else {
+      logEvent("You skipped school.");
+    }
+    updateUI();
+  }
+
+  function applyForJob() {
+    if (player.age < 18) {
+      logEvent("You're too young to work.");
+      return;
+    }
+    const job = jobs[Math.floor(Math.random() * jobs.length)];
+    player.career = job;
+    player.money += Math.floor(Math.random() * 500) + 500;
+    logEvent(`You got a job as a ${job} and earned some money!`);
+    updateUI();
+  }
+
+  function commitCrime() {
+    const crime = crimes[Math.floor(Math.random() * crimes.length)];
+    const success = Math.random() < 0.4;
+    if (success) {
+      const earnings = Math.floor(Math.random() * 1000) + 200;
+      player.money += earnings;
+      logEvent(`You managed to ${crime} and made $${earnings}.`);
+    } else {
+      player.health -= 20;
+      player.happiness -= 15;
+      logEvent(`You were caught trying to ${crime} and got beaten up.`);
+    }
+    updateUI();
+  }
+
+  function makeFriend() {
+    const outcomes = [
+      "You made a new friend at school.",
+      "You had a fight with someone.",
+      "You bonded with your sibling.",
+      "You joined a friend group.",
+      "You felt lonely today."
+    ];
+    const outcome = outcomes[Math.floor(Math.random() * outcomes.length)];
+    player.happiness += Math.random() < 0.7 ? 5 : -5;
+    logEvent(outcome);
+    updateUI();
+  }
+
+  function saveGame() {
+    localStorage.setItem("bitlifeSave", JSON.stringify(player));
+    logEvent("Game saved.");
+  }
+
+  function loadGame() {
+    const saved = localStorage.getItem("bitlifeSave");
+    if (saved) {
+      player = JSON.parse(saved);
+      logEvent("Game loaded.");
+      updateUI();
+    } else {
+      alert("No save found.");
+    }
+  }
+
+  function showAdmin() {
+    const password = prompt("Enter admin password:");
+    if (password === "supersecretadmin123") {
+      document.getElementById("admin-panel").style.display = "block";
+      logEvent("Admin access granted.");
+    } else {
+      alert("Incorrect password.");
+    }
+  }
+
+  // Init
+  document.getElementById("name").innerText = player.name;
+  updateUI();
+</script>
+
 </body>
 </html>
