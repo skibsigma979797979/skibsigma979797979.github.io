@@ -2,259 +2,118 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Checkpoint Platformer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mini BitLife</title>
   <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-      background: #111;
-      touch-action: none;
-    }
-    canvas {
-      display: block;
-      width: 100vw;
-      height: 100vh;
-    }
-    .controls {
-      position: absolute;
-      bottom: 10px;
-      width: 100%;
-      display: flex;
-      justify-content: center;
-      gap: 20px;
-    }
-    .btn {
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.1);
-      border: 2px solid #fff;
+    body {
+      font-family: Arial, sans-serif;
+      background: #222;
       color: white;
-      font-size: 24px;
+      padding: 20px;
+      max-width: 600px;
+      margin: auto;
+    }
+    .stats {
       display: flex;
-      align-items: center;
-      justify-content: center;
-      user-select: none;
+      justify-content: space-between;
+    }
+    .log {
+      margin-top: 20px;
+      background: #333;
+      padding: 10px;
+      border-radius: 5px;
+      height: 200px;
+      overflow-y: auto;
+    }
+    button {
+      margin-top: 10px;
+      padding: 10px;
+      width: 100%;
+      background: #4CAF50;
+      border: none;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #45a049;
     }
   </style>
 </head>
 <body>
-<canvas id="game"></canvas>
-<div class="controls">
-  <div class="btn" id="left">⬅</div>
-  <div class="btn" id="jump">⬆</div>
-  <div class="btn" id="right">➡</div>
-</div>
-<script>
-const canvas = document.getElementById('game');
-const ctx = canvas.getContext('2d');
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
 
-const keys = { left: false, right: false, jump: false };
-let levelIndex = 0;
+  <h1>Mini BitLife</h1>
+  <div>
+    <strong>Name:</strong> <span id="name">Loading...</span><br>
+    <strong>Age:</strong> <span id="age">0</span>
+  </div>
 
-const player = {
-  x: 100, y: 100, w: 40, h: 40,
-  vx: 0, vy: 0, speed: 5, jumping: false,
-  baseSpeed: 5
-};
+  <div class="stats">
+    <div>❤️ Health: <span id="health">100</span></div>
+    <div>😊 Happiness: <span id="happiness">100</span></div>
+    <div>🧠 Smarts: <span id="smarts">50</span></div>
+    <div>😎 Looks: <span id="looks">50</span></div>
+  </div>
 
-let lastCheckpoint = { x: 100, y: 100 };
+  <button onclick="ageUp()">Age Up</button>
 
-const gravity = 0.5;
-let platforms = [], coins = [], enemies = [], powerUps = [];
+  <div class="log" id="log"></div>
 
-const sfx = {
-  jump: new Audio('https://cdn.pixabay.com/audio/2021/08/04/audio_304c4d2821.mp3'),
-  coin: new Audio('https://cdn.pixabay.com/audio/2022/03/10/audio_74e9576b22.mp3'),
-  hit: new Audio('https://cdn.pixabay.com/audio/2021/08/04/audio_dbf6eb77be.mp3'),
-  win: new Audio('https://cdn.pixabay.com/audio/2022/03/15/audio_b9c9dbe7e3.mp3')
-};
+  <script>
+    const names = ["Alex", "Jordan", "Taylor", "Morgan", "Casey", "Riley"];
+    const events = [
+      "You learned to walk.",
+      "You made a new friend.",
+      "You caught the flu.",
+      "You got an award at school.",
+      "You got into a fight.",
+      "You discovered a love for music.",
+      "You broke your arm.",
+      "You got a pet cat."
+    ];
 
-function resetPlayer() {
-  player.x = lastCheckpoint.x;
-  player.y = lastCheckpoint.y;
-  player.vx = 0;
-  player.vy = 0;
-  player.speed = player.baseSpeed;
-}
+    let age = 0;
+    let health = 100;
+    let happiness = 100;
+    let smarts = 50;
+    let looks = 50;
+    let name = names[Math.floor(Math.random() * names.length)];
 
-function spawnLevel(index) {
-  platforms = [];
-  coins = [];
-  enemies = [];
-  powerUps = [];
+    document.getElementById("name").innerText = name;
 
-  let spacing = 250;
-  for (let i = 0; i < 5 + index; i++) {
-    let x = 150 * i + 100;
-    let y = canvas.height - (Math.random() * 200 + 100);
-    let isCheckpoint = i === 0 || Math.random() < 0.2;
-    platforms.push({ x, y, w: 150, h: 20, checkpoint: isCheckpoint });
-    if (isCheckpoint && i === 0) lastCheckpoint = { x: x + 40, y: y - 40 };
-    if (Math.random() < 0.7) coins.push({ x: x + 60, y: y - 30, collected: false });
-    if (Math.random() < 0.3) enemies.push({ x: x + 50, y: y - 40, w: 40, h: 40, dir: 1, speed: 2, range: [x + 30, x + 120] });
-    if (Math.random() < 0.2) powerUps.push({ x: x + 80, y: y - 20, used: false });
-  }
-  platforms.push({ x: 0, y: canvas.height - 40, w: canvas.width, h: 40, checkpoint: false });
-}
+    function ageUp() {
+      age++;
+      document.getElementById("age").innerText = age;
 
-function update() {
-  player.vx = 0;
-  if (keys.left) player.vx = -player.speed;
-  if (keys.right) player.vx = player.speed;
+      // Random stat change
+      health -= Math.floor(Math.random() * 5);
+      happiness += Math.floor(Math.random() * 3) - 1;
+      smarts += Math.floor(Math.random() * 2);
+      looks += Math.floor(Math.random() * 2) - 1;
 
-  player.vy += gravity;
-  player.x += player.vx;
-  player.y += player.vy;
+      // Clamp stats
+      health = Math.max(0, Math.min(100, health));
+      happiness = Math.max(0, Math.min(100, happiness));
+      smarts = Math.max(0, Math.min(100, smarts));
+      looks = Math.max(0, Math.min(100, looks));
 
-  let onGround = false;
-  for (let p of platforms) {
-    // Top collision
-    if (
-      player.x < p.x + p.w &&
-      player.x + player.w > p.x &&
-      player.y + player.h <= p.y + player.vy &&
-      player.y + player.h + player.vy > p.y
-    ) {
-      player.vy = 0;
-      player.y = p.y - player.h;
-      onGround = true;
-      player.jumping = false;
-      if (p.checkpoint) lastCheckpoint = { x: player.x, y: player.y };
-    }
+      // Update UI
+      document.getElementById("health").innerText = health;
+      document.getElementById("happiness").innerText = happiness;
+      document.getElementById("smarts").innerText = smarts;
+      document.getElementById("looks").innerText = looks;
 
-    // Bottom collision
-    if (
-      player.x < p.x + p.w &&
-      player.x + player.w > p.x &&
-      player.y >= p.y + p.h &&
-      player.y + player.vy < p.y + p.h
-    ) {
-      player.vy = 0;
-      player.y = p.y + p.h;
-    }
+      // Add random event
+      const event = events[Math.floor(Math.random() * events.length)];
+      const log = document.getElementById("log");
+      log.innerHTML = `<p>Age ${age}: ${event}</p>` + log.innerHTML;
 
-    // Left/Right collision
-    if (
-      player.y + player.h > p.y &&
-      player.y < p.y + p.h
-    ) {
-      if (
-        player.x + player.w <= p.x &&
-        player.x + player.w + player.vx > p.x
-      ) {
-        player.vx = 0;
-        player.x = p.x - player.w;
-      } else if (
-        player.x >= p.x + p.w &&
-        player.x + player.vx < p.x + p.w
-      ) {
-        player.vx = 0;
-        player.x = p.x + p.w;
+      // Check for death
+      if (health <= 0) {
+        alert(`${name} has died at age ${age}. Game over.`);
+        location.reload();
       }
     }
-  }
-
-  if (keys.jump && !player.jumping && onGround) {
-    player.vy = -12;
-    player.jumping = true;
-    sfx.jump.play();
-  }
-
-  for (let coin of coins) {
-    if (!coin.collected && player.x < coin.x + 20 && player.x + player.w > coin.x && player.y < coin.y + 20 && player.y + player.h > coin.y) {
-      coin.collected = true;
-      sfx.coin.play();
-    }
-  }
-
-  for (let enemy of enemies) {
-    enemy.x += enemy.dir * enemy.speed;
-    if (enemy.x < enemy.range[0] || enemy.x > enemy.range[1]) enemy.dir *= -1;
-    if (
-      player.x < enemy.x + enemy.w &&
-      player.x + player.w > enemy.x &&
-      player.y < enemy.y + enemy.h &&
-      player.y + player.h > enemy.y
-    ) {
-      sfx.hit.play();
-      resetPlayer();
-    }
-  }
-
-  for (let pu of powerUps) {
-    if (!pu.used && player.x < pu.x + 20 && player.x + player.w > pu.x && player.y < pu.y + 20 && player.y + player.h > pu.y) {
-      pu.used = true;
-      player.speed = 10;
-      setTimeout(() => player.speed = player.baseSpeed, 3000);
-    }
-  }
-
-  if (coins.every(c => c.collected)) {
-    levelIndex++;
-    sfx.win.play();
-    spawnLevel(levelIndex);
-    resetPlayer();
-  }
-}
-
-function draw() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.fillStyle = '#61dafb';
-  ctx.fillRect(player.x, player.y, player.w, player.h);
-
-  ctx.fillStyle = '#fff';
-  for (let p of platforms) {
-    ctx.fillRect(p.x, p.y, p.w, p.h);
-    if (p.checkpoint) {
-      ctx.fillStyle = 'cyan';
-      ctx.fillRect(p.x + p.w / 2 - 5, p.y - 30, 10, 30);
-      ctx.fillStyle = '#fff';
-    }
-  }
-
-  ctx.fillStyle = 'gold';
-  for (let coin of coins) if (!coin.collected) ctx.fillRect(coin.x, coin.y, 20, 20);
-
-  ctx.fillStyle = 'red';
-  for (let enemy of enemies) ctx.fillRect(enemy.x, enemy.y, enemy.w, enemy.h);
-
-  ctx.fillStyle = 'lime';
-  for (let pu of powerUps) if (!pu.used) ctx.fillRect(pu.x, pu.y, 20, 20);
-
-  ctx.fillStyle = '#fff';
-  ctx.font = '16px sans-serif';
-  ctx.fillText('Level: ' + (levelIndex + 1), 10, 20);
-}
-
-function gameLoop() {
-  update();
-  draw();
-  requestAnimationFrame(gameLoop);
-}
-
-spawnLevel(levelIndex);
-gameLoop();
-
-['left','right','jump'].forEach(id => {
-  document.getElementById(id).ontouchstart = () => keys[id] = true;
-  document.getElementById(id).ontouchend = () => keys[id] = false;
-});
-
-window.addEventListener('keydown', e => {
-  if (e.key === 'ArrowLeft') keys.left = true;
-  if (e.key === 'ArrowRight') keys.right = true;
-  if (e.key === 'ArrowUp') keys.jump = true;
-});
-window.addEventListener('keyup', e => {
-  if (e.key === 'ArrowLeft') keys.left = false;
-  if (e.key === 'ArrowRight') keys.right = false;
-  if (e.key === 'ArrowUp') keys.jump = false;
-});
-</script>
+  </script>
 </body>
 </html>
